@@ -1,0 +1,7 @@
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+pydantic==2.9.2
+python-dotenv==1.0.1
+psycopg2-binary==2.9.12   # PostgreSQL 연결 (RAG-0)
+openai==2.21.0            # 질문 임베딩·답변 생성 (RAG-3, RAG-6)
+# pgvector 는 DB 확장이라 파이썬 패키지 불필요 (SQL 로 사용)

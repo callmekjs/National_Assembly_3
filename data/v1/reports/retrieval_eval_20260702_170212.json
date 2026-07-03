@@ -1,0 +1,247 @@
+{
+ "generated_at": "2026-07-02T17:00:44",
+ "n_questions": 18,
+ "k": 10,
+ "modes": {
+  "keyword": {
+   "recall@5": 0.944,
+   "recall@10": 0.944,
+   "mrr@10": 0.858,
+   "details": [
+    {
+     "q": "티메프 사태 피해자 구제 대책",
+     "first_relevant_rank": 1
+    },
+    {
+     "q": "AI 기본법의 핵심 쟁점",
+     "first_relevant_rank": 1
+    },
+    {
+     "q": "단통법 폐지 논의",
+     "first_relevant_rank": 1
+    },
+    {
+     "q": "전세사기 피해자 지원 대책",
+     "first_relevant_rank": 1
+    },
+    {
+     "q": "중대재해처벌법 적용 문제",
+     "first_relevant_rank": 1
+    },
+    {
+     "q": "딥페이크 성범죄 대응",
+     "first_relevant_rank": 1
+    },
+    {
+     "q": "유영하 위원의 질의",
+     "first_relevant_rank": 1
+    },
+    {
+     "q": "이진숙 방송통신위원장 후보자 인사청문회 발언",
+     "first_relevant_rank": 1
+    },
+    {
+     "q": "김선호 국방부장관 직무대행의 답변",
+     "first_relevant_rank": 1
+    },
+    {
+     "q": "조지호 경찰청장 발언",
+     "first_relevant_rank": 1
+    },
+    {
+     "q": "공영방송 지배구조 개선 논의",
+     "first_relevant_rank": 1
+    },
+    {
+     "q": "병사 월급 인상과 처우 개선",
+     "first_relevant_rank": null
+    },
+    {
+     "q": "R&D 예산 삭감 논란",
+     "first_relevant_rank": 4
+    },
+    {
+     "q": "가상자산 이용자 보호 방안",
+     "first_relevant_rank": 1
+    },
+    {
+     "q": "비상계엄 당시 경찰의 대응",
+     "first_relevant_rank": 5
+    },
+    {
+     "q": "쿠팡 물류센터 노동 환경 문제",
+     "first_relevant_rank": 1
+    },
+    {
+     "q": "선관위 채용 특혜 의혹",
+     "first_relevant_rank": 1
+    },
+    {
+     "q": "국세청 세무조사 남용 지적",
+     "first_relevant_rank": 1
+    }
+   ],
+   "elapsed_sec": 31.1
+  },
+  "vector": {
+   "recall@5": 0.611,
+   "recall@10": 0.722,
+   "mrr@10": 0.526,
+   "details": [
+    {
+     "q": "티메프 사태 피해자 구제 대책",
+     "first_relevant_rank": 2
+    },
+    {
+     "q": "AI 기본법의 핵심 쟁점",
+     "first_relevant_rank": 10
+    },
+    {
+     "q": "단통법 폐지 논의",
+     "first_relevant_rank": 1
+    },
+    {
+     "q": "전세사기 피해자 지원 대책",
+     "first_relevant_rank": 1
+    },
+    {
+     "q": "중대재해처벌법 적용 문제",
+     "first_relevant_rank": null
+    },
+    {
+     "q": "딥페이크 성범죄 대응",
+     "first_relevant_rank": 1
+    },
+    {
+     "q": "유영하 위원의 질의",
+     "first_relevant_rank": null
+    },
+    {
+     "q": "이진숙 방송통신위원장 후보자 인사청문회 발언",
+     "first_relevant_rank": 1
+    },
+    {
+     "q": "김선호 국방부장관 직무대행의 답변",
+     "first_relevant_rank": null
+    },
+    {
+     "q": "조지호 경찰청장 발언",
+     "first_relevant_rank": 1
+    },
+    {
+     "q": "공영방송 지배구조 개선 논의",
+     "first_relevant_rank": 1
+    },
+    {
+     "q": "병사 월급 인상과 처우 개선",
+     "first_relevant_rank": 8
+    },
+    {
+     "q": "R&D 예산 삭감 논란",
+     "first_relevant_rank": 1
+    },
+    {
+     "q": "가상자산 이용자 보호 방안",
+     "first_relevant_rank": 1
+    },
+    {
+     "q": "비상계엄 당시 경찰의 대응",
+     "first_relevant_rank": 2
+    },
+    {
+     "q": "쿠팡 물류센터 노동 환경 문제",
+     "first_relevant_rank": null
+    },
+    {
+     "q": "선관위 채용 특혜 의혹",
+     "first_relevant_rank": 4
+    },
+    {
+     "q": "국세청 세무조사 남용 지적",
+     "first_relevant_rank": null
+    }
+   ],
+   "elapsed_sec": 17.3
+  },
+  "hybrid": {
+   "recall@5": 1.0,
+   "recall@10": 1.0,
+   "mrr@10": 0.944,
+   "details": [
+    {
+     "q": "티메프 사태 피해자 구제 대책",
+     "first_relevant_rank": 1
+    },
+    {
+     "q": "AI 기본법의 핵심 쟁점",
+     "first_relevant_rank": 1
+    },
+    {
+     "q": "단통법 폐지 논의",
+     "first_relevant_rank": 1
+    },
+    {
+     "q": "전세사기 피해자 지원 대책",
+     "first_relevant_rank": 1
+    },
+    {
+     "q": "중대재해처벌법 적용 문제",
+     "first_relevant_rank": 1
+    },
+    {
+     "q": "딥페이크 성범죄 대응",
+     "first_relevant_rank": 1
+    },
+    {
+     "q": "유영하 위원의 질의",
+     "first_relevant_rank": 1
+    },
+    {
+     "q": "이진숙 방송통신위원장 후보자 인사청문회 발언",
+     "first_relevant_rank": 1
+    },
+    {
+     "q": "김선호 국방부장관 직무대행의 답변",
+     "first_relevant_rank": 1
+    },
+    {
+     "q": "조지호 경찰청장 발언",
+     "first_relevant_rank": 1
+    },
+    {
+     "q": "공영방송 지배구조 개선 논의",
+     "first_relevant_rank": 2
+    },
+    {
+     "q": "병사 월급 인상과 처우 개선",
+     "first_relevant_rank": 1
+    },
+    {
+     "q": "R&D 예산 삭감 논란",
+     "first_relevant_rank": 1
+    },
+    {
+     "q": "가상자산 이용자 보호 방안",
+     "first_relevant_rank": 1
+    },
+    {
+     "q": "비상계엄 당시 경찰의 대응",
+     "first_relevant_rank": 1
+    },
+    {
+     "q": "쿠팡 물류센터 노동 환경 문제",
+     "first_relevant_rank": 1
+    },
+    {
+     "q": "선관위 채용 특혜 의혹",
+     "first_relevant_rank": 1
+    },
+    {
+     "q": "국세청 세무조사 남용 지적",
+     "first_relevant_rank": 2
+    }
+   ],
+   "elapsed_sec": 40.0
+  }
+ }
+}

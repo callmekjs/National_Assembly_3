@@ -1,0 +1,860 @@
+{
+ "version": "v2",
+ "created": "2026-07-02",
+ "note": "\uac80\uc0c9 \ud3c9\uac00\uc14b 63\ubb38\ud56d = \uc790\uccb4 18 + prototype 75\ubb38\ud56d\uc5d0\uc11c \uc774\uc2dd 45. \uc720\ud615 \uccb4\uacc4\ub294 prototype \uacc4\uc2b9. \uc815\ub2f5\uc740 \uae30\uc900(criteria) \ubc29\uc2dd \u2014 chunk_id \uc7ac\ubc30\uc5f4\uc5d0\ub3c4 \uc720\ud6a8. \ud55c\uc790\ub294 \\u \uc774\uc2a4\ucf00\uc774\ud504(DB\ub294 \ud638\ud658\uc6a9 \ud55c\uc790). unanswerable\uc740 \ubc18\uc804 \ucc44\uc810(\uae30\uc900 \uc77c\uce58 0\uac74\uc774\uba74 \ud1b5\uacfc).",
+ "questions": [
+  {
+   "id": "r001",
+   "type": "proper_noun",
+   "q": "\ud2f0\uba54\ud504 \uc0ac\ud0dc \ud53c\ud574\uc790 \uad6c\uc81c \ub300\ucc45",
+   "criteria": {
+    "text_any": [
+     "\ud2f0\uba54\ud504",
+     "\ud2f0\ubaac",
+     "\uc704\uba54\ud504"
+    ]
+   }
+  },
+  {
+   "id": "r002",
+   "type": "proper_noun",
+   "q": "AI \uae30\ubcf8\ubc95\uc758 \ud575\uc2ec \uc7c1\uc810",
+   "criteria": {
+    "text_any": [
+     "AI \uae30\ubcf8\ubc95",
+     "AI\uae30\ubcf8\ubc95",
+     "\uc778\uacf5\uc9c0\ub2a5\uae30\ubcf8\ubc95",
+     "\uc778\uacf5\uc9c0\ub2a5 \uae30\ubcf8\ubc95"
+    ]
+   }
+  },
+  {
+   "id": "r003",
+   "type": "proper_noun",
+   "q": "\ub2e8\ud1b5\ubc95 \ud3d0\uc9c0 \ub17c\uc758",
+   "criteria": {
+    "text_any": [
+     "\ub2e8\ud1b5\ubc95",
+     "\ub2e8\ub9d0\uae30\uc720\ud1b5\ubc95",
+     "\uc774\ub3d9\ud1b5\uc2e0\ub2e8\ub9d0\uc7a5\uce58"
+    ]
+   }
+  },
+  {
+   "id": "r004",
+   "type": "proper_noun",
+   "q": "\uc804\uc138\uc0ac\uae30 \ud53c\ud574\uc790 \uc9c0\uc6d0 \ub300\ucc45",
+   "criteria": {
+    "text_any": [
+     "\uc804\uc138\uc0ac\uae30"
+    ]
+   }
+  },
+  {
+   "id": "r005",
+   "type": "proper_noun",
+   "q": "\uc911\ub300\uc7ac\ud574\ucc98\ubc8c\ubc95 \uc801\uc6a9 \ubb38\uc81c",
+   "criteria": {
+    "text_any": [
+     "\uc911\ub300\uc7ac\ud574"
+    ]
+   }
+  },
+  {
+   "id": "r006",
+   "type": "proper_noun",
+   "q": "\ub525\ud398\uc774\ud06c \uc131\ubc94\uc8c4 \ub300\uc751",
+   "criteria": {
+    "text_any": [
+     "\ub525\ud398\uc774\ud06c"
+    ]
+   }
+  },
+  {
+   "id": "r007",
+   "type": "person",
+   "q": "\uc720\uc601\ud558 \uc704\uc6d0\uc758 \uc9c8\uc758",
+   "criteria": {
+    "speaker_any": [
+     "\uf9c9\u69ae\u590f"
+    ]
+   }
+  },
+  {
+   "id": "r008",
+   "type": "person",
+   "q": "\uc774\uc9c4\uc219 \ubc29\uc1a1\ud1b5\uc2e0\uc704\uc6d0\uc7a5 \ud6c4\ubcf4\uc790 \uc778\uc0ac\uccad\ubb38\ud68c \ubc1c\uc5b8",
+   "criteria": {
+    "speaker_any": [
+     "\uc774\uc9c4\uc219"
+    ]
+   }
+  },
+  {
+   "id": "r009",
+   "type": "person",
+   "q": "\uae40\uc120\ud638 \uad6d\ubc29\ubd80\uc7a5\uad00 \uc9c1\ubb34\ub300\ud589\uc758 \ub2f5\ubcc0",
+   "criteria": {
+    "speaker_any": [
+     "\uae40\uc120\ud638"
+    ]
+   }
+  },
+  {
+   "id": "r010",
+   "type": "person",
+   "q": "\uc870\uc9c0\ud638 \uacbd\ucc30\uccad\uc7a5 \ubc1c\uc5b8",
+   "criteria": {
+    "speaker_any": [
+     "\uc870\uc9c0\ud638"
+    ]
+   }
+  },
+  {
+   "id": "r011",
+   "type": "topic",
+   "q": "\uacf5\uc601\ubc29\uc1a1 \uc9c0\ubc30\uad6c\uc870 \uac1c\uc120 \ub17c\uc758",
+   "criteria": {
+    "text_any": [
+     "\uacf5\uc601\ubc29\uc1a1 \uc9c0\ubc30\uad6c\uc870",
+     "\ubc29\ubb38\uc9c4",
+     "\ubc29\uc1a1\ubb38\ud654\uc9c4\ud765\ud68c",
+     "KBS \uc774\uc0ac"
+    ]
+   }
+  },
+  {
+   "id": "r012",
+   "type": "topic",
+   "q": "\ubcd1\uc0ac \uc6d4\uae09 \uc778\uc0c1\uacfc \ucc98\uc6b0 \uac1c\uc120",
+   "criteria": {
+    "text_any": [
+     "\ubcd1\uc0ac \uc6d4\uae09",
+     "\ubcd1 \ubd09\uae09",
+     "\ubcd1\uc0ac \ubd09\uae09",
+     "\ubcd1\uc7a5 \uc6d4\uae09"
+    ]
+   }
+  },
+  {
+   "id": "r013",
+   "type": "topic",
+   "q": "R&D \uc608\uc0b0 \uc0ad\uac10 \ub17c\ub780",
+   "criteria": {
+    "text_any": [
+     "R&D",
+     "\uc5f0\uad6c\uac1c\ubc1c"
+    ],
+    "text_all": [
+     [
+      "\uc0ad\uac10",
+      "\uac10\uc561",
+      "\ucd95\uc18c"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "r014",
+   "type": "topic",
+   "q": "\uac00\uc0c1\uc790\uc0b0 \uc774\uc6a9\uc790 \ubcf4\ud638 \ubc29\uc548",
+   "criteria": {
+    "text_any": [
+     "\uac00\uc0c1\uc790\uc0b0",
+     "\uc554\ud638\ud654\ud3d0",
+     "\ucf54\uc778"
+    ]
+   }
+  },
+  {
+   "id": "r015",
+   "type": "mixed",
+   "q": "\ube44\uc0c1\uacc4\uc5c4 \ub2f9\uc2dc \uacbd\ucc30\uc758 \ub300\uc751",
+   "criteria": {
+    "text_any": [
+     "\uacc4\uc5c4"
+    ],
+    "text_all": [
+     [
+      "\uacbd\ucc30"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "r016",
+   "type": "mixed",
+   "q": "\ucfe0\ud321 \ubb3c\ub958\uc13c\ud130 \ub178\ub3d9 \ud658\uacbd \ubb38\uc81c",
+   "criteria": {
+    "text_any": [
+     "\ucfe0\ud321"
+    ],
+    "text_all": [
+     [
+      "\ubb3c\ub958",
+      "\ub178\ub3d9",
+      "\uc0b0\uc7ac",
+      "\ud0dd\ubc30",
+      "\uc0c8\ubcbd"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "r017",
+   "type": "mixed",
+   "q": "\uc120\uad00\uc704 \ucc44\uc6a9 \ud2b9\ud61c \uc758\ud639",
+   "criteria": {
+    "text_any": [
+     "\uc120\uad00\uc704",
+     "\uc120\uac70\uad00\ub9ac\uc704\uc6d0\ud68c"
+    ],
+    "text_all": [
+     [
+      "\ucc44\uc6a9",
+      "\ud2b9\ud61c",
+      "\uc790\ub140"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "r018",
+   "type": "mixed",
+   "q": "\uad6d\uc138\uccad \uc138\ubb34\uc870\uc0ac \ub0a8\uc6a9 \uc9c0\uc801",
+   "criteria": {
+    "text_any": [
+     "\uad6d\uc138\uccad"
+    ],
+    "text_all": [
+     [
+      "\uc138\ubb34\uc870\uc0ac",
+      "\uc870\uc0ac\uad8c"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "r019",
+   "type": "person",
+   "q": "\uc870\ud0dc\uc5f4 \uc7a5\uad00\uc740 \ud2b8\ub7fc\ud504 2\uae30 \ucd9c\ubc94\uc5d0 \ub300\ud574 \uc5b4\ub5a4 \uc678\uad50\uc801 \uc900\ube44\ub97c \uc5b8\uae09\ud588\ub098\uc694?",
+   "criteria": {
+    "speaker_any": [
+     "\uc870\ud0dc\uc5f4"
+    ],
+    "text_any": [
+     "\ud2b8\ub7fc\ud504"
+    ],
+    "mode": "and"
+   }
+  },
+  {
+   "id": "r020",
+   "type": "person",
+   "q": "\ud64d\uae30\uc6d0 \uc704\uc6d0\uc740 \uc624\ubb3c\ud48d\uc120 \ubb38\uc81c\uc5d0 \ub300\ud574 \uc5b4\ub5a4 \uc785\uc7a5\uc744 \ubcf4\uc600\ub098\uc694?",
+   "criteria": {
+    "speaker_any": [
+     "\ud64d\uae30\uc6d0"
+    ],
+    "text_any": [
+     "\uc624\ubb3c\ud48d\uc120",
+     "\ud48d\uc120"
+    ],
+    "mode": "and"
+   }
+  },
+  {
+   "id": "r021",
+   "type": "person",
+   "q": "\uae40\uc900\ud615 \uc704\uc6d0\uc740 \ud55c\uad6d \uc678\uad50 \uc815\ucc45\uc5d0 \ub300\ud574 \uc5b4\ub5a4 \ube44\ud310\uc801 \uc758\uacac\uc744 \uc81c\uc2dc\ud588\ub098\uc694?",
+   "criteria": {
+    "speaker_any": [
+     "\uae40\uc900\ud615"
+    ],
+    "committee_any": [
+     "\uc678\ud1b5\uc704"
+    ]
+   }
+  },
+  {
+   "id": "r022",
+   "type": "person",
+   "q": "\uc724\ud6c4\ub355 \uc704\uc6d0\uc740 \uc7ac\uc678\uad6d\ubbfc \ubcf4\ud638\uc640 \uad00\ub828\ud574 \uc5b4\ub5a4 \uc9c8\ubb38\uc774\ub098 \uc8fc\uc7a5\uc744 \ud588\ub098\uc694?",
+   "criteria": {
+    "speaker_any": [
+     "\uc724\ud6c4\ub355"
+    ],
+    "text_any": [
+     "\uc7ac\uc678\uad6d\ubbfc"
+    ],
+    "mode": "and"
+   }
+  },
+  {
+   "id": "r023",
+   "type": "person",
+   "q": "\uc870\ud604 \uc678\uad50\ubd80\uc7a5\uad00\uc740 \ud55c\ubbf8\ub3d9\ub9f9\uc5d0 \ub300\ud574 \uc5b4\ub5a4 \uc6d0\uce59\uacfc \uc785\uc7a5\uc744 \ubc1d\ud614\ub098\uc694?",
+   "criteria": {
+    "speaker_any": [
+     "\uc870\ud604"
+    ],
+    "text_any": [
+     "\ud55c\ubbf8\ub3d9\ub9f9",
+     "\ub3d9\ub9f9"
+    ],
+    "mode": "and"
+   }
+  },
+  {
+   "id": "r024",
+   "type": "person",
+   "q": "\uc774\uc7ac\uac15 \uc704\uc6d0\uc740 \ub300\ubd81\uc804\ub2e8 \uc0b4\ud3ec \ubb38\uc81c\uc5d0 \ub300\ud574 \uc5b4\ub5a4 \uc785\uc7a5\uc744 \ucde8\ud588\ub098\uc694?",
+   "criteria": {
+    "speaker_any": [
+     "\uc774\uc7ac\uac15"
+    ],
+    "text_any": [
+     "\ub300\ubd81\uc804\ub2e8",
+     "\uc804\ub2e8"
+    ],
+    "mode": "and"
+   }
+  },
+  {
+   "id": "r025",
+   "type": "person",
+   "q": "\uc815\ub3d9\uc601 \ud1b5\uc77c\ubd80\uc7a5\uad00\uc740 \ub0a8\ubd81 \ub300\ud654 \uac00\ub2a5\uc131\uc5d0 \ub300\ud574 \uc5b4\ub5a4 \uc785\uc7a5\uc744 \ubc1d\ud614\ub098\uc694?",
+   "criteria": {
+    "speaker_any": [
+     "\uc815\ub3d9\uc601"
+    ],
+    "text_any": [
+     "\ub0a8\ubd81",
+     "\ub300\ud654"
+    ],
+    "mode": "and"
+   }
+  },
+  {
+   "id": "r026",
+   "type": "person",
+   "q": "\uae40\uc601\ubc30 \uc18c\uc704\uc6d0\uc7a5\uc774 \uc678\uad50 \ud604\uc548\uacfc \uad00\ub828\ud574 \uc5b4\ub5a4 \ubc1c\uc5b8\uc744 \ud588\ub098\uc694?",
+   "criteria": {
+    "speaker_any": [
+     "\uae40\uc601\ubc30"
+    ],
+    "committee_any": [
+     "\uc678\ud1b5\uc704"
+    ]
+   }
+  },
+  {
+   "id": "r027",
+   "type": "person",
+   "q": "\ud55c\uc815\uc560 \uc704\uc6d0\uc740 \uc678\uad50 \ud604\uc548\uacfc \uad00\ub828\ud574 \uc5b4\ub5a4 \uc8fc\uc7a5\uc774\ub098 \uc9c8\uc758\ub97c \ud588\ub098\uc694?",
+   "criteria": {
+    "speaker_any": [
+     "\ud55c\uc815\uc560"
+    ],
+    "committee_any": [
+     "\uc678\ud1b5\uc704"
+    ]
+   }
+  },
+  {
+   "id": "r028",
+   "type": "person",
+   "q": "\uc774\uc6a9\uc120 \uc704\uc6d0\uc740 \ubbf8\uad6d\uacfc\uc758 \ud1b5\uc0c1 \ub610\ub294 \uc678\uad50 \ubb38\uc81c\uc5d0 \ub300\ud574 \uc5b4\ub5a4 \uc785\uc7a5\uc744 \ubcf4\uc600\ub098\uc694?",
+   "criteria": {
+    "speaker_any": [
+     "\uc774\uc6a9\uc120"
+    ],
+    "text_any": [
+     "\ubbf8\uad6d",
+     "\ud1b5\uc0c1",
+     "\uad00\uc138"
+    ],
+    "mode": "and"
+   }
+  },
+  {
+   "id": "r029",
+   "type": "person",
+   "q": "\uae40\ud604\uc815 \uc704\uc6d0\uc740 \uc740\ud589\uc758 \uacfc\ub3c4\ud55c \uc774\uc775\uacfc \uae08\ub9ac \uc815\ucc45\uc5d0 \ub300\ud574 \uc5b4\ub5a4 \ube44\ud310\uc801 \ubc1c\uc5b8\uc744 \ud588\ub098\uc694?",
+   "criteria": {
+    "speaker_any": [
+     "\uae40\ud604\uc815"
+    ],
+    "text_any": [
+     "\uc740\ud589",
+     "\uae08\ub9ac"
+    ],
+    "mode": "and"
+   }
+  },
+  {
+   "id": "r030",
+   "type": "person",
+   "q": "\uc774\uc815\ubb38 \uc18c\uc704\uc6d0\uc7a5\uc740 \uad11\ubcf5\ud68c \uc608\uc0b0 \uc0ad\uac10 \ubb38\uc81c\uc5d0 \ub300\ud574 \uc5b4\ub5a4 \ubc1c\uc5b8\uc744 \ud588\ub098\uc694?",
+   "criteria": {
+    "speaker_any": [
+     "\uc774\uc815\ubb38"
+    ],
+    "text_any": [
+     "\uad11\ubcf5\ud68c"
+    ],
+    "mode": "and"
+   }
+  },
+  {
+   "id": "r031",
+   "type": "person",
+   "q": "\uae40\ub0a8\uadfc \uc704\uc6d0\uc740 \uc815\ubb34\uc704\uc6d0\ud68c\uc5d0\uc11c \uc5b4\ub5a4 \uae08\uc735 \ub610\ub294 \uacf5\uc815\uac70\ub798 \uad00\ub828 \uc8fc\uc7a5\uc744 \ud588\ub098\uc694?",
+   "criteria": {
+    "speaker_any": [
+     "\uae40\ub0a8\uadfc"
+    ],
+    "text_any": [
+     "\uae08\uc735",
+     "\uacf5\uc815\uac70\ub798",
+     "\uc740\ud589"
+    ],
+    "mode": "and"
+   }
+  },
+  {
+   "id": "r032",
+   "type": "person",
+   "q": "\ucd5c\ud615\ub450 \uc704\uc6d0\uc740 SKT \uc720\uc2ec \ud574\ud0b9 \uc0ac\ud0dc\uc5d0 \ub300\ud574 \uc5b4\ub5a4 \ubc1c\uc5b8\uc774\ub098 \uc9c0\uc801\uc744 \ud588\ub098\uc694?",
+   "criteria": {
+    "speaker_any": [
+     "\ucd5c\ud615\ub450"
+    ],
+    "text_any": [
+     "\uc720\uc2ec",
+     "SKT",
+     "\ud574\ud0b9"
+    ],
+    "mode": "and"
+   }
+  },
+  {
+   "id": "r033",
+   "type": "person",
+   "q": "\uc774\ud6c8\uae30 \uc704\uc6d0\uc774 SKT\uc758 \uc815\ubcf4\ubcf4\ud638 \ud22c\uc790\uc640 \uad00\ub828\ud574 \uc81c\uae30\ud55c \ubb38\uc81c\uc810\uc740 \ubb34\uc5c7\uc778\uac00\uc694?",
+   "criteria": {
+    "speaker_any": [
+     "\uc774\ud6c8\uae30"
+    ],
+    "text_any": [
+     "\uc815\ubcf4\ubcf4\ud638",
+     "\uc720\uc2ec",
+     "\ud574\ud0b9",
+     "SKT"
+    ],
+    "mode": "and"
+   }
+  },
+  {
+   "id": "r034",
+   "type": "topic",
+   "q": "\ubc29\uc1a1\ud1b5\uc2e0\uc704\uc6d0\uc7a5 \ud6c4\ubcf4\uc790 \uc778\uc0ac\uccad\ubb38\ud68c\uc5d0\uc11c \uc704\uc6d0\ub4e4\uc774 \uc81c\uae30\ud55c \uc8fc\uc694 \uc7c1\uc810\uc740 \ubb34\uc5c7\uc774\uc5c8\ub098\uc694?",
+   "criteria": {
+    "text_any": [
+     "\uccad\ubb38"
+    ],
+    "committee_any": [
+     "\uacfc\ubc29\uc704"
+    ]
+   }
+  },
+  {
+   "id": "r035",
+   "type": "topic",
+   "q": "SKT \uc720\uc2ec \ud574\ud0b9 \uc0ac\ud0dc\uc5d0 \ub300\ud574 \uacfc\ud559\uae30\uc220\uc815\ubcf4\ubc29\uc1a1\ud1b5\uc2e0\uc704\uc6d0\ud68c\uc5d0\uc11c \uc5b4\ub5a4 \ub17c\uc758\uac00 \uc788\uc5c8\ub098\uc694?",
+   "criteria": {
+    "text_any": [
+     "\uc720\uc2ec"
+    ],
+    "committee_any": [
+     "\uacfc\ubc29\uc704"
+    ]
+   }
+  },
+  {
+   "id": "r036",
+   "type": "topic",
+   "q": "\uae30\uc5c5\uc740\ud589 \uc9c1\uc6d0 \ud30c\uc5c5 \ubc0f \uc784\uae08 \ubb38\uc81c\uc5d0 \ub300\ud574 \uc815\ubb34\uc704\uc6d0\ud68c\uc5d0\uc11c \uc5b4\ub5a4 \ub17c\uc758\uac00 \uc788\uc5c8\ub098\uc694?",
+   "criteria": {
+    "text_any": [
+     "\uae30\uc5c5\uc740\ud589"
+    ],
+    "text_all": [
+     [
+      "\ud30c\uc5c5",
+      "\uc784\uae08",
+      "\ubcf4\uc218"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "r037",
+   "type": "topic",
+   "q": "\ube44\ud575\ud654\uc5d0 \ub300\ud55c \uc678\uad50\ud1b5\uc77c\uc704\uc6d0\ud68c\uc758 \ub17c\uc758 \ub0b4\uc6a9\uc744 \uc694\uc57d\ud574 \uc8fc\uc138\uc694.",
+   "criteria": {
+    "text_any": [
+     "\ube44\ud575\ud654"
+    ],
+    "committee_any": [
+     "\uc678\ud1b5\uc704"
+    ]
+   }
+  },
+  {
+   "id": "r038",
+   "type": "topic",
+   "q": "\ub300\ubd81\uc804\ub2e8 \uc0b4\ud3ec\uc5d0 \ub300\ud55c \uc815\ubd80\uc758 \uc785\uc7a5\uacfc \uc758\ud68c\uc758 \ubc18\uc751\uc740 \uc5b4\ub5a0\ud588\ub098\uc694?",
+   "criteria": {
+    "text_any": [
+     "\ub300\ubd81\uc804\ub2e8",
+     "\uc804\ub2e8 \uc0b4\ud3ec"
+    ]
+   }
+  },
+  {
+   "id": "r039",
+   "type": "topic",
+   "q": "\uc7ac\uc678\uad6d\ubbfc \ubcf4\ud638\ub97c \uc704\ud55c \uc815\ubd80\uc758 \uad6c\uccb4\uc801 \ubc29\uc548\uc73c\ub85c \uc5b4\ub5a4 \uac83\ub4e4\uc774 \uc5b8\uae09\ub418\uc5c8\ub098\uc694?",
+   "criteria": {
+    "text_any": [
+     "\uc7ac\uc678\uad6d\ubbfc"
+    ],
+    "committee_any": [
+     "\uc678\ud1b5\uc704"
+    ]
+   }
+  },
+  {
+   "id": "r040",
+   "type": "comparison",
+   "q": "\uc5ec\uc57c \uc758\uc6d0\ub4e4\uc758 \ub300\ubd81\uc804\ub2e8 \uc0b4\ud3ec\uc5d0 \ub300\ud55c \uc2dc\uac01\uc740 \uc5b4\ub5bb\uac8c \ub2e4\ub978\uac00\uc694?",
+   "criteria": {
+    "text_any": [
+     "\ub300\ubd81\uc804\ub2e8",
+     "\uc804\ub2e8"
+    ],
+    "committee_any": [
+     "\uc678\ud1b5\uc704"
+    ]
+   }
+  },
+  {
+   "id": "r041",
+   "type": "comparison",
+   "q": "\uc815\ubb34\uc704\uc6d0\ud68c\uc5d0\uc11c \uc5ec\ub2f9\uacfc \uc57c\ub2f9 \uc704\uc6d0\ub4e4\uc740 \uc740\ud589 \uaddc\uc81c \ubb38\uc81c\uc5d0 \ub300\ud574 \uc5b4\ub5bb\uac8c \ub2e4\ub978 \uc785\uc7a5\uc744 \ubcf4\uc600\ub098\uc694?",
+   "criteria": {
+    "text_any": [
+     "\uc740\ud589"
+    ],
+    "text_all": [
+     [
+      "\uaddc\uc81c",
+      "\uae08\ub9ac",
+      "\uc774\uc790"
+     ]
+    ],
+    "committee_any": [
+     "\uc815\ubb34\uc704"
+    ]
+   }
+  },
+  {
+   "id": "r042",
+   "type": "comparison",
+   "q": "KBS\uc640 MBC \ubc29\uc1a1 \ub3c5\ub9bd\uc131 \ubb38\uc81c\uc5d0 \ub300\ud574 \uc5ec\ub2f9\uacfc \uc57c\ub2f9 \uc704\uc6d0\ub4e4\uc758 \uc785\uc7a5\uc740 \uc5b4\ub5bb\uac8c \ub2ec\ub790\ub098\uc694?",
+   "criteria": {
+    "text_any": [
+     "KBS",
+     "MBC",
+     "\uacf5\uc601\ubc29\uc1a1"
+    ],
+    "text_all": [
+     [
+      "\ub3c5\ub9bd"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "r043",
+   "type": "date_based",
+   "q": "2025\ub144 7\uc6d4 14\uc77c \uc678\uad50\ud1b5\uc77c\uc704\uc6d0\ud68c\uc5d0\uc11c \uc5b4\ub5a4 \uc8fc\uc694 \uc8fc\uc81c\ub4e4\uc774 \ub2e4\ub904\uc84c\ub098\uc694?",
+   "criteria": {
+    "committee_any": [
+     "\uc678\ud1b5\uc704"
+    ],
+    "date_any": [
+     "2025-07-14"
+    ]
+   }
+  },
+  {
+   "id": "r044",
+   "type": "date_based",
+   "q": "2026\ub144 1\uc6d4 28\uc77c \ud68c\uc758\uc5d0\uc11c \uc870\ud604 \uc7a5\uad00\uc774 \ubc1d\ud78c \uc8fc\uc694 \uc678\uad50 \ud604\uc548\uc740 \ubb34\uc5c7\uc778\uac00\uc694?",
+   "criteria": {
+    "committee_any": [
+     "\uc678\ud1b5\uc704"
+    ],
+    "date_any": [
+     "2026-01-28"
+    ]
+   }
+  },
+  {
+   "id": "r045",
+   "type": "date_based",
+   "q": "2025\ub144 9\uc6d4 8\uc77c \ud68c\uc758\uc5d0\uc11c \ubd81\ud55c \uad00\ub828 \uc5b4\ub5a4 \uc0ac\uc548\uc774 \ub17c\uc758\ub418\uc5c8\ub098\uc694?",
+   "criteria": {
+    "committee_any": [
+     "\uc678\ud1b5\uc704"
+    ],
+    "date_any": [
+     "2025-09-08"
+    ]
+   }
+  },
+  {
+   "id": "r046",
+   "type": "date_based",
+   "q": "2024\ub144 7\uc6d4 22\uc77c \uc815\ubb34\uc704\uc6d0\ud68c\uc5d0\uc11c \uc5b4\ub5a4 \uc778\uc0ac\uccad\ubb38\ud68c\uac00 \uc9c4\ud589\ub418\uc5c8\uace0 \uc8fc\uc694 \uc7c1\uc810\uc740 \ubb34\uc5c7\uc774\uc5c8\ub098\uc694?",
+   "criteria": {
+    "committee_any": [
+     "\uc815\ubb34\uc704"
+    ],
+    "date_any": [
+     "2024-07-22"
+    ]
+   }
+  },
+  {
+   "id": "r047",
+   "type": "date_based",
+   "q": "2025\ub144 5\uc6d4 8\uc77c \uacfc\ud559\uae30\uc220\uc815\ubcf4\ubc29\uc1a1\ud1b5\uc2e0\uc704\uc6d0\ud68c\uc5d0\uc11c \uc5b4\ub5a4 \uccad\ubb38\ud68c\uac00 \uc5f4\ub838\uace0 \uc8fc\uc694 \ub0b4\uc6a9\uc740 \ubb34\uc5c7\uc778\uac00\uc694?",
+   "criteria": {
+    "committee_any": [
+     "\uacfc\ubc29\uc704"
+    ],
+    "date_any": [
+     "2025-05-08"
+    ]
+   }
+  },
+  {
+   "id": "r048",
+   "type": "multi_chunk",
+   "q": "\ud2b8\ub7fc\ud504 \ud589\uc815\ubd80\uc758 \uad00\uc138 \ubc0f \ud1b5\uc0c1 \uc555\ubc15\uc5d0 \ub300\ud55c \uc678\uad50\ud1b5\uc77c\uc704\uc6d0\ud68c\uc758 \ub17c\uc758\uac00 \uc2dc\uac04\uc774 \uc9c0\ub098\uba74\uc11c \uc5b4\ub5bb\uac8c \ubcc0\ud654\ud588\ub098\uc694?",
+   "criteria": {
+    "text_any": [
+     "\uad00\uc138"
+    ],
+    "committee_any": [
+     "\uc678\ud1b5\uc704"
+    ]
+   }
+  },
+  {
+   "id": "r049",
+   "type": "multi_chunk",
+   "q": "\uacc4\uc5c4 \uc120\ud3ec\ubd80\ud130 \ud0c4\ud575 \uc774\ud6c4\uae4c\uc9c0 \uc678\uad50\ud1b5\uc77c\uc704\uc6d0\ud68c\uc5d0\uc11c \ub17c\uc758\ub41c \uc678\uad50\uc548\ubcf4 \uc774\uc288\ub4e4\uc744 \uc2dc\uac04\uc21c\uc73c\ub85c \uc815\ub9ac\ud574 \uc8fc\uc138\uc694.",
+   "criteria": {
+    "text_any": [
+     "\uacc4\uc5c4",
+     "\ud0c4\ud575"
+    ],
+    "committee_any": [
+     "\uc678\ud1b5\uc704"
+    ]
+   }
+  },
+  {
+   "id": "r050",
+   "type": "multi_chunk",
+   "q": "\ud55c\uad6d\uc758 \ub300\uc77c \uc678\uad50 \uc815\ucc45\uc5d0 \ub300\ud55c \uc678\uad50\ud1b5\uc77c\uc704\uc6d0\ud68c\uc758 \ub17c\uc758\ub294 \uc2dc\uae30\ubcc4\ub85c \uc5b4\ub5bb\uac8c \ubcc0\ud654\ud588\ub098\uc694?",
+   "criteria": {
+    "text_any": [
+     "\uc77c\ubcf8",
+     "\ud55c\uc77c"
+    ],
+    "committee_any": [
+     "\uc678\ud1b5\uc704"
+    ]
+   }
+  },
+  {
+   "id": "r051",
+   "type": "numerical_fact",
+   "q": "\ubc29\uc704\ube44 \ubd84\ub2f4\uae08 \ud611\uc0c1\uacfc \uad00\ub828\ud574 \ud68c\uc758\ub85d\uc5d0\uc11c \uc5b8\uae09\ub41c \uad6c\uccb4\uc801\uc778 \uae08\uc561\uc774\ub098 \ube44\uc728\uc774 \uc788\ub098\uc694?",
+   "criteria": {
+    "text_any": [
+     "\ubc29\uc704\ube44"
+    ]
+   }
+  },
+  {
+   "id": "r052",
+   "type": "numerical_fact",
+   "q": "ODA \uc608\uc0b0\uacfc \uad00\ub828\ud574 \uc678\uad50\ud1b5\uc77c\uc704\uc6d0\ud68c\uc5d0\uc11c \uc5b8\uae09\ub41c \uad6c\uccb4\uc801\uc778 \uc218\uce58\ub098 \uc99d\uac10 \uaddc\ubaa8\ub294 \ubb34\uc5c7\uc778\uac00\uc694?",
+   "criteria": {
+    "text_any": [
+     "ODA"
+    ],
+    "committee_any": [
+     "\uc678\ud1b5\uc704"
+    ]
+   }
+  },
+  {
+   "id": "r053",
+   "type": "cause_effect",
+   "q": "\ubd81\ud55c\uc774 \uc624\ubb3c\ud48d\uc120\uc744 \ubcf4\ub0b4\uae30 \uc2dc\uc791\ud55c \uc9c1\uc811\uc801\uc778 \uc6d0\uc778\uc73c\ub85c \ud68c\uc758\ub85d\uc5d0\uc11c \uc5b8\uae09\ub41c \uac83\uc740 \ubb34\uc5c7\uc778\uac00\uc694?",
+   "criteria": {
+    "text_any": [
+     "\uc624\ubb3c\ud48d\uc120"
+    ]
+   }
+  },
+  {
+   "id": "r054",
+   "type": "cause_effect",
+   "q": "\uacc4\uc5c4 \uc120\ud3ec\uac00 \ud55c\uad6d \uc678\uad50\uc5d0 \uc5b4\ub5a4 \uc601\ud5a5\uc744 \ubbf8\ucce4\ub2e4\uace0 \uc678\uad50\ud1b5\uc77c\uc704\uc6d0\ud68c \uc704\uc6d0\ub4e4\uc774 \uc9c0\uc801\ud588\ub098\uc694?",
+   "criteria": {
+    "text_any": [
+     "\uacc4\uc5c4"
+    ],
+    "committee_any": [
+     "\uc678\ud1b5\uc704"
+    ]
+   }
+  },
+  {
+   "id": "r055",
+   "type": "quote_exact",
+   "q": "\uc870\ud0dc\uc5f4 \uc7a5\uad00\uc774 \ud2b8\ub7fc\ud504 1\uae30 \ud589\uc815\ubd80 \uacbd\ud5d8\uc744 \uc9c1\uc811 \uc5b8\uae09\ud55c \ubc1c\uc5b8\uc744 \uc778\uc6a9\ud574 \uc8fc\uc138\uc694.",
+   "criteria": {
+    "speaker_any": [
+     "\uc870\ud0dc\uc5f4"
+    ],
+    "text_any": [
+     "\ud2b8\ub7fc\ud504"
+    ],
+    "mode": "and"
+   }
+  },
+  {
+   "id": "r056",
+   "type": "quote_exact",
+   "q": "\uc815\ub3d9\uc601 \ud1b5\uc77c\ubd80\uc7a5\uad00\uc774 \ub0a8\ubd81 \ub300\ud654\uc758 \uc911\uc694\uc131\uc744 \uac15\uc870\ud55c \uad6c\uccb4\uc801\uc778 \ubc1c\uc5b8\uc744 \uc778\uc6a9\ud574 \uc8fc\uc138\uc694.",
+   "criteria": {
+    "speaker_any": [
+     "\uc815\ub3d9\uc601"
+    ],
+    "text_any": [
+     "\ub300\ud654",
+     "\ub0a8\ubd81"
+    ],
+    "mode": "and"
+   }
+  },
+  {
+   "id": "r057",
+   "type": "aggregation",
+   "q": "\uc77c\ubcf8\uacfc\uc758 \uad00\uacc4\uc5d0 \ub300\ud574 \uc5ec\ub7ec \uc704\uc6d0\ub4e4\uc774 \uacf5\ud1b5\uc801\uc73c\ub85c \uc81c\uae30\ud55c \uc6b0\ub824\ub098 \uc694\uad6c\ub294 \ubb34\uc5c7\uc778\uac00\uc694?",
+   "criteria": {
+    "text_any": [
+     "\uc77c\ubcf8"
+    ],
+    "committee_any": [
+     "\uc678\ud1b5\uc704"
+    ]
+   }
+  },
+  {
+   "id": "r058",
+   "type": "aggregation",
+   "q": "\ud2b8\ub7fc\ud504 \uad00\uc138 \uc555\ubc15\uc5d0 \ub300\ud574 \uc5ec\ub7ec \uc704\uc6d0\ub4e4\uc774 \uc815\ubd80\uc5d0 \uacf5\ud1b5\uc801\uc73c\ub85c \uc694\uad6c\ud55c \ub300\uc751\ucc45\uc740 \ubb34\uc5c7\uc778\uac00\uc694?",
+   "criteria": {
+    "text_any": [
+     "\uad00\uc138"
+    ]
+   }
+  },
+  {
+   "id": "r059",
+   "type": "cross_committee",
+   "q": "\uc774\uc900\uc11d \uc758\uc6d0\uc740 \uc5b4\ub290 \uc0c1\uc784\uc704\uc6d0\ud68c \uc18c\uc18d\uc774\uba70, \ud574\ub2f9 \uc704\uc6d0\ud68c\uc5d0\uc11c \uc5b4\ub5a4 \ubc1c\uc5b8\uc744 \ud588\ub098\uc694?",
+   "criteria": {
+    "speaker_any": [
+     "\uc774\uc900\uc11d"
+    ]
+   }
+  },
+  {
+   "id": "r060",
+   "type": "unanswerable",
+   "q": "\uc774\uc900\uc11d \uc758\uc6d0\uc740 \uc678\uad50\ud1b5\uc77c\uc704\uc6d0\ud68c\uc5d0\uc11c \ubd81\ud55c \ubb38\uc81c\uc5d0 \ub300\ud574 \uc5b4\ub5a4 \ubc1c\uc5b8\uc744 \ud588\ub098\uc694?",
+   "unanswerable": true,
+   "criteria": {
+    "speaker_any": [
+     "\uc774\uc900\uc11d"
+    ],
+    "committee_any": [
+     "\uc678\ud1b5\uc704"
+    ]
+   }
+  },
+  {
+   "id": "r061",
+   "type": "unanswerable",
+   "q": "\uc815\ubb34\uc704\uc6d0\ud68c\uc5d0\uc11c \ubd81\ud55c \ud575 \ubb38\uc81c \uad00\ub828 \ub17c\uc758\uac00 \uc788\uc5c8\ub098\uc694?",
+   "unanswerable": true,
+   "criteria": {
+    "text_any": [
+     "\ubd81\ud55c \ud575"
+    ],
+    "committee_any": [
+     "\uc815\ubb34\uc704"
+    ]
+   }
+  },
+  {
+   "id": "r062",
+   "type": "unanswerable",
+   "q": "2024\ub144 6\uc6d4 \uc678\uad50\ud1b5\uc77c\uc704\uc6d0\ud68c\uc5d0\uc11c \uc5b4\ub5a4 \ub17c\uc758\uac00 \uc788\uc5c8\ub098\uc694?",
+   "unanswerable": true,
+   "criteria": {
+    "committee_any": [
+     "\uc678\ud1b5\uc704"
+    ],
+    "date_any": [
+     "2024-06"
+    ]
+   }
+  },
+  {
+   "id": "r063",
+   "type": "unanswerable",
+   "q": "\uc774\uc900\uc11d \uc758\uc6d0\uc740 \uc815\ubb34\uc704\uc6d0\ud68c\uc5d0\uc11c \uae08\uc735 \uc815\ucc45\uc5d0 \ub300\ud574 \uc5b4\ub5a4 \ubc1c\uc5b8\uc744 \ud588\ub098\uc694?",
+   "unanswerable": true,
+   "criteria": {
+    "speaker_any": [
+     "\uc774\uc900\uc11d"
+    ],
+    "committee_any": [
+     "\uc815\ubb34\uc704"
+    ]
+   }
+  }
+ ]
+}

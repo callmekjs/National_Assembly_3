@@ -1,0 +1,1733 @@
+{
+ "generated_at": "2026-07-03T10:35:54",
+ "eval_set": "retrieval_eval_set.json",
+ "n_questions": 63,
+ "k": 10,
+ "modes": {
+  "keyword": {
+   "recall@5": 0.831,
+   "recall@10": 0.898,
+   "mrr@10": 0.774,
+   "unanswerable_pass": "4/4",
+   "by_type": {
+    "aggregation": {
+     "n": 2,
+     "recall@5": 0.5,
+     "mrr": 0.571
+    },
+    "cause_effect": {
+     "n": 2,
+     "recall@5": 1.0,
+     "mrr": 1.0
+    },
+    "comparison": {
+     "n": 3,
+     "recall@5": 0.667,
+     "mrr": 0.5
+    },
+    "cross_committee": {
+     "n": 1,
+     "recall@5": 1.0,
+     "mrr": 1.0
+    },
+    "date_based": {
+     "n": 5,
+     "recall@5": 0.6,
+     "mrr": 0.533
+    },
+    "mixed": {
+     "n": 4,
+     "recall@5": 0.75,
+     "mrr": 0.781
+    },
+    "multi_chunk": {
+     "n": 3,
+     "recall@5": 0.333,
+     "mrr": 0.333
+    },
+    "numerical_fact": {
+     "n": 2,
+     "recall@5": 0.5,
+     "mrr": 0.5
+    },
+    "person": {
+     "n": 19,
+     "recall@5": 0.947,
+     "mrr": 0.86
+    },
+    "proper_noun": {
+     "n": 6,
+     "recall@5": 1.0,
+     "mrr": 1.0
+    },
+    "quote_exact": {
+     "n": 2,
+     "recall@5": 1.0,
+     "mrr": 1.0
+    },
+    "topic": {
+     "n": 10,
+     "recall@5": 0.9,
+     "mrr": 0.792
+    }
+   },
+   "details": [
+    {
+     "id": "r001",
+     "q": "티메프 사태 피해자 구제 대책",
+     "type": "proper_noun",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 7
+    },
+    {
+     "id": "r002",
+     "q": "AI 기본법의 핵심 쟁점",
+     "type": "proper_noun",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 5
+    },
+    {
+     "id": "r003",
+     "q": "단통법 폐지 논의",
+     "type": "proper_noun",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 10
+    },
+    {
+     "id": "r004",
+     "q": "전세사기 피해자 지원 대책",
+     "type": "proper_noun",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 10
+    },
+    {
+     "id": "r005",
+     "q": "중대재해처벌법 적용 문제",
+     "type": "proper_noun",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 4
+    },
+    {
+     "id": "r006",
+     "q": "딥페이크 성범죄 대응",
+     "type": "proper_noun",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 5
+    },
+    {
+     "id": "r007",
+     "q": "유영하 위원의 질의",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 10
+    },
+    {
+     "id": "r008",
+     "q": "이진숙 방송통신위원장 후보자 인사청문회 발언",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 10
+    },
+    {
+     "id": "r009",
+     "q": "김선호 국방부장관 직무대행의 답변",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 10
+    },
+    {
+     "id": "r010",
+     "q": "조지호 경찰청장 발언",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 10
+    },
+    {
+     "id": "r011",
+     "q": "공영방송 지배구조 개선 논의",
+     "type": "topic",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 4
+    },
+    {
+     "id": "r012",
+     "q": "병사 월급 인상과 처우 개선",
+     "type": "topic",
+     "unanswerable": false,
+     "first_relevant_rank": 2,
+     "n_matches_topk": 1
+    },
+    {
+     "id": "r013",
+     "q": "R&D 예산 삭감 논란",
+     "type": "topic",
+     "unanswerable": false,
+     "first_relevant_rank": 4,
+     "n_matches_topk": 2
+    },
+    {
+     "id": "r014",
+     "q": "가상자산 이용자 보호 방안",
+     "type": "topic",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 4
+    },
+    {
+     "id": "r015",
+     "q": "비상계엄 당시 경찰의 대응",
+     "type": "mixed",
+     "unanswerable": false,
+     "first_relevant_rank": 8,
+     "n_matches_topk": 3
+    },
+    {
+     "id": "r016",
+     "q": "쿠팡 물류센터 노동 환경 문제",
+     "type": "mixed",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 9
+    },
+    {
+     "id": "r017",
+     "q": "선관위 채용 특혜 의혹",
+     "type": "mixed",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 6
+    },
+    {
+     "id": "r018",
+     "q": "국세청 세무조사 남용 지적",
+     "type": "mixed",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 1
+    },
+    {
+     "id": "r019",
+     "q": "조태열 장관은 트럼프 2기 출범에 대해 어떤 외교적 준비를 언급했나요?",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": 2,
+     "n_matches_topk": 4
+    },
+    {
+     "id": "r020",
+     "q": "홍기원 위원은 오물풍선 문제에 대해 어떤 입장을 보였나요?",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": 3,
+     "n_matches_topk": 2
+    },
+    {
+     "id": "r021",
+     "q": "김준형 위원은 한국 외교 정책에 대해 어떤 비판적 의견을 제시했나요?",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 9
+    },
+    {
+     "id": "r022",
+     "q": "윤후덕 위원은 재외국민 보호와 관련해 어떤 질문이나 주장을 했나요?",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": null,
+     "n_matches_topk": 0
+    },
+    {
+     "id": "r023",
+     "q": "조현 외교부장관은 한미동맹에 대해 어떤 원칙과 입장을 밝혔나요?",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 3
+    },
+    {
+     "id": "r024",
+     "q": "이재강 위원은 대북전단 살포 문제에 대해 어떤 입장을 취했나요?",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 9
+    },
+    {
+     "id": "r025",
+     "q": "정동영 통일부장관은 남북 대화 가능성에 대해 어떤 입장을 밝혔나요?",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 10
+    },
+    {
+     "id": "r026",
+     "q": "김영배 소위원장이 외교 현안과 관련해 어떤 발언을 했나요?",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 10
+    },
+    {
+     "id": "r027",
+     "q": "한정애 위원은 외교 현안과 관련해 어떤 주장이나 질의를 했나요?",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 10
+    },
+    {
+     "id": "r028",
+     "q": "이용선 위원은 미국과의 통상 또는 외교 문제에 대해 어떤 입장을 보였나요?",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 8
+    },
+    {
+     "id": "r029",
+     "q": "김현정 위원은 은행의 과도한 이익과 금리 정책에 대해 어떤 비판적 발언을 했나요?",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 4
+    },
+    {
+     "id": "r030",
+     "q": "이정문 소위원장은 광복회 예산 삭감 문제에 대해 어떤 발언을 했나요?",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 3
+    },
+    {
+     "id": "r031",
+     "q": "김남근 위원은 정무위원회에서 어떤 금융 또는 공정거래 관련 주장을 했나요?",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 9
+    },
+    {
+     "id": "r032",
+     "q": "최형두 위원은 SKT 유심 해킹 사태에 대해 어떤 발언이나 지적을 했나요?",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 8
+    },
+    {
+     "id": "r033",
+     "q": "이훈기 위원이 SKT의 정보보호 투자와 관련해 제기한 문제점은 무엇인가요?",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": 2,
+     "n_matches_topk": 9
+    },
+    {
+     "id": "r034",
+     "q": "방송통신위원장 후보자 인사청문회에서 위원들이 제기한 주요 쟁점은 무엇이었나요?",
+     "type": "topic",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 2
+    },
+    {
+     "id": "r035",
+     "q": "SKT 유심 해킹 사태에 대해 과학기술정보방송통신위원회에서 어떤 논의가 있었나요?",
+     "type": "topic",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 5
+    },
+    {
+     "id": "r036",
+     "q": "기업은행 직원 파업 및 임금 문제에 대해 정무위원회에서 어떤 논의가 있었나요?",
+     "type": "topic",
+     "unanswerable": false,
+     "first_relevant_rank": 6,
+     "n_matches_topk": 1
+    },
+    {
+     "id": "r037",
+     "q": "비핵화에 대한 외교통일위원회의 논의 내용을 요약해 주세요.",
+     "type": "topic",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 6
+    },
+    {
+     "id": "r038",
+     "q": "대북전단 살포에 대한 정부의 입장과 의회의 반응은 어떠했나요?",
+     "type": "topic",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 4
+    },
+    {
+     "id": "r039",
+     "q": "재외국민 보호를 위한 정부의 구체적 방안으로 어떤 것들이 언급되었나요?",
+     "type": "topic",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 4
+    },
+    {
+     "id": "r040",
+     "q": "여야 의원들의 대북전단 살포에 대한 시각은 어떻게 다른가요?",
+     "type": "comparison",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 5
+    },
+    {
+     "id": "r041",
+     "q": "정무위원회에서 여당과 야당 위원들은 은행 규제 문제에 대해 어떻게 다른 입장을 보였나요?",
+     "type": "comparison",
+     "unanswerable": false,
+     "first_relevant_rank": null,
+     "n_matches_topk": 0
+    },
+    {
+     "id": "r042",
+     "q": "KBS와 MBC 방송 독립성 문제에 대해 여당과 야당 위원들의 입장은 어떻게 달랐나요?",
+     "type": "comparison",
+     "unanswerable": false,
+     "first_relevant_rank": 2,
+     "n_matches_topk": 3
+    },
+    {
+     "id": "r043",
+     "q": "2025년 7월 14일 외교통일위원회에서 어떤 주요 주제들이 다뤄졌나요?",
+     "type": "date_based",
+     "unanswerable": false,
+     "first_relevant_rank": 6,
+     "n_matches_topk": 2
+    },
+    {
+     "id": "r044",
+     "q": "2026년 1월 28일 회의에서 조현 장관이 밝힌 주요 외교 현안은 무엇인가요?",
+     "type": "date_based",
+     "unanswerable": false,
+     "first_relevant_rank": 2,
+     "n_matches_topk": 1
+    },
+    {
+     "id": "r045",
+     "q": "2025년 9월 8일 회의에서 북한 관련 어떤 사안이 논의되었나요?",
+     "type": "date_based",
+     "unanswerable": false,
+     "first_relevant_rank": null,
+     "n_matches_topk": 0
+    },
+    {
+     "id": "r046",
+     "q": "2024년 7월 22일 정무위원회에서 어떤 인사청문회가 진행되었고 주요 쟁점은 무엇이었나요?",
+     "type": "date_based",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 1
+    },
+    {
+     "id": "r047",
+     "q": "2025년 5월 8일 과학기술정보방송통신위원회에서 어떤 청문회가 열렸고 주요 내용은 무엇인가요?",
+     "type": "date_based",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 2
+    },
+    {
+     "id": "r048",
+     "q": "트럼프 행정부의 관세 및 통상 압박에 대한 외교통일위원회의 논의가 시간이 지나면서 어떻게 변화했나요?",
+     "type": "multi_chunk",
+     "unanswerable": false,
+     "first_relevant_rank": null,
+     "n_matches_topk": 0
+    },
+    {
+     "id": "r049",
+     "q": "계엄 선포부터 탄핵 이후까지 외교통일위원회에서 논의된 외교안보 이슈들을 시간순으로 정리해 주세요.",
+     "type": "multi_chunk",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 3
+    },
+    {
+     "id": "r050",
+     "q": "한국의 대일 외교 정책에 대한 외교통일위원회의 논의는 시기별로 어떻게 변화했나요?",
+     "type": "multi_chunk",
+     "unanswerable": false,
+     "first_relevant_rank": null,
+     "n_matches_topk": 0
+    },
+    {
+     "id": "r051",
+     "q": "방위비 분담금 협상과 관련해 회의록에서 언급된 구체적인 금액이나 비율이 있나요?",
+     "type": "numerical_fact",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 2
+    },
+    {
+     "id": "r052",
+     "q": "ODA 예산과 관련해 외교통일위원회에서 언급된 구체적인 수치나 증감 규모는 무엇인가요?",
+     "type": "numerical_fact",
+     "unanswerable": false,
+     "first_relevant_rank": null,
+     "n_matches_topk": 0
+    },
+    {
+     "id": "r053",
+     "q": "북한이 오물풍선을 보내기 시작한 직접적인 원인으로 회의록에서 언급된 것은 무엇인가요?",
+     "type": "cause_effect",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 8
+    },
+    {
+     "id": "r054",
+     "q": "계엄 선포가 한국 외교에 어떤 영향을 미쳤다고 외교통일위원회 위원들이 지적했나요?",
+     "type": "cause_effect",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 3
+    },
+    {
+     "id": "r055",
+     "q": "조태열 장관이 트럼프 1기 행정부 경험을 직접 언급한 발언을 인용해 주세요.",
+     "type": "quote_exact",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 7
+    },
+    {
+     "id": "r056",
+     "q": "정동영 통일부장관이 남북 대화의 중요성을 강조한 구체적인 발언을 인용해 주세요.",
+     "type": "quote_exact",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 10
+    },
+    {
+     "id": "r057",
+     "q": "일본과의 관계에 대해 여러 위원들이 공통적으로 제기한 우려나 요구는 무엇인가요?",
+     "type": "aggregation",
+     "unanswerable": false,
+     "first_relevant_rank": 7,
+     "n_matches_topk": 2
+    },
+    {
+     "id": "r058",
+     "q": "트럼프 관세 압박에 대해 여러 위원들이 정부에 공통적으로 요구한 대응책은 무엇인가요?",
+     "type": "aggregation",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 9
+    },
+    {
+     "id": "r059",
+     "q": "이준석 의원은 어느 상임위원회 소속이며, 해당 위원회에서 어떤 발언을 했나요?",
+     "type": "cross_committee",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 6
+    },
+    {
+     "id": "r060",
+     "q": "이준석 의원은 외교통일위원회에서 북한 문제에 대해 어떤 발언을 했나요?",
+     "type": "unanswerable",
+     "unanswerable": true,
+     "first_relevant_rank": null,
+     "n_matches_topk": 0
+    },
+    {
+     "id": "r061",
+     "q": "정무위원회에서 북한 핵 문제 관련 논의가 있었나요?",
+     "type": "unanswerable",
+     "unanswerable": true,
+     "first_relevant_rank": null,
+     "n_matches_topk": 0
+    },
+    {
+     "id": "r062",
+     "q": "2024년 6월 외교통일위원회에서 어떤 논의가 있었나요?",
+     "type": "unanswerable",
+     "unanswerable": true,
+     "first_relevant_rank": null,
+     "n_matches_topk": 0
+    },
+    {
+     "id": "r063",
+     "q": "이준석 의원은 정무위원회에서 금융 정책에 대해 어떤 발언을 했나요?",
+     "type": "unanswerable",
+     "unanswerable": true,
+     "first_relevant_rank": null,
+     "n_matches_topk": 0
+    }
+   ],
+   "elapsed_sec": 146.6
+  },
+  "vector": {
+   "recall@5": 0.644,
+   "recall@10": 0.746,
+   "mrr@10": 0.53,
+   "unanswerable_pass": "4/4",
+   "by_type": {
+    "aggregation": {
+     "n": 2,
+     "recall@5": 1.0,
+     "mrr": 1.0
+    },
+    "cause_effect": {
+     "n": 2,
+     "recall@5": 1.0,
+     "mrr": 1.0
+    },
+    "comparison": {
+     "n": 3,
+     "recall@5": 1.0,
+     "mrr": 0.528
+    },
+    "cross_committee": {
+     "n": 1,
+     "recall@5": 0.0,
+     "mrr": 0.0
+    },
+    "date_based": {
+     "n": 5,
+     "recall@5": 0.4,
+     "mrr": 0.422
+    },
+    "mixed": {
+     "n": 4,
+     "recall@5": 0.5,
+     "mrr": 0.188
+    },
+    "multi_chunk": {
+     "n": 3,
+     "recall@5": 0.667,
+     "mrr": 0.27
+    },
+    "numerical_fact": {
+     "n": 2,
+     "recall@5": 1.0,
+     "mrr": 0.75
+    },
+    "person": {
+     "n": 19,
+     "recall@5": 0.632,
+     "mrr": 0.573
+    },
+    "proper_noun": {
+     "n": 6,
+     "recall@5": 0.667,
+     "mrr": 0.6
+    },
+    "quote_exact": {
+     "n": 2,
+     "recall@5": 0.5,
+     "mrr": 0.5
+    },
+    "topic": {
+     "n": 10,
+     "recall@5": 0.6,
+     "mrr": 0.502
+    }
+   },
+   "details": [
+    {
+     "id": "r001",
+     "q": "티메프 사태 피해자 구제 대책",
+     "type": "proper_noun",
+     "unanswerable": false,
+     "first_relevant_rank": 2,
+     "n_matches_topk": 1
+    },
+    {
+     "id": "r002",
+     "q": "AI 기본법의 핵심 쟁점",
+     "type": "proper_noun",
+     "unanswerable": false,
+     "first_relevant_rank": 10,
+     "n_matches_topk": 1
+    },
+    {
+     "id": "r003",
+     "q": "단통법 폐지 논의",
+     "type": "proper_noun",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 8
+    },
+    {
+     "id": "r004",
+     "q": "전세사기 피해자 지원 대책",
+     "type": "proper_noun",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 10
+    },
+    {
+     "id": "r005",
+     "q": "중대재해처벌법 적용 문제",
+     "type": "proper_noun",
+     "unanswerable": false,
+     "first_relevant_rank": null,
+     "n_matches_topk": 0
+    },
+    {
+     "id": "r006",
+     "q": "딥페이크 성범죄 대응",
+     "type": "proper_noun",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 10
+    },
+    {
+     "id": "r007",
+     "q": "유영하 위원의 질의",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": null,
+     "n_matches_topk": 0
+    },
+    {
+     "id": "r008",
+     "q": "이진숙 방송통신위원장 후보자 인사청문회 발언",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 10
+    },
+    {
+     "id": "r009",
+     "q": "김선호 국방부장관 직무대행의 답변",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": null,
+     "n_matches_topk": 0
+    },
+    {
+     "id": "r010",
+     "q": "조지호 경찰청장 발언",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 10
+    },
+    {
+     "id": "r011",
+     "q": "공영방송 지배구조 개선 논의",
+     "type": "topic",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 6
+    },
+    {
+     "id": "r012",
+     "q": "병사 월급 인상과 처우 개선",
+     "type": "topic",
+     "unanswerable": false,
+     "first_relevant_rank": 8,
+     "n_matches_topk": 1
+    },
+    {
+     "id": "r013",
+     "q": "R&D 예산 삭감 논란",
+     "type": "topic",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 9
+    },
+    {
+     "id": "r014",
+     "q": "가상자산 이용자 보호 방안",
+     "type": "topic",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 6
+    },
+    {
+     "id": "r015",
+     "q": "비상계엄 당시 경찰의 대응",
+     "type": "mixed",
+     "unanswerable": false,
+     "first_relevant_rank": 2,
+     "n_matches_topk": 3
+    },
+    {
+     "id": "r016",
+     "q": "쿠팡 물류센터 노동 환경 문제",
+     "type": "mixed",
+     "unanswerable": false,
+     "first_relevant_rank": null,
+     "n_matches_topk": 0
+    },
+    {
+     "id": "r017",
+     "q": "선관위 채용 특혜 의혹",
+     "type": "mixed",
+     "unanswerable": false,
+     "first_relevant_rank": 4,
+     "n_matches_topk": 2
+    },
+    {
+     "id": "r018",
+     "q": "국세청 세무조사 남용 지적",
+     "type": "mixed",
+     "unanswerable": false,
+     "first_relevant_rank": null,
+     "n_matches_topk": 0
+    },
+    {
+     "id": "r019",
+     "q": "조태열 장관은 트럼프 2기 출범에 대해 어떤 외교적 준비를 언급했나요?",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": 7,
+     "n_matches_topk": 1
+    },
+    {
+     "id": "r020",
+     "q": "홍기원 위원은 오물풍선 문제에 대해 어떤 입장을 보였나요?",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": null,
+     "n_matches_topk": 0
+    },
+    {
+     "id": "r021",
+     "q": "김준형 위원은 한국 외교 정책에 대해 어떤 비판적 의견을 제시했나요?",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 10
+    },
+    {
+     "id": "r022",
+     "q": "윤후덕 위원은 재외국민 보호와 관련해 어떤 질문이나 주장을 했나요?",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": null,
+     "n_matches_topk": 0
+    },
+    {
+     "id": "r023",
+     "q": "조현 외교부장관은 한미동맹에 대해 어떤 원칙과 입장을 밝혔나요?",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 5
+    },
+    {
+     "id": "r024",
+     "q": "이재강 위원은 대북전단 살포 문제에 대해 어떤 입장을 취했나요?",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": null,
+     "n_matches_topk": 0
+    },
+    {
+     "id": "r025",
+     "q": "정동영 통일부장관은 남북 대화 가능성에 대해 어떤 입장을 밝혔나요?",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 9
+    },
+    {
+     "id": "r026",
+     "q": "김영배 소위원장이 외교 현안과 관련해 어떤 발언을 했나요?",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 10
+    },
+    {
+     "id": "r027",
+     "q": "한정애 위원은 외교 현안과 관련해 어떤 주장이나 질의를 했나요?",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": null,
+     "n_matches_topk": 0
+    },
+    {
+     "id": "r028",
+     "q": "이용선 위원은 미국과의 통상 또는 외교 문제에 대해 어떤 입장을 보였나요?",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 2
+    },
+    {
+     "id": "r029",
+     "q": "김현정 위원은 은행의 과도한 이익과 금리 정책에 대해 어떤 비판적 발언을 했나요?",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 1
+    },
+    {
+     "id": "r030",
+     "q": "이정문 소위원장은 광복회 예산 삭감 문제에 대해 어떤 발언을 했나요?",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": 4,
+     "n_matches_topk": 2
+    },
+    {
+     "id": "r031",
+     "q": "김남근 위원은 정무위원회에서 어떤 금융 또는 공정거래 관련 주장을 했나요?",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 7
+    },
+    {
+     "id": "r032",
+     "q": "최형두 위원은 SKT 유심 해킹 사태에 대해 어떤 발언이나 지적을 했나요?",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 5
+    },
+    {
+     "id": "r033",
+     "q": "이훈기 위원이 SKT의 정보보호 투자와 관련해 제기한 문제점은 무엇인가요?",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": 2,
+     "n_matches_topk": 7
+    },
+    {
+     "id": "r034",
+     "q": "방송통신위원장 후보자 인사청문회에서 위원들이 제기한 주요 쟁점은 무엇이었나요?",
+     "type": "topic",
+     "unanswerable": false,
+     "first_relevant_rank": 4,
+     "n_matches_topk": 4
+    },
+    {
+     "id": "r035",
+     "q": "SKT 유심 해킹 사태에 대해 과학기술정보방송통신위원회에서 어떤 논의가 있었나요?",
+     "type": "topic",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 5
+    },
+    {
+     "id": "r036",
+     "q": "기업은행 직원 파업 및 임금 문제에 대해 정무위원회에서 어떤 논의가 있었나요?",
+     "type": "topic",
+     "unanswerable": false,
+     "first_relevant_rank": 7,
+     "n_matches_topk": 1
+    },
+    {
+     "id": "r037",
+     "q": "비핵화에 대한 외교통일위원회의 논의 내용을 요약해 주세요.",
+     "type": "topic",
+     "unanswerable": false,
+     "first_relevant_rank": null,
+     "n_matches_topk": 0
+    },
+    {
+     "id": "r038",
+     "q": "대북전단 살포에 대한 정부의 입장과 의회의 반응은 어떠했나요?",
+     "type": "topic",
+     "unanswerable": false,
+     "first_relevant_rank": null,
+     "n_matches_topk": 0
+    },
+    {
+     "id": "r039",
+     "q": "재외국민 보호를 위한 정부의 구체적 방안으로 어떤 것들이 언급되었나요?",
+     "type": "topic",
+     "unanswerable": false,
+     "first_relevant_rank": 2,
+     "n_matches_topk": 5
+    },
+    {
+     "id": "r040",
+     "q": "여야 의원들의 대북전단 살포에 대한 시각은 어떻게 다른가요?",
+     "type": "comparison",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 5
+    },
+    {
+     "id": "r041",
+     "q": "정무위원회에서 여당과 야당 위원들은 은행 규제 문제에 대해 어떻게 다른 입장을 보였나요?",
+     "type": "comparison",
+     "unanswerable": false,
+     "first_relevant_rank": 4,
+     "n_matches_topk": 3
+    },
+    {
+     "id": "r042",
+     "q": "KBS와 MBC 방송 독립성 문제에 대해 여당과 야당 위원들의 입장은 어떻게 달랐나요?",
+     "type": "comparison",
+     "unanswerable": false,
+     "first_relevant_rank": 3,
+     "n_matches_topk": 1
+    },
+    {
+     "id": "r043",
+     "q": "2025년 7월 14일 외교통일위원회에서 어떤 주요 주제들이 다뤄졌나요?",
+     "type": "date_based",
+     "unanswerable": false,
+     "first_relevant_rank": null,
+     "n_matches_topk": 0
+    },
+    {
+     "id": "r044",
+     "q": "2026년 1월 28일 회의에서 조현 장관이 밝힌 주요 외교 현안은 무엇인가요?",
+     "type": "date_based",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 10
+    },
+    {
+     "id": "r045",
+     "q": "2025년 9월 8일 회의에서 북한 관련 어떤 사안이 논의되었나요?",
+     "type": "date_based",
+     "unanswerable": false,
+     "first_relevant_rank": 9,
+     "n_matches_topk": 1
+    },
+    {
+     "id": "r046",
+     "q": "2024년 7월 22일 정무위원회에서 어떤 인사청문회가 진행되었고 주요 쟁점은 무엇이었나요?",
+     "type": "date_based",
+     "unanswerable": false,
+     "first_relevant_rank": null,
+     "n_matches_topk": 0
+    },
+    {
+     "id": "r047",
+     "q": "2025년 5월 8일 과학기술정보방송통신위원회에서 어떤 청문회가 열렸고 주요 내용은 무엇인가요?",
+     "type": "date_based",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 1
+    },
+    {
+     "id": "r048",
+     "q": "트럼프 행정부의 관세 및 통상 압박에 대한 외교통일위원회의 논의가 시간이 지나면서 어떻게 변화했나요?",
+     "type": "multi_chunk",
+     "unanswerable": false,
+     "first_relevant_rank": 3,
+     "n_matches_topk": 1
+    },
+    {
+     "id": "r049",
+     "q": "계엄 선포부터 탄핵 이후까지 외교통일위원회에서 논의된 외교안보 이슈들을 시간순으로 정리해 주세요.",
+     "type": "multi_chunk",
+     "unanswerable": false,
+     "first_relevant_rank": 7,
+     "n_matches_topk": 1
+    },
+    {
+     "id": "r050",
+     "q": "한국의 대일 외교 정책에 대한 외교통일위원회의 논의는 시기별로 어떻게 변화했나요?",
+     "type": "multi_chunk",
+     "unanswerable": false,
+     "first_relevant_rank": 3,
+     "n_matches_topk": 2
+    },
+    {
+     "id": "r051",
+     "q": "방위비 분담금 협상과 관련해 회의록에서 언급된 구체적인 금액이나 비율이 있나요?",
+     "type": "numerical_fact",
+     "unanswerable": false,
+     "first_relevant_rank": 2,
+     "n_matches_topk": 1
+    },
+    {
+     "id": "r052",
+     "q": "ODA 예산과 관련해 외교통일위원회에서 언급된 구체적인 수치나 증감 규모는 무엇인가요?",
+     "type": "numerical_fact",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 8
+    },
+    {
+     "id": "r053",
+     "q": "북한이 오물풍선을 보내기 시작한 직접적인 원인으로 회의록에서 언급된 것은 무엇인가요?",
+     "type": "cause_effect",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 8
+    },
+    {
+     "id": "r054",
+     "q": "계엄 선포가 한국 외교에 어떤 영향을 미쳤다고 외교통일위원회 위원들이 지적했나요?",
+     "type": "cause_effect",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 3
+    },
+    {
+     "id": "r055",
+     "q": "조태열 장관이 트럼프 1기 행정부 경험을 직접 언급한 발언을 인용해 주세요.",
+     "type": "quote_exact",
+     "unanswerable": false,
+     "first_relevant_rank": null,
+     "n_matches_topk": 0
+    },
+    {
+     "id": "r056",
+     "q": "정동영 통일부장관이 남북 대화의 중요성을 강조한 구체적인 발언을 인용해 주세요.",
+     "type": "quote_exact",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 6
+    },
+    {
+     "id": "r057",
+     "q": "일본과의 관계에 대해 여러 위원들이 공통적으로 제기한 우려나 요구는 무엇인가요?",
+     "type": "aggregation",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 8
+    },
+    {
+     "id": "r058",
+     "q": "트럼프 관세 압박에 대해 여러 위원들이 정부에 공통적으로 요구한 대응책은 무엇인가요?",
+     "type": "aggregation",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 5
+    },
+    {
+     "id": "r059",
+     "q": "이준석 의원은 어느 상임위원회 소속이며, 해당 위원회에서 어떤 발언을 했나요?",
+     "type": "cross_committee",
+     "unanswerable": false,
+     "first_relevant_rank": null,
+     "n_matches_topk": 0
+    },
+    {
+     "id": "r060",
+     "q": "이준석 의원은 외교통일위원회에서 북한 문제에 대해 어떤 발언을 했나요?",
+     "type": "unanswerable",
+     "unanswerable": true,
+     "first_relevant_rank": null,
+     "n_matches_topk": 0
+    },
+    {
+     "id": "r061",
+     "q": "정무위원회에서 북한 핵 문제 관련 논의가 있었나요?",
+     "type": "unanswerable",
+     "unanswerable": true,
+     "first_relevant_rank": null,
+     "n_matches_topk": 0
+    },
+    {
+     "id": "r062",
+     "q": "2024년 6월 외교통일위원회에서 어떤 논의가 있었나요?",
+     "type": "unanswerable",
+     "unanswerable": true,
+     "first_relevant_rank": null,
+     "n_matches_topk": 0
+    },
+    {
+     "id": "r063",
+     "q": "이준석 의원은 정무위원회에서 금융 정책에 대해 어떤 발언을 했나요?",
+     "type": "unanswerable",
+     "unanswerable": true,
+     "first_relevant_rank": null,
+     "n_matches_topk": 0
+    }
+   ],
+   "elapsed_sec": 41.8
+  },
+  "hybrid": {
+   "recall@5": 0.949,
+   "recall@10": 0.966,
+   "mrr@10": 0.885,
+   "unanswerable_pass": "4/4",
+   "by_type": {
+    "aggregation": {
+     "n": 2,
+     "recall@5": 0.5,
+     "mrr": 0.571
+    },
+    "cause_effect": {
+     "n": 2,
+     "recall@5": 1.0,
+     "mrr": 1.0
+    },
+    "comparison": {
+     "n": 3,
+     "recall@5": 1.0,
+     "mrr": 0.583
+    },
+    "cross_committee": {
+     "n": 1,
+     "recall@5": 1.0,
+     "mrr": 1.0
+    },
+    "date_based": {
+     "n": 5,
+     "recall@5": 1.0,
+     "mrr": 1.0
+    },
+    "mixed": {
+     "n": 4,
+     "recall@5": 1.0,
+     "mrr": 0.875
+    },
+    "multi_chunk": {
+     "n": 3,
+     "recall@5": 0.667,
+     "mrr": 0.667
+    },
+    "numerical_fact": {
+     "n": 2,
+     "recall@5": 1.0,
+     "mrr": 1.0
+    },
+    "person": {
+     "n": 19,
+     "recall@5": 0.947,
+     "mrr": 0.886
+    },
+    "proper_noun": {
+     "n": 6,
+     "recall@5": 1.0,
+     "mrr": 1.0
+    },
+    "quote_exact": {
+     "n": 2,
+     "recall@5": 1.0,
+     "mrr": 1.0
+    },
+    "topic": {
+     "n": 10,
+     "recall@5": 1.0,
+     "mrr": 0.9
+    }
+   },
+   "details": [
+    {
+     "id": "r001",
+     "q": "티메프 사태 피해자 구제 대책",
+     "type": "proper_noun",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 7
+    },
+    {
+     "id": "r002",
+     "q": "AI 기본법의 핵심 쟁점",
+     "type": "proper_noun",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 6
+    },
+    {
+     "id": "r003",
+     "q": "단통법 폐지 논의",
+     "type": "proper_noun",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 10
+    },
+    {
+     "id": "r004",
+     "q": "전세사기 피해자 지원 대책",
+     "type": "proper_noun",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 9
+    },
+    {
+     "id": "r005",
+     "q": "중대재해처벌법 적용 문제",
+     "type": "proper_noun",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 4
+    },
+    {
+     "id": "r006",
+     "q": "딥페이크 성범죄 대응",
+     "type": "proper_noun",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 7
+    },
+    {
+     "id": "r007",
+     "q": "유영하 위원의 질의",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 10
+    },
+    {
+     "id": "r008",
+     "q": "이진숙 방송통신위원장 후보자 인사청문회 발언",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 10
+    },
+    {
+     "id": "r009",
+     "q": "김선호 국방부장관 직무대행의 답변",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 10
+    },
+    {
+     "id": "r010",
+     "q": "조지호 경찰청장 발언",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 10
+    },
+    {
+     "id": "r011",
+     "q": "공영방송 지배구조 개선 논의",
+     "type": "topic",
+     "unanswerable": false,
+     "first_relevant_rank": 2,
+     "n_matches_topk": 7
+    },
+    {
+     "id": "r012",
+     "q": "병사 월급 인상과 처우 개선",
+     "type": "topic",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 1
+    },
+    {
+     "id": "r013",
+     "q": "R&D 예산 삭감 논란",
+     "type": "topic",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 3
+    },
+    {
+     "id": "r014",
+     "q": "가상자산 이용자 보호 방안",
+     "type": "topic",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 4
+    },
+    {
+     "id": "r015",
+     "q": "비상계엄 당시 경찰의 대응",
+     "type": "mixed",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 4
+    },
+    {
+     "id": "r016",
+     "q": "쿠팡 물류센터 노동 환경 문제",
+     "type": "mixed",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 9
+    },
+    {
+     "id": "r017",
+     "q": "선관위 채용 특혜 의혹",
+     "type": "mixed",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 6
+    },
+    {
+     "id": "r018",
+     "q": "국세청 세무조사 남용 지적",
+     "type": "mixed",
+     "unanswerable": false,
+     "first_relevant_rank": 2,
+     "n_matches_topk": 1
+    },
+    {
+     "id": "r019",
+     "q": "조태열 장관은 트럼프 2기 출범에 대해 어떤 외교적 준비를 언급했나요?",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 5
+    },
+    {
+     "id": "r020",
+     "q": "홍기원 위원은 오물풍선 문제에 대해 어떤 입장을 보였나요?",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": 3,
+     "n_matches_topk": 2
+    },
+    {
+     "id": "r021",
+     "q": "김준형 위원은 한국 외교 정책에 대해 어떤 비판적 의견을 제시했나요?",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 9
+    },
+    {
+     "id": "r022",
+     "q": "윤후덕 위원은 재외국민 보호와 관련해 어떤 질문이나 주장을 했나요?",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": null,
+     "n_matches_topk": 0
+    },
+    {
+     "id": "r023",
+     "q": "조현 외교부장관은 한미동맹에 대해 어떤 원칙과 입장을 밝혔나요?",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": 2,
+     "n_matches_topk": 4
+    },
+    {
+     "id": "r024",
+     "q": "이재강 위원은 대북전단 살포 문제에 대해 어떤 입장을 취했나요?",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 8
+    },
+    {
+     "id": "r025",
+     "q": "정동영 통일부장관은 남북 대화 가능성에 대해 어떤 입장을 밝혔나요?",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 10
+    },
+    {
+     "id": "r026",
+     "q": "김영배 소위원장이 외교 현안과 관련해 어떤 발언을 했나요?",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 10
+    },
+    {
+     "id": "r027",
+     "q": "한정애 위원은 외교 현안과 관련해 어떤 주장이나 질의를 했나요?",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 10
+    },
+    {
+     "id": "r028",
+     "q": "이용선 위원은 미국과의 통상 또는 외교 문제에 대해 어떤 입장을 보였나요?",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 9
+    },
+    {
+     "id": "r029",
+     "q": "김현정 위원은 은행의 과도한 이익과 금리 정책에 대해 어떤 비판적 발언을 했나요?",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 4
+    },
+    {
+     "id": "r030",
+     "q": "이정문 소위원장은 광복회 예산 삭감 문제에 대해 어떤 발언을 했나요?",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 4
+    },
+    {
+     "id": "r031",
+     "q": "김남근 위원은 정무위원회에서 어떤 금융 또는 공정거래 관련 주장을 했나요?",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 9
+    },
+    {
+     "id": "r032",
+     "q": "최형두 위원은 SKT 유심 해킹 사태에 대해 어떤 발언이나 지적을 했나요?",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 9
+    },
+    {
+     "id": "r033",
+     "q": "이훈기 위원이 SKT의 정보보호 투자와 관련해 제기한 문제점은 무엇인가요?",
+     "type": "person",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 10
+    },
+    {
+     "id": "r034",
+     "q": "방송통신위원장 후보자 인사청문회에서 위원들이 제기한 주요 쟁점은 무엇이었나요?",
+     "type": "topic",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 4
+    },
+    {
+     "id": "r035",
+     "q": "SKT 유심 해킹 사태에 대해 과학기술정보방송통신위원회에서 어떤 논의가 있었나요?",
+     "type": "topic",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 7
+    },
+    {
+     "id": "r036",
+     "q": "기업은행 직원 파업 및 임금 문제에 대해 정무위원회에서 어떤 논의가 있었나요?",
+     "type": "topic",
+     "unanswerable": false,
+     "first_relevant_rank": 2,
+     "n_matches_topk": 1
+    },
+    {
+     "id": "r037",
+     "q": "비핵화에 대한 외교통일위원회의 논의 내용을 요약해 주세요.",
+     "type": "topic",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 6
+    },
+    {
+     "id": "r038",
+     "q": "대북전단 살포에 대한 정부의 입장과 의회의 반응은 어떠했나요?",
+     "type": "topic",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 4
+    },
+    {
+     "id": "r039",
+     "q": "재외국민 보호를 위한 정부의 구체적 방안으로 어떤 것들이 언급되었나요?",
+     "type": "topic",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 6
+    },
+    {
+     "id": "r040",
+     "q": "여야 의원들의 대북전단 살포에 대한 시각은 어떻게 다른가요?",
+     "type": "comparison",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 5
+    },
+    {
+     "id": "r041",
+     "q": "정무위원회에서 여당과 야당 위원들은 은행 규제 문제에 대해 어떻게 다른 입장을 보였나요?",
+     "type": "comparison",
+     "unanswerable": false,
+     "first_relevant_rank": 4,
+     "n_matches_topk": 2
+    },
+    {
+     "id": "r042",
+     "q": "KBS와 MBC 방송 독립성 문제에 대해 여당과 야당 위원들의 입장은 어떻게 달랐나요?",
+     "type": "comparison",
+     "unanswerable": false,
+     "first_relevant_rank": 2,
+     "n_matches_topk": 2
+    },
+    {
+     "id": "r043",
+     "q": "2025년 7월 14일 외교통일위원회에서 어떤 주요 주제들이 다뤄졌나요?",
+     "type": "date_based",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 10
+    },
+    {
+     "id": "r044",
+     "q": "2026년 1월 28일 회의에서 조현 장관이 밝힌 주요 외교 현안은 무엇인가요?",
+     "type": "date_based",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 10
+    },
+    {
+     "id": "r045",
+     "q": "2025년 9월 8일 회의에서 북한 관련 어떤 사안이 논의되었나요?",
+     "type": "date_based",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 10
+    },
+    {
+     "id": "r046",
+     "q": "2024년 7월 22일 정무위원회에서 어떤 인사청문회가 진행되었고 주요 쟁점은 무엇이었나요?",
+     "type": "date_based",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 10
+    },
+    {
+     "id": "r047",
+     "q": "2025년 5월 8일 과학기술정보방송통신위원회에서 어떤 청문회가 열렸고 주요 내용은 무엇인가요?",
+     "type": "date_based",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 10
+    },
+    {
+     "id": "r048",
+     "q": "트럼프 행정부의 관세 및 통상 압박에 대한 외교통일위원회의 논의가 시간이 지나면서 어떻게 변화했나요?",
+     "type": "multi_chunk",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 8
+    },
+    {
+     "id": "r049",
+     "q": "계엄 선포부터 탄핵 이후까지 외교통일위원회에서 논의된 외교안보 이슈들을 시간순으로 정리해 주세요.",
+     "type": "multi_chunk",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 8
+    },
+    {
+     "id": "r050",
+     "q": "한국의 대일 외교 정책에 대한 외교통일위원회의 논의는 시기별로 어떻게 변화했나요?",
+     "type": "multi_chunk",
+     "unanswerable": false,
+     "first_relevant_rank": null,
+     "n_matches_topk": 0
+    },
+    {
+     "id": "r051",
+     "q": "방위비 분담금 협상과 관련해 회의록에서 언급된 구체적인 금액이나 비율이 있나요?",
+     "type": "numerical_fact",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 3
+    },
+    {
+     "id": "r052",
+     "q": "ODA 예산과 관련해 외교통일위원회에서 언급된 구체적인 수치나 증감 규모는 무엇인가요?",
+     "type": "numerical_fact",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 9
+    },
+    {
+     "id": "r053",
+     "q": "북한이 오물풍선을 보내기 시작한 직접적인 원인으로 회의록에서 언급된 것은 무엇인가요?",
+     "type": "cause_effect",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 8
+    },
+    {
+     "id": "r054",
+     "q": "계엄 선포가 한국 외교에 어떤 영향을 미쳤다고 외교통일위원회 위원들이 지적했나요?",
+     "type": "cause_effect",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 3
+    },
+    {
+     "id": "r055",
+     "q": "조태열 장관이 트럼프 1기 행정부 경험을 직접 언급한 발언을 인용해 주세요.",
+     "type": "quote_exact",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 6
+    },
+    {
+     "id": "r056",
+     "q": "정동영 통일부장관이 남북 대화의 중요성을 강조한 구체적인 발언을 인용해 주세요.",
+     "type": "quote_exact",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 10
+    },
+    {
+     "id": "r057",
+     "q": "일본과의 관계에 대해 여러 위원들이 공통적으로 제기한 우려나 요구는 무엇인가요?",
+     "type": "aggregation",
+     "unanswerable": false,
+     "first_relevant_rank": 7,
+     "n_matches_topk": 2
+    },
+    {
+     "id": "r058",
+     "q": "트럼프 관세 압박에 대해 여러 위원들이 정부에 공통적으로 요구한 대응책은 무엇인가요?",
+     "type": "aggregation",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 9
+    },
+    {
+     "id": "r059",
+     "q": "이준석 의원은 어느 상임위원회 소속이며, 해당 위원회에서 어떤 발언을 했나요?",
+     "type": "cross_committee",
+     "unanswerable": false,
+     "first_relevant_rank": 1,
+     "n_matches_topk": 6
+    },
+    {
+     "id": "r060",
+     "q": "이준석 의원은 외교통일위원회에서 북한 문제에 대해 어떤 발언을 했나요?",
+     "type": "unanswerable",
+     "unanswerable": true,
+     "first_relevant_rank": null,
+     "n_matches_topk": 0
+    },
+    {
+     "id": "r061",
+     "q": "정무위원회에서 북한 핵 문제 관련 논의가 있었나요?",
+     "type": "unanswerable",
+     "unanswerable": true,
+     "first_relevant_rank": null,
+     "n_matches_topk": 0
+    },
+    {
+     "id": "r062",
+     "q": "2024년 6월 외교통일위원회에서 어떤 논의가 있었나요?",
+     "type": "unanswerable",
+     "unanswerable": true,
+     "first_relevant_rank": null,
+     "n_matches_topk": 0
+    },
+    {
+     "id": "r063",
+     "q": "이준석 의원은 정무위원회에서 금융 정책에 대해 어떤 발언을 했나요?",
+     "type": "unanswerable",
+     "unanswerable": true,
+     "first_relevant_rank": null,
+     "n_matches_topk": 0
+    }
+   ],
+   "elapsed_sec": 137.7
+  }
+ }
+}

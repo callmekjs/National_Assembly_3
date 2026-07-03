@@ -1,0 +1,33 @@
+{
+  "generated_at": "2026-07-01 12:55 UTC",
+  "pipeline": "National Assembly Minutes DataOps v1",
+  "stages": {
+    "extract": {
+      "sources": 767,
+      "pages": 41571
+    },
+    "normalize": {
+      "sources": 767,
+      "pages": 41571
+    },
+    "parse": {
+      "sources": 767,
+      "turns": 326356
+    },
+    "enrich": {
+      "sources": 767,
+      "enriched_turns": 326356
+    },
+    "chunk": {
+      "sources": 767,
+      "chunks": 327359
+    }
+  },
+  "completion": {
+    "extract_rate": "767/767",
+    "normalize_rate": "767/767",
+    "parse_rate": "767/767",
+    "enrich_rate": "767/767",
+    "chunk_rate": "767/767"
+  }
+}

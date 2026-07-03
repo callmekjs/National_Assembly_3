@@ -1,0 +1,2882 @@
+[
+ {
+  "member_id": "T2T8225E",
+  "name": "강경숙",
+  "hanja_name": "姜景淑",
+  "party": "조국혁신당",
+  "party_raw": "조국혁신당",
+  "era": "제22대",
+  "committees": "교육위원회, 예산결산특별위원회"
+ },
+ {
+  "member_id": "L2I9861C",
+  "name": "강대식",
+  "hanja_name": "姜大植",
+  "party": "국민의힘",
+  "party_raw": "미래통합당/국민의힘",
+  "era": "제21대, 제22대",
+  "committees": "국방위원회"
+ },
+ {
+  "member_id": "8P37634C",
+  "name": "강득구",
+  "hanja_name": "姜得求",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당",
+  "era": "제21대, 제22대",
+  "committees": "기후위기 특별위원회, 국토교통위원회"
+ },
+ {
+  "member_id": "9901388T",
+  "name": "강명구",
+  "hanja_name": "姜明求",
+  "party": "국민의힘",
+  "party_raw": "국민의힘",
+  "era": "제22대",
+  "committees": "정무위원회"
+ },
+ {
+  "member_id": "GX22581L",
+  "name": "강민국",
+  "hanja_name": "姜旻局",
+  "party": "국민의힘",
+  "party_raw": "미래통합당/국민의힘",
+  "era": "제21대, 제22대",
+  "committees": "정무위원회"
+ },
+ {
+  "member_id": "NQO7187X",
+  "name": "강선영",
+  "hanja_name": "姜善榮",
+  "party": "국민의미래",
+  "party_raw": "국민의미래",
+  "era": "제22대",
+  "committees": "국방위원회, 국회운영위원회"
+ },
+ {
+  "member_id": "MNZ4401T",
+  "name": "강선우",
+  "hanja_name": "姜仙祐",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당",
+  "era": "제21대, 제22대",
+  "committees": "농림축산식품해양수산위원회, 성평등가족위원회"
+ },
+ {
+  "member_id": "42K7317Y",
+  "name": "강승규",
+  "hanja_name": "姜升圭",
+  "party": "국민의힘",
+  "party_raw": "한나라당/국민의힘",
+  "era": "제18대, 제22대",
+  "committees": "국무총리(한성숙) 임명동의에 관한 인사청문특별위원회, 예산결산특별위원회"
+ },
+ {
+  "member_id": "Q129715Y",
+  "name": "강유정",
+  "hanja_name": "姜由楨",
+  "party": "더불어민주연합",
+  "party_raw": "더불어민주연합",
+  "era": "제22대",
+  "committees": "국회운영위원회, 문화체육관광위원회"
+ },
+ {
+  "member_id": "5KV96424",
+  "name": "강준현",
+  "hanja_name": "康準鉉",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당",
+  "era": "제21대, 제22대",
+  "committees": "정무위원회"
+ },
+ {
+  "member_id": "TRE2429O",
+  "name": "강훈식",
+  "hanja_name": "姜勳植",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당/더불어민주당",
+  "era": "제20대, 제21대, 제22대",
+  "committees": "정무위원회"
+ },
+ {
+  "member_id": "HS39431V",
+  "name": "고동진",
+  "hanja_name": "高東眞",
+  "party": "국민의힘",
+  "party_raw": "국민의힘",
+  "era": "제22대",
+  "committees": "행정안전위원회"
+ },
+ {
+  "member_id": "WCD5518S",
+  "name": "고민정",
+  "hanja_name": "高旼廷",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당",
+  "era": "제21대, 제22대",
+  "committees": "교육위원회"
+ },
+ {
+  "member_id": "REG96285",
+  "name": "곽규택",
+  "hanja_name": "郭圭澤",
+  "party": "국민의힘",
+  "party_raw": "국민의힘",
+  "era": "제22대",
+  "committees": "순직 해병 수사 방해 및 사건 은폐 등의 진실규명을 위한 국정조사특별위원회, 국회운영위원회, 법제사법위원회"
+ },
+ {
+  "member_id": "FIE6569O",
+  "name": "곽상언",
+  "hanja_name": "郭相彦",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "기후에너지환경노동위원회, 성평등가족위원회"
+ },
+ {
+  "member_id": "7469929V",
+  "name": "구자근",
+  "hanja_name": "具滋根",
+  "party": "국민의힘",
+  "party_raw": "미래통합당/국민의힘",
+  "era": "제21대, 제22대",
+  "committees": null
+ },
+ {
+  "member_id": "GDG1847Z",
+  "name": "권성동",
+  "hanja_name": "權性東",
+  "party": "국민의힘",
+  "party_raw": "한나라당/새누리당/새누리당/무소속/국민의힘",
+  "era": "제18대, 제19대, 제20대, 제21대, 제22대",
+  "committees": null
+ },
+ {
+  "member_id": "LG63087O",
+  "name": "권영세",
+  "hanja_name": "權寧世",
+  "party": "국민의힘",
+  "party_raw": "한나라당/한나라당/한나라당/미래통합당/국민의힘",
+  "era": "제16대, 제17대, 제18대, 제21대, 제22대",
+  "committees": "재정경제기획위원회"
+ },
+ {
+  "member_id": "LYY5513O",
+  "name": "권영진",
+  "hanja_name": "權泳臻",
+  "party": "국민의힘",
+  "party_raw": "한나라당/국민의힘",
+  "era": "제18대, 제22대",
+  "committees": null
+ },
+ {
+  "member_id": "C7E79345",
+  "name": "권칠승",
+  "hanja_name": "權七勝",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당/더불어민주당",
+  "era": "제20대, 제21대, 제22대",
+  "committees": "보건복지위원회"
+ },
+ {
+  "member_id": "EFU76868",
+  "name": "권향엽",
+  "hanja_name": "權香葉",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "산업통상자원중소벤처기업위원회, 예산결산특별위원회"
+ },
+ {
+  "member_id": "TQP7167T",
+  "name": "김건",
+  "hanja_name": "金建",
+  "party": "국민의미래",
+  "party_raw": "국민의미래",
+  "era": "제22대",
+  "committees": null
+ },
+ {
+  "member_id": "X1K3667J",
+  "name": "김교흥",
+  "hanja_name": "金敎興",
+  "party": "더불어민주당",
+  "party_raw": "열린우리당/더불어민주당/더불어민주당",
+  "era": "제17대, 제21대, 제22대",
+  "committees": "보건복지위원회, 예산결산특별위원회"
+ },
+ {
+  "member_id": "HE08888N",
+  "name": "김기웅",
+  "hanja_name": "金基雄",
+  "party": "국민의힘",
+  "party_raw": "국민의힘",
+  "era": "제22대",
+  "committees": "예산결산특별위원회"
+ },
+ {
+  "member_id": "3CC88975",
+  "name": "김기표",
+  "hanja_name": "金起杓",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "법제사법위원회"
+ },
+ {
+  "member_id": "X7I4680R",
+  "name": "김기현",
+  "hanja_name": "金起炫",
+  "party": "국민의힘",
+  "party_raw": "한나라당/한나라당/새누리당/미래통합당/국민의힘",
+  "era": "제17대, 제18대, 제19대, 제21대, 제22대",
+  "committees": null
+ },
+ {
+  "member_id": "QHL3248U",
+  "name": "김남국",
+  "hanja_name": "金南局",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당",
+  "era": "제21대, 제22대",
+  "committees": "과학기술정보방송통신위원회, 예산결산특별위원회"
+ },
+ {
+  "member_id": "IUX1829H",
+  "name": "김남근",
+  "hanja_name": "金南槿",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "국토교통위원회, 성평등가족위원회, 예산결산특별위원회"
+ },
+ {
+  "member_id": "SKP6181Y",
+  "name": "김남준",
+  "hanja_name": "金南俊",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "예산결산특별위원회, 재정경제기획위원회"
+ },
+ {
+  "member_id": "NXB3178C",
+  "name": "김남희",
+  "hanja_name": "金南希",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "연금개혁 특별위원회, 제9회전국동시지방선거투표용지부족사태등국민참정권침해진상규명및선거관리개혁을위한국정조사특별위원회, 법제사법위원회"
+ },
+ {
+  "member_id": "ANS8383S",
+  "name": "김대식",
+  "hanja_name": "金大植",
+  "party": "국민의힘",
+  "party_raw": "국민의힘",
+  "era": "제22대",
+  "committees": "예산결산특별위원회"
+ },
+ {
+  "member_id": "LH97552Q",
+  "name": "김도읍",
+  "hanja_name": "金度邑",
+  "party": "국민의힘",
+  "party_raw": "새누리당/새누리당/미래통합당/국민의힘",
+  "era": "제19대, 제20대, 제21대, 제22대",
+  "committees": null
+ },
+ {
+  "member_id": "MIS62075",
+  "name": "김동아",
+  "hanja_name": "金東我",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "국무총리(한성숙) 임명동의에 관한 인사청문특별위원회, 법제사법위원회"
+ },
+ {
+  "member_id": "86R9476S",
+  "name": "김문수",
+  "hanja_name": "金文洙",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "교육위원회"
+ },
+ {
+  "member_id": "3BC6890E",
+  "name": "김미애",
+  "hanja_name": "金美愛",
+  "party": "국민의힘",
+  "party_raw": "미래통합당/국민의힘",
+  "era": "제21대, 제22대",
+  "committees": null
+ },
+ {
+  "member_id": "MLH1404S",
+  "name": "김민석",
+  "hanja_name": "金民錫",
+  "party": "더불어민주당",
+  "party_raw": "새정치국민회의/새천년민주당/더불어민주당/더불어민주당",
+  "era": "제15대, 제16대, 제21대, 제22대",
+  "committees": "국방위원회"
+ },
+ {
+  "member_id": "TCP9838Y",
+  "name": "김민전",
+  "hanja_name": "金玟甸",
+  "party": "국민의미래",
+  "party_raw": "국민의미래",
+  "era": "제22대",
+  "committees": null
+ },
+ {
+  "member_id": "8Q88373R",
+  "name": "김병기",
+  "hanja_name": "金炳基",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당/더불어민주당",
+  "era": "제20대, 제21대, 제22대",
+  "committees": "국방위원회"
+ },
+ {
+  "member_id": "GF286398",
+  "name": "김병주",
+  "hanja_name": "金柄周",
+  "party": "더불어민주당",
+  "party_raw": "더불어시민당/더불어민주당",
+  "era": "제21대, 제22대",
+  "committees": "순직 해병 수사 방해 및 사건 은폐 등의 진실규명을 위한 국정조사특별위원회, 국방위원회"
+ },
+ {
+  "member_id": "VDN5593C",
+  "name": "김상욱",
+  "hanja_name": "金相旭",
+  "party": "국민의힘",
+  "party_raw": "국민의힘",
+  "era": "제22대",
+  "committees": "12.29 여객기 참사 진상규명을 위한 국정조사특별위원회, 12.29여객기참사진상규명과피해자및유가족의피해구제를위한특별위원회, 외교통일위원회, 예산결산특별위원회, 농림축산식품해양수산위원회, 여성가족위원회, 행정안전위원회, 환경노동위원회"
+ },
+ {
+  "member_id": "1Y73132H",
+  "name": "김상훈",
+  "hanja_name": "金相勳",
+  "party": "국민의힘",
+  "party_raw": "새누리당/새누리당/미래통합당/국민의힘",
+  "era": "제19대, 제20대, 제21대, 제22대",
+  "committees": "정무위원회"
+ },
+ {
+  "member_id": "ZYP7962W",
+  "name": "김석기",
+  "hanja_name": "金碩基",
+  "party": "국민의힘",
+  "party_raw": "새누리당/미래통합당/국민의힘",
+  "era": "제20대, 제21대, 제22대",
+  "committees": null
+ },
+ {
+  "member_id": "JNL7001A",
+  "name": "김선교",
+  "hanja_name": "金善敎",
+  "party": "국민의힘",
+  "party_raw": "미래통합당/국민의힘",
+  "era": "제21대, 제22대",
+  "committees": "국무총리(한성숙) 임명동의에 관한 인사청문특별위원회, 농림축산식품해양수산위원회"
+ },
+ {
+  "member_id": "7GW5372Y",
+  "name": "김선민",
+  "hanja_name": "金宣旼",
+  "party": "조국혁신당",
+  "party_raw": "조국혁신당",
+  "era": "제22대",
+  "committees": "과학기술정보방송통신위원회"
+ },
+ {
+  "member_id": "DOZ1588B",
+  "name": "김성범",
+  "hanja_name": "金晟範",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "농림축산식품해양수산위원회"
+ },
+ {
+  "member_id": "9D939735",
+  "name": "김성원",
+  "hanja_name": "金成願",
+  "party": "국민의힘",
+  "party_raw": "새누리당/미래통합당/국민의힘",
+  "era": "제20대, 제21대, 제22대",
+  "committees": null
+ },
+ {
+  "member_id": "XSP20229",
+  "name": "김성환",
+  "hanja_name": "金星煥",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당/더불어민주당",
+  "era": "제20대, 제21대, 제22대",
+  "committees": "외교통일위원회"
+ },
+ {
+  "member_id": "88O1334C",
+  "name": "김성회",
+  "hanja_name": "金城會",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "순직 해병 수사 방해 및 사건 은폐 등의 진실규명을 위한 국정조사특별위원회, 기후위기 특별위원회, 국방위원회, 국회운영위원회, 예산결산특별위원회"
+ },
+ {
+  "member_id": "1SR94244",
+  "name": "김소희",
+  "hanja_name": "金素熙",
+  "party": "국민의미래",
+  "party_raw": "국민의미래",
+  "era": "제22대",
+  "committees": "기후위기 특별위원회, 기후에너지환경노동위원회"
+ },
+ {
+  "member_id": "5K93695T",
+  "name": "김승수",
+  "hanja_name": "金承洙",
+  "party": "국민의힘",
+  "party_raw": "미래통합당/국민의힘",
+  "era": "제21대, 제22대",
+  "committees": "국회운영위원회, 문화체육관광위원회"
+ },
+ {
+  "member_id": "ATB59635",
+  "name": "김승원",
+  "hanja_name": "金勝源",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당",
+  "era": "제21대, 제22대",
+  "committees": "법제사법위원회"
+ },
+ {
+  "member_id": "B7D7534L",
+  "name": "김영배",
+  "hanja_name": "金永培",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당",
+  "era": "제21대, 제22대",
+  "committees": "제9회전국동시지방선거투표용지부족사태등국민참정권침해진상규명및선거관리개혁을위한국정조사특별위원회, 행정안전위원회"
+ },
+ {
+  "member_id": "5765663F",
+  "name": "김영진",
+  "hanja_name": "金榮鎭",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당/더불어민주당",
+  "era": "제20대, 제21대, 제22대",
+  "committees": "행정안전위원회"
+ },
+ {
+  "member_id": "7BM2933Y",
+  "name": "김영호",
+  "hanja_name": "金映豪",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당/더불어민주당",
+  "era": "제20대, 제21대, 제22대",
+  "committees": "외교통일위원회"
+ },
+ {
+  "member_id": "8O34202I",
+  "name": "김영환",
+  "hanja_name": "金永煥",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "재정경제기획위원회"
+ },
+ {
+  "member_id": "CNZ51556",
+  "name": "김예지",
+  "hanja_name": "金睿智",
+  "party": "국민의미래",
+  "party_raw": "미래한국당/국민의미래",
+  "era": "제21대, 제22대",
+  "committees": null
+ },
+ {
+  "member_id": "NB64509Z",
+  "name": "김용만",
+  "hanja_name": "金容萬",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "제9회전국동시지방선거투표용지부족사태등국민참정권침해진상규명및선거관리개혁을위한국정조사특별위원회, 정무위원회"
+ },
+ {
+  "member_id": "OFE45081",
+  "name": "김용민",
+  "hanja_name": "金容民",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당",
+  "era": "제21대, 제22대",
+  "committees": "법제사법위원회"
+ },
+ {
+  "member_id": "EPI69383",
+  "name": "김용태",
+  "hanja_name": "金龍泰",
+  "party": "국민의힘",
+  "party_raw": "국민의힘",
+  "era": "제22대",
+  "committees": "연금개혁 특별위원회, 기후위기 특별위원회"
+ },
+ {
+  "member_id": "3UI95829",
+  "name": "김우영",
+  "hanja_name": "金宇榮",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "과학기술정보방송통신위원회"
+ },
+ {
+  "member_id": "4L695580",
+  "name": "김원이",
+  "hanja_name": "金元二",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당",
+  "era": "제21대, 제22대",
+  "committees": "기후위기 특별위원회, 산업통상자원중소벤처기업위원회"
+ },
+ {
+  "member_id": "LCZ1711I",
+  "name": "김위상",
+  "hanja_name": "金渭相",
+  "party": "국민의미래",
+  "party_raw": "국민의미래",
+  "era": "제22대",
+  "committees": "기후에너지환경노동위원회, 예산결산특별위원회"
+ },
+ {
+  "member_id": "5N65159P",
+  "name": "김윤",
+  "hanja_name": "金輪",
+  "party": "더불어민주연합",
+  "party_raw": "더불어민주연합",
+  "era": "제22대",
+  "committees": "국회운영위원회, 보건복지위원회"
+ },
+ {
+  "member_id": "JZY9937U",
+  "name": "김윤덕",
+  "hanja_name": "金潤德",
+  "party": "더불어민주당",
+  "party_raw": "민주통합당/더불어민주당/더불어민주당",
+  "era": "제19대, 제21대, 제22대",
+  "committees": "문화체육관광위원회"
+ },
+ {
+  "member_id": "L5P27909",
+  "name": "김은혜",
+  "hanja_name": "金恩慧",
+  "party": "국민의힘",
+  "party_raw": "미래통합당/국민의힘",
+  "era": "제21대, 제22대",
+  "committees": "제9회전국동시지방선거투표용지부족사태등국민참정권침해진상규명및선거관리개혁을위한국정조사특별위원회, 국회운영위원회"
+ },
+ {
+  "member_id": "FIC9046Z",
+  "name": "김의겸",
+  "hanja_name": "金宜謙",
+  "party": "더불어민주당",
+  "party_raw": "열린민주당/더불어민주당",
+  "era": "제21대, 제22대",
+  "committees": "산업통상자원중소벤처기업위원회"
+ },
+ {
+  "member_id": "X7E7893P",
+  "name": "김장겸",
+  "hanja_name": "金張謙",
+  "party": "국민의미래",
+  "party_raw": "국민의미래",
+  "era": "제22대",
+  "committees": "과학기술정보방송통신위원회"
+ },
+ {
+  "member_id": "57B28032",
+  "name": "김재섭",
+  "hanja_name": "金宰燮",
+  "party": "국민의힘",
+  "party_raw": "국민의힘",
+  "era": "제22대",
+  "committees": "연금개혁 특별위원회, 정무위원회"
+ },
+ {
+  "member_id": "DMP1439I",
+  "name": "김재원",
+  "hanja_name": "金載原",
+  "party": "조국혁신당",
+  "party_raw": "조국혁신당",
+  "era": "제22대",
+  "committees": "문화체육관광위원회"
+ },
+ {
+  "member_id": "E1J8836Y",
+  "name": "김정재",
+  "hanja_name": "金汀才",
+  "party": "국민의힘",
+  "party_raw": "새누리당/미래통합당/국민의힘",
+  "era": "제20대, 제21대, 제22대",
+  "committees": null
+ },
+ {
+  "member_id": "9LD2641Q",
+  "name": "김정호",
+  "hanja_name": "金禎鎬",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당/더불어민주당",
+  "era": "제20대, 제21대, 제22대",
+  "committees": "기후위기 특별위원회, 기후에너지환경노동위원회"
+ },
+ {
+  "member_id": "M2Q9024I",
+  "name": "김종민",
+  "hanja_name": "金鍾民",
+  "party": "새로운미래",
+  "party_raw": "더불어민주당/더불어민주당/새로운미래",
+  "era": "제20대, 제21대, 제22대",
+  "committees": "산업통상자원중소벤처기업위원회"
+ },
+ {
+  "member_id": "N378078V",
+  "name": "김종양",
+  "hanja_name": "金鍾陽",
+  "party": "국민의힘",
+  "party_raw": "국민의힘",
+  "era": "제22대",
+  "committees": null
+ },
+ {
+  "member_id": "D6U6678O",
+  "name": "김주영",
+  "hanja_name": "金周暎",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당",
+  "era": "제21대, 제22대",
+  "committees": "기후에너지환경노동위원회"
+ },
+ {
+  "member_id": "YM42715P",
+  "name": "김준혁",
+  "hanja_name": "金俊爀",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "교육위원회"
+ },
+ {
+  "member_id": "8A05621B",
+  "name": "김준형",
+  "hanja_name": "金峻亨",
+  "party": "조국혁신당",
+  "party_raw": "조국혁신당",
+  "era": "제22대",
+  "committees": "국회운영위원회, 외교통일위원회"
+ },
+ {
+  "member_id": "WMT66995",
+  "name": "김준환",
+  "hanja_name": "金峻煥",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "외교통일위원회"
+ },
+ {
+  "member_id": "7ZS19508",
+  "name": "김태규",
+  "hanja_name": "金泰圭",
+  "party": "국민의힘",
+  "party_raw": "국민의힘",
+  "era": "제22대",
+  "committees": "행정안전위원회"
+ },
+ {
+  "member_id": "1WE5693J",
+  "name": "김태년",
+  "hanja_name": "金太年",
+  "party": "더불어민주당",
+  "party_raw": "열린우리당/민주통합당/더불어민주당/더불어민주당/더불어민주당",
+  "era": "제17대, 제19대, 제20대, 제21대, 제22대",
+  "committees": "재정경제기획위원회"
+ },
+ {
+  "member_id": "6WK3815W",
+  "name": "김태선",
+  "hanja_name": "金台善",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "기후에너지환경노동위원회"
+ },
+ {
+  "member_id": "P0F1530P",
+  "name": "김태호",
+  "hanja_name": "金台鎬",
+  "party": "국민의힘",
+  "party_raw": "한나라당/새누리당/무소속/국민의힘",
+  "era": "제18대, 제19대, 제21대, 제22대",
+  "committees": null
+ },
+ {
+  "member_id": "NUB4941Z",
+  "name": "김한규",
+  "hanja_name": "金翰奎",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당",
+  "era": "제21대, 제22대",
+  "committees": "국무총리(한성숙) 임명동의에 관한 인사청문특별위원회, 국회운영위원회, 법제사법위원회"
+ },
+ {
+  "member_id": "7YL9580G",
+  "name": "김현",
+  "hanja_name": "金玄",
+  "party": "더불어민주당",
+  "party_raw": "민주통합당/더불어민주당",
+  "era": "제19대, 제22대",
+  "committees": "과학기술정보방송통신위원회, 예산결산특별위원회"
+ },
+ {
+  "member_id": "6VC83722",
+  "name": "김현정",
+  "hanja_name": "金鉉正",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "정무위원회"
+ },
+ {
+  "member_id": "JEZ3130Q",
+  "name": "김형동",
+  "hanja_name": "金亨東",
+  "party": "국민의힘",
+  "party_raw": "미래통합당/국민의힘",
+  "era": "제21대, 제22대",
+  "committees": "기후에너지환경노동위원회"
+ },
+ {
+  "member_id": "HRG9655C",
+  "name": "김희정",
+  "hanja_name": "金姬廷",
+  "party": "국민의힘",
+  "party_raw": "한나라당/새누리당/국민의힘",
+  "era": "제17대, 제19대, 제22대",
+  "committees": "국무총리(한성숙) 임명동의에 관한 인사청문특별위원회"
+ },
+ {
+  "member_id": "SLW27496",
+  "name": "나경원",
+  "hanja_name": "羅景垣",
+  "party": "국민의힘",
+  "party_raw": "한나라당/한나라당/새누리당/새누리당/국민의힘",
+  "era": "제17대, 제18대, 제19대, 제20대, 제22대",
+  "committees": "법제사법위원회"
+ },
+ {
+  "member_id": "04T3751T",
+  "name": "남인순",
+  "hanja_name": "南仁順",
+  "party": "더불어민주당",
+  "party_raw": "민주통합당/더불어민주당/더불어민주당/더불어민주당",
+  "era": "제19대, 제20대, 제21대, 제22대",
+  "committees": "연금개혁 특별위원회, 보건복지위원회"
+ },
+ {
+  "member_id": "RUZ25800",
+  "name": "노종면",
+  "hanja_name": "盧宗勉",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "문화체육관광위원회"
+ },
+ {
+  "member_id": "FJK3396E",
+  "name": "맹성규",
+  "hanja_name": "孟聖奎",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당/더불어민주당",
+  "era": "제20대, 제21대, 제22대",
+  "committees": "외교통일위원회"
+ },
+ {
+  "member_id": "J1G57517",
+  "name": "모경종",
+  "hanja_name": "牟炅鍾",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "연금개혁 특별위원회, 국토교통위원회"
+ },
+ {
+  "member_id": "GRP3908I",
+  "name": "문금주",
+  "hanja_name": "文今柱",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "국회운영위원회, 농림축산식품해양수산위원회"
+ },
+ {
+  "member_id": "D9I3309M",
+  "name": "문대림",
+  "hanja_name": "文大林",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "농림축산식품해양수산위원회, 예산결산특별위원회"
+ },
+ {
+  "member_id": "GOC54665",
+  "name": "문정복",
+  "hanja_name": "文貞福",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당",
+  "era": "제21대, 제22대",
+  "committees": "국토교통위원회"
+ },
+ {
+  "member_id": "4U29186R",
+  "name": "문진석",
+  "hanja_name": "文振碩",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당",
+  "era": "제21대, 제22대",
+  "committees": "재정경제기획위원회"
+ },
+ {
+  "member_id": "TZ228122",
+  "name": "민병덕",
+  "hanja_name": "閔炳德",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당",
+  "era": "제21대, 제22대",
+  "committees": "정무위원회"
+ },
+ {
+  "member_id": "VRY5522V",
+  "name": "민형배",
+  "hanja_name": "閔炯培",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당",
+  "era": "제21대, 제22대",
+  "committees": "헌법재판소 재판관후보자를 겸하는 헌법재판소장(김상환) 임명동의에 관한 인사청문특별위원회, 기후위기 특별위원회, 문화체육관광위원회"
+ },
+ {
+  "member_id": "O6D8329R",
+  "name": "민홍철",
+  "hanja_name": "閔洪喆",
+  "party": "더불어민주당",
+  "party_raw": "민주통합당/더불어민주당/더불어민주당/더불어민주당",
+  "era": "제19대, 제20대, 제21대, 제22대",
+  "committees": "국방위원회"
+ },
+ {
+  "member_id": "IWR8966I",
+  "name": "박균택",
+  "hanja_name": "朴均澤",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "국무총리(한성숙) 임명동의에 관한 인사청문특별위원회, 국회운영위원회, 법제사법위원회"
+ },
+ {
+  "member_id": "W4X85128",
+  "name": "박대출",
+  "hanja_name": "朴大出",
+  "party": "국민의힘",
+  "party_raw": "새누리당/새누리당/미래통합당/국민의힘",
+  "era": "제19대, 제20대, 제21대, 제22대",
+  "committees": "재정경제기획위원회"
+ },
+ {
+  "member_id": "N4R2421C",
+  "name": "박덕흠",
+  "hanja_name": "朴德欽",
+  "party": "국민의힘",
+  "party_raw": "새누리당/새누리당/미래통합당/국민의힘",
+  "era": "제19대, 제20대, 제21대, 제22대",
+  "committees": "과학기술정보방송통신위원회"
+ },
+ {
+  "member_id": "M4O5221T",
+  "name": "박민규",
+  "hanja_name": "朴珉奎",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "정무위원회"
+ },
+ {
+  "member_id": "7R156073",
+  "name": "박범계",
+  "hanja_name": "朴範界",
+  "party": "더불어민주당",
+  "party_raw": "민주통합당/더불어민주당/더불어민주당/더불어민주당",
+  "era": "제19대, 제20대, 제21대, 제22대",
+  "committees": "순직 해병 수사 방해 및 사건 은폐 등의 진실규명을 위한 국정조사특별위원회, 교육위원회"
+ },
+ {
+  "member_id": "VA04150X",
+  "name": "박상웅",
+  "hanja_name": "朴相雄",
+  "party": "국민의힘",
+  "party_raw": "국민의힘",
+  "era": "제22대",
+  "committees": null
+ },
+ {
+  "member_id": "HXT76735",
+  "name": "박상혁",
+  "hanja_name": "朴商赫",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당",
+  "era": "제21대, 제22대",
+  "committees": "정무위원회"
+ },
+ {
+  "member_id": "VZA76236",
+  "name": "박선원",
+  "hanja_name": "朴善源",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "국무총리(한성숙) 임명동의에 관한 인사청문특별위원회, 국방위원회, 국회운영위원회, 정보위원회"
+ },
+ {
+  "member_id": "X3170462",
+  "name": "박성민",
+  "hanja_name": "朴成敏",
+  "party": "국민의힘",
+  "party_raw": "미래통합당/국민의힘",
+  "era": "제21대, 제22대",
+  "committees": null
+ },
+ {
+  "member_id": "IL74008M",
+  "name": "박성준",
+  "hanja_name": "朴省俊",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당",
+  "era": "제21대, 제22대",
+  "committees": "예산결산특별위원회, 외교통일위원회"
+ },
+ {
+  "member_id": "NX534083",
+  "name": "박성훈",
+  "hanja_name": "朴成訓",
+  "party": "국민의힘",
+  "party_raw": "국민의힘",
+  "era": "제22대",
+  "committees": "재정경제기획위원회"
+ },
+ {
+  "member_id": "Y0X4618N",
+  "name": "박수민",
+  "hanja_name": "朴琇民",
+  "party": "국민의힘",
+  "party_raw": "국민의힘",
+  "era": "제22대",
+  "committees": "연금개혁 특별위원회, 제9회전국동시지방선거투표용지부족사태등국민참정권침해진상규명및선거관리개혁을위한국정조사특별위원회, 국회운영위원회, 행정안전위원회"
+ },
+ {
+  "member_id": "FU87526G",
+  "name": "박수영",
+  "hanja_name": "朴洙瑩",
+  "party": "국민의힘",
+  "party_raw": "미래통합당/국민의힘",
+  "era": "제21대, 제22대",
+  "committees": "재정경제기획위원회"
+ },
+ {
+  "member_id": "5TQ6306B",
+  "name": "박수현",
+  "hanja_name": "朴洙賢",
+  "party": "더불어민주당",
+  "party_raw": "민주통합당/더불어민주당",
+  "era": "제19대, 제22대",
+  "committees": "국회운영위원회, 문화체육관광위원회, 예산결산특별위원회"
+ },
+ {
+  "member_id": "1JI2689F",
+  "name": "박용갑",
+  "hanja_name": "朴龍甲",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "보건복지위원회, 예산결산특별위원회"
+ },
+ {
+  "member_id": "1A82234K",
+  "name": "박은정",
+  "hanja_name": "朴恩貞",
+  "party": "조국혁신당",
+  "party_raw": "조국혁신당",
+  "era": "제22대",
+  "committees": "순직 해병 수사 방해 및 사건 은폐 등의 진실규명을 위한 국정조사특별위원회, 법제사법위원회"
+ },
+ {
+  "member_id": "4019850M",
+  "name": "박정",
+  "hanja_name": "朴釘",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당/더불어민주당",
+  "era": "제20대, 제21대, 제22대",
+  "committees": "기후에너지환경노동위원회"
+ },
+ {
+  "member_id": "6RD62559",
+  "name": "박정하",
+  "hanja_name": "朴正河",
+  "party": "국민의힘",
+  "party_raw": "국민의힘/국민의힘",
+  "era": "제21대, 제22대",
+  "committees": "문화체육관광위원회"
+ },
+ {
+  "member_id": "HVV5250J",
+  "name": "박정현",
+  "hanja_name": "朴貞炫",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "기후위기 특별위원회, 국회운영위원회, 행정안전위원회"
+ },
+ {
+  "member_id": "AEJ19639",
+  "name": "박정훈",
+  "hanja_name": "朴庭勳",
+  "party": "국민의힘",
+  "party_raw": "국민의힘",
+  "era": "제22대",
+  "committees": "과학기술정보방송통신위원회"
+ },
+ {
+  "member_id": "6AU2417B",
+  "name": "박주민",
+  "hanja_name": "朴柱民",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당/더불어민주당",
+  "era": "제20대, 제21대, 제22대",
+  "committees": "순직 해병 수사 방해 및 사건 은폐 등의 진실규명을 위한 국정조사특별위원회, 행정안전위원회"
+ },
+ {
+  "member_id": "G6W8250J",
+  "name": "박준태",
+  "hanja_name": "朴俊泰",
+  "party": "국민의미래",
+  "party_raw": "국민의미래",
+  "era": "제22대",
+  "committees": "순직 해병 수사 방해 및 사건 은폐 등의 진실규명을 위한 국정조사특별위원회, 농림축산식품해양수산위원회"
+ },
+ {
+  "member_id": "H7X3372O",
+  "name": "박지원",
+  "hanja_name": "朴芝源",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "보건복지위원회, 예산결산특별위원회"
+ },
+ {
+  "member_id": "8BF5855P",
+  "name": "박지원",
+  "hanja_name": "朴智元",
+  "party": "더불어민주당",
+  "party_raw": "민주당/무소속/민주통합당/국민의당/더불어민주당",
+  "era": "제14대, 제18대, 제19대, 제20대, 제22대",
+  "committees": "법제사법위원회, 정보위원회"
+ },
+ {
+  "member_id": "EMH4976E",
+  "name": "박지혜",
+  "hanja_name": "朴智慧",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "기후위기 특별위원회, 기후에너지환경노동위원회, 성평등가족위원회"
+ },
+ {
+  "member_id": "BT62420K",
+  "name": "박찬대",
+  "hanja_name": "朴贊大",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당/더불어민주당",
+  "era": "제20대, 제21대, 제22대",
+  "committees": "정무위원회, 국방위원회, 국회운영위원회, 정보위원회"
+ },
+ {
+  "member_id": "GP21946O",
+  "name": "박충권",
+  "hanja_name": "朴沖？",
+  "party": "국민의미래",
+  "party_raw": "국민의미래",
+  "era": "제22대",
+  "committees": "국회운영위원회, 행정안전위원회"
+ },
+ {
+  "member_id": "E2B3753X",
+  "name": "박해철",
+  "hanja_name": "朴海澈",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "기후에너지환경노동위원회"
+ },
+ {
+  "member_id": "6U243644",
+  "name": "박형수",
+  "hanja_name": "朴亨修",
+  "party": "국민의힘",
+  "party_raw": "미래통합당/국민의힘",
+  "era": "제21대, 제22대",
+  "committees": "기후에너지환경노동위원회, 예산결산특별위원회"
+ },
+ {
+  "member_id": "S824682L",
+  "name": "박홍근",
+  "hanja_name": "朴洪根",
+  "party": "더불어민주당",
+  "party_raw": "민주통합당/더불어민주당/더불어민주당/더불어민주당",
+  "era": "제19대, 제20대, 제21대, 제22대",
+  "committees": "국방위원회"
+ },
+ {
+  "member_id": "ZW43496R",
+  "name": "박홍배",
+  "hanja_name": "朴弘培",
+  "party": "더불어민주연합",
+  "party_raw": "더불어민주연합",
+  "era": "제22대",
+  "committees": "연금개혁 특별위원회, 정무위원회"
+ },
+ {
+  "member_id": "43Q3892U",
+  "name": "박희승",
+  "hanja_name": "朴熙承",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "산업통상자원중소벤처기업위원회"
+ },
+ {
+  "member_id": "QQP4727N",
+  "name": "배준영",
+  "hanja_name": "裵俊英",
+  "party": "국민의힘",
+  "party_raw": "미래통합당/국민의힘",
+  "era": "제21대, 제22대",
+  "committees": "예산결산특별위원회"
+ },
+ {
+  "member_id": "4X525582",
+  "name": "배현진",
+  "hanja_name": "裵賢鎭",
+  "party": "국민의힘",
+  "party_raw": "미래통합당/국민의힘",
+  "era": "제21대, 제22대",
+  "committees": null
+ },
+ {
+  "member_id": "YN160848",
+  "name": "백선희",
+  "hanja_name": "白仙姬",
+  "party": "조국혁신당",
+  "party_raw": "조국혁신당",
+  "era": "제22대",
+  "committees": "보건복지위원회, 예산결산특별위원회"
+ },
+ {
+  "member_id": "MDC3257K",
+  "name": "백승아",
+  "hanja_name": "白承아",
+  "party": "더불어민주연합",
+  "party_raw": "더불어민주연합",
+  "era": "제22대",
+  "committees": "국무총리(한성숙) 임명동의에 관한 인사청문특별위원회, 교육위원회"
+ },
+ {
+  "member_id": "CAA7713A",
+  "name": "백종헌",
+  "hanja_name": "白宗憲",
+  "party": "국민의힘",
+  "party_raw": "미래통합당/국민의힘",
+  "era": "제21대, 제22대",
+  "committees": null
+ },
+ {
+  "member_id": "HSS7466Y",
+  "name": "백혜련",
+  "hanja_name": "白惠蓮",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당/더불어민주당",
+  "era": "제20대, 제21대, 제22대",
+  "committees": "국무총리(한성숙) 임명동의에 관한 인사청문특별위원회, 산업통상자원중소벤처기업위원회, 성평등가족위원회, 정보위원회"
+ },
+ {
+  "member_id": "GJ56729D",
+  "name": "복기왕",
+  "hanja_name": "卜箕旺",
+  "party": "더불어민주당",
+  "party_raw": "열린우리당/더불어민주당",
+  "era": "제17대, 제22대",
+  "committees": "국토교통위원회"
+ },
+ {
+  "member_id": "6I88973D",
+  "name": "부승찬",
+  "hanja_name": "夫勝粲",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "순직 해병 수사 방해 및 사건 은폐 등의 진실규명을 위한 국정조사특별위원회, 국토교통위원회"
+ },
+ {
+  "member_id": "QQ429063",
+  "name": "서명옥",
+  "hanja_name": "徐明玉",
+  "party": "국민의힘",
+  "party_raw": "국민의힘",
+  "era": "제22대",
+  "committees": null
+ },
+ {
+  "member_id": "51A45980",
+  "name": "서미화",
+  "hanja_name": "徐美和",
+  "party": "더불어민주연합",
+  "party_raw": "더불어민주연합",
+  "era": "제22대",
+  "committees": "국회운영위원회, 보건복지위원회"
+ },
+ {
+  "member_id": "L7J93733",
+  "name": "서범수",
+  "hanja_name": "徐範洙",
+  "party": "국민의힘",
+  "party_raw": "미래통합당/국민의힘",
+  "era": "제21대, 제22대",
+  "committees": "기후위기 특별위원회, 제9회전국동시지방선거투표용지부족사태등국민참정권침해진상규명및선거관리개혁을위한국정조사특별위원회, 예산결산특별위원회, 행정안전위원회"
+ },
+ {
+  "member_id": "FOK3459D",
+  "name": "서삼석",
+  "hanja_name": "徐參錫",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당/더불어민주당",
+  "era": "제20대, 제21대, 제22대",
+  "committees": "농림축산식품해양수산위원회"
+ },
+ {
+  "member_id": "TKJ4800F",
+  "name": "서영교",
+  "hanja_name": "徐瑛敎",
+  "party": "더불어민주당",
+  "party_raw": "민주통합당/더불어민주당/더불어민주당/더불어민주당",
+  "era": "제19대, 제20대, 제21대, 제22대",
+  "committees": "법제사법위원회"
+ },
+ {
+  "member_id": "XR24352K",
+  "name": "서영석",
+  "hanja_name": "徐暎錫",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당",
+  "era": "제21대, 제22대",
+  "committees": "보건복지위원회"
+ },
+ {
+  "member_id": "80C5885Z",
+  "name": "서왕진",
+  "hanja_name": "徐旺鎭",
+  "party": "조국혁신당",
+  "party_raw": "조국혁신당",
+  "era": "제22대",
+  "committees": "기후위기 특별위원회, 기후에너지환경노동위원회"
+ },
+ {
+  "member_id": "MR210505",
+  "name": "서일준",
+  "hanja_name": "徐一俊",
+  "party": "국민의힘",
+  "party_raw": "미래통합당/국민의힘",
+  "era": "제21대, 제22대",
+  "committees": null
+ },
+ {
+  "member_id": "P7U7800Z",
+  "name": "서지영",
+  "hanja_name": "徐知英",
+  "party": "국민의힘",
+  "party_raw": "국민의힘",
+  "era": "제22대",
+  "committees": "국회운영위원회"
+ },
+ {
+  "member_id": "JP222486",
+  "name": "서천호",
+  "hanja_name": "徐千浩",
+  "party": "국민의힘",
+  "party_raw": "국민의힘",
+  "era": "제22대",
+  "committees": "농림축산식품해양수산위원회"
+ },
+ {
+  "member_id": "7XY7109I",
+  "name": "성일종",
+  "hanja_name": "成一鍾",
+  "party": "국민의힘",
+  "party_raw": "새누리당/미래통합당/국민의힘",
+  "era": "제20대, 제21대, 제22대",
+  "committees": "국방위원회"
+ },
+ {
+  "member_id": "ZDR63255",
+  "name": "소병훈",
+  "hanja_name": "蘇秉勳",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당/더불어민주당",
+  "era": "제20대, 제21대, 제22대",
+  "committees": "보건복지위원회"
+ },
+ {
+  "member_id": "JSA8739I",
+  "name": "손명수",
+  "hanja_name": "孫明秀",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "정무위원회"
+ },
+ {
+  "member_id": "2KM3589W",
+  "name": "손솔",
+  "hanja_name": "孫率",
+  "party": "더불어민주연합",
+  "party_raw": "더불어민주연합",
+  "era": "제22대",
+  "committees": "법제사법위원회"
+ },
+ {
+  "member_id": "SQ36001H",
+  "name": "송기헌",
+  "hanja_name": "宋基憲",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당/더불어민주당",
+  "era": "제20대, 제21대, 제22대",
+  "committees": "과학기술정보방송통신위원회"
+ },
+ {
+  "member_id": "CNW5754J",
+  "name": "송석준",
+  "hanja_name": "宋錫俊",
+  "party": "국민의힘",
+  "party_raw": "새누리당/미래통합당/국민의힘",
+  "era": "제20대, 제21대, 제22대",
+  "committees": "순직 해병 수사 방해 및 사건 은폐 등의 진실규명을 위한 국정조사특별위원회, 법제사법위원회"
+ },
+ {
+  "member_id": "6EN68926",
+  "name": "송언석",
+  "hanja_name": "宋彦錫",
+  "party": "국민의힘",
+  "party_raw": "자유한국당/미래통합당/국민의힘",
+  "era": "제20대, 제21대, 제22대",
+  "committees": "예산결산특별위원회"
+ },
+ {
+  "member_id": "PAO22428",
+  "name": "송영길",
+  "hanja_name": "宋永吉",
+  "party": "더불어민주당",
+  "party_raw": "새천년민주당/열린우리당/통합민주당/더불어민주당/더불어민주당/더불어민주당",
+  "era": "제16대, 제17대, 제18대, 제20대, 제21대, 제22대",
+  "committees": "국방위원회"
+ },
+ {
+  "member_id": "3249208I",
+  "name": "송옥주",
+  "hanja_name": "宋玉珠",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당/더불어민주당",
+  "era": "제20대, 제21대, 제22대",
+  "committees": "농림축산식품해양수산위원회"
+ },
+ {
+  "member_id": "RG972910",
+  "name": "송재봉",
+  "hanja_name": "宋在奉",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "기후위기 특별위원회, 산업통상자원중소벤처기업위원회, 예산결산특별위원회"
+ },
+ {
+  "member_id": "OWD1018N",
+  "name": "신동욱",
+  "hanja_name": "申東旭",
+  "party": "국민의힘",
+  "party_raw": "국민의힘",
+  "era": "제22대",
+  "committees": "제9회전국동시지방선거투표용지부족사태등국민참정권침해진상규명및선거관리개혁을위한국정조사특별위원회, 법제사법위원회"
+ },
+ {
+  "member_id": "RMC1840P",
+  "name": "신성범",
+  "hanja_name": "愼聖範",
+  "party": "국민의힘",
+  "party_raw": "한나라당/새누리당/국민의힘",
+  "era": "제18대, 제19대, 제22대",
+  "committees": "과학기술정보방송통신위원회"
+ },
+ {
+  "member_id": "AFH96856",
+  "name": "신영대",
+  "hanja_name": "申榮大",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당",
+  "era": "제21대, 제22대",
+  "committees": "국토교통위원회, 기획재정위원회, 예산결산특별위원회"
+ },
+ {
+  "member_id": "NPD75153",
+  "name": "신장식",
+  "hanja_name": "申莊植",
+  "party": "조국혁신당",
+  "party_raw": "조국혁신당",
+  "era": "제22대",
+  "committees": "농림축산식품해양수산위원회"
+ },
+ {
+  "member_id": "M7O7878U",
+  "name": "신정훈",
+  "hanja_name": "辛正勳",
+  "party": "더불어민주당",
+  "party_raw": "새정치민주연합/더불어민주당/더불어민주당",
+  "era": "제19대, 제21대, 제22대",
+  "committees": "재정경제기획위원회"
+ },
+ {
+  "member_id": "TST4507I",
+  "name": "안규백",
+  "hanja_name": "安圭伯",
+  "party": "더불어민주당",
+  "party_raw": "통합민주당/민주통합당/더불어민주당/더불어민주당/더불어민주당",
+  "era": "제18대, 제19대, 제20대, 제21대, 제22대",
+  "committees": "교육위원회"
+ },
+ {
+  "member_id": "EB16073M",
+  "name": "안도걸",
+  "hanja_name": "安道杰",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "국회운영위원회, 예산결산특별위원회, 재정경제기획위원회"
+ },
+ {
+  "member_id": "PYA8594I",
+  "name": "안상훈",
+  "hanja_name": "安祥薰",
+  "party": "국민의미래",
+  "party_raw": "국민의미래",
+  "era": "제22대",
+  "committees": "연금개혁 특별위원회"
+ },
+ {
+  "member_id": "YOG1280B",
+  "name": "안철수",
+  "hanja_name": "安哲秀",
+  "party": "국민의힘",
+  "party_raw": "무소속/국민의당/국민의힘/국민의힘",
+  "era": "제19대, 제20대, 제21대, 제22대",
+  "committees": null
+ },
+ {
+  "member_id": "W8L9421K",
+  "name": "안태준",
+  "hanja_name": "安泰俊",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "국토교통위원회"
+ },
+ {
+  "member_id": "XEF29171",
+  "name": "안호영",
+  "hanja_name": "安浩永",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당/더불어민주당",
+  "era": "제20대, 제21대, 제22대",
+  "committees": "기후에너지환경노동위원회"
+ },
+ {
+  "member_id": "3OQ8273H",
+  "name": "양문석",
+  "hanja_name": "梁文錫",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "국회운영위원회, 문화체육관광위원회"
+ },
+ {
+  "member_id": "CK143054",
+  "name": "양부남",
+  "hanja_name": "楊富男",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "제9회전국동시지방선거투표용지부족사태등국민참정권침해진상규명및선거관리개혁을위한국정조사특별위원회, 행정안전위원회"
+ },
+ {
+  "member_id": "8FB1535Y",
+  "name": "어기구",
+  "hanja_name": "魚基龜",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당/더불어민주당",
+  "era": "제20대, 제21대, 제22대",
+  "committees": "예산결산특별위원회, 재정경제기획위원회"
+ },
+ {
+  "member_id": "8348421R",
+  "name": "엄태영",
+  "hanja_name": "嚴泰永",
+  "party": "국민의힘",
+  "party_raw": "미래통합당/국민의힘",
+  "era": "제21대, 제22대",
+  "committees": null
+ },
+ {
+  "member_id": "URX8075K",
+  "name": "염태영",
+  "hanja_name": "廉泰英",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "기후위기 특별위원회, 국토교통위원회"
+ },
+ {
+  "member_id": "OIA3741M",
+  "name": "오기형",
+  "hanja_name": "吳奇炯",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당",
+  "era": "제21대, 제22대",
+  "committees": "연금개혁 특별위원회, 재정경제기획위원회"
+ },
+ {
+  "member_id": "BRU2690F",
+  "name": "오세희",
+  "hanja_name": "吳世姬",
+  "party": "더불어민주연합",
+  "party_raw": "더불어민주연합",
+  "era": "제22대",
+  "committees": "산업통상자원중소벤처기업위원회"
+ },
+ {
+  "member_id": "GE71932C",
+  "name": "용혜인",
+  "hanja_name": "龍慧仁",
+  "party": "더불어민주연합",
+  "party_raw": "기본소득당/더불어민주연합",
+  "era": "제21대, 제22대",
+  "committees": "행정안전위원회"
+ },
+ {
+  "member_id": "XBT9550Q",
+  "name": "우원식",
+  "hanja_name": "禹元植",
+  "party": "더불어민주당",
+  "party_raw": "열린우리당/민주통합당/더불어민주당/더불어민주당/더불어민주당",
+  "era": "제17대, 제19대, 제20대, 제21대, 제22대",
+  "committees": "재정경제기획위원회"
+ },
+ {
+  "member_id": "8UC4779G",
+  "name": "우재준",
+  "hanja_name": "禹在埈",
+  "party": "국민의힘",
+  "party_raw": "국민의힘",
+  "era": "제22대",
+  "committees": "연금개혁 특별위원회, 예산결산특별위원회, 행정안전위원회"
+ },
+ {
+  "member_id": "RQQ3807K",
+  "name": "위성곤",
+  "hanja_name": "魏聖坤",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당/더불어민주당",
+  "era": "제20대, 제21대, 제22대",
+  "committees": "기후위기 특별위원회, 12.29여객기참사진상규명과피해자및유가족의피해구제를위한특별위원회, 예산결산특별위원회, 행정안전위원회"
+ },
+ {
+  "member_id": "T9E37304",
+  "name": "위성락",
+  "hanja_name": "魏聖洛",
+  "party": "더불어민주연합",
+  "party_raw": "더불어민주연합",
+  "era": "제22대",
+  "committees": "외교통일위원회, 정보위원회"
+ },
+ {
+  "member_id": "GX38539O",
+  "name": "유동수",
+  "hanja_name": "柳東秀",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당/더불어민주당",
+  "era": "제20대, 제21대, 제22대",
+  "committees": "정무위원회"
+ },
+ {
+  "member_id": "MU69217P",
+  "name": "유상범",
+  "hanja_name": "劉相凡",
+  "party": "국민의힘",
+  "party_raw": "미래통합당/국민의힘",
+  "era": "제21대, 제22대",
+  "committees": "순직 해병 수사 방해 및 사건 은폐 등의 진실규명을 위한 국정조사특별위원회, 재정경제기획위원회"
+ },
+ {
+  "member_id": "JZV5283U",
+  "name": "유영하",
+  "hanja_name": "柳榮夏",
+  "party": "국민의힘",
+  "party_raw": "국민의힘",
+  "era": "제22대",
+  "committees": "국무총리(한성숙) 임명동의에 관한 인사청문특별위원회, 정무위원회"
+ },
+ {
+  "member_id": "KBK8836C",
+  "name": "유용원",
+  "hanja_name": "庾龍源",
+  "party": "국민의미래",
+  "party_raw": "국민의미래",
+  "era": "제22대",
+  "committees": "순직 해병 수사 방해 및 사건 은폐 등의 진실규명을 위한 국정조사특별위원회, 국방위원회"
+ },
+ {
+  "member_id": "MRK4871S",
+  "name": "유의동",
+  "hanja_name": "兪義東",
+  "party": "국민의힘",
+  "party_raw": "새누리당/새누리당/미래통합당/국민의힘",
+  "era": "제19대, 제20대, 제21대, 제22대",
+  "committees": "정무위원회"
+ },
+ {
+  "member_id": "GP07421U",
+  "name": "윤건영",
+  "hanja_name": "尹建永",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당",
+  "era": "제21대, 제22대",
+  "committees": "제9회전국동시지방선거투표용지부족사태등국민참정권침해진상규명및선거관리개혁을위한국정조사특별위원회, 정보위원회, 행정안전위원회"
+ },
+ {
+  "member_id": "MSY7784L",
+  "name": "윤상현",
+  "hanja_name": "尹相現",
+  "party": "국민의힘",
+  "party_raw": "한나라당/새누리당/무소속/국민의힘/국민의힘",
+  "era": "제18대, 제19대, 제20대, 제21대, 제22대",
+  "committees": "제9회전국동시지방선거투표용지부족사태등국민참정권침해진상규명및선거관리개혁을위한국정조사특별위원회, 법제사법위원회"
+ },
+ {
+  "member_id": "9VR65006",
+  "name": "윤영석",
+  "hanja_name": "尹永碩",
+  "party": "국민의힘",
+  "party_raw": "새누리당/새누리당/미래통합당/국민의힘",
+  "era": "제19대, 제20대, 제21대, 제22대",
+  "committees": "연금개혁 특별위원회, 재정경제기획위원회"
+ },
+ {
+  "member_id": "W0154979",
+  "name": "윤용근",
+  "hanja_name": "尹用根",
+  "party": "국민의힘",
+  "party_raw": "국민의힘",
+  "era": "제22대",
+  "committees": null
+ },
+ {
+  "member_id": "ZRF3039U",
+  "name": "윤재옥",
+  "hanja_name": "尹在玉",
+  "party": "국민의힘",
+  "party_raw": "새누리당/새누리당/미래통합당/국민의힘",
+  "era": "제19대, 제20대, 제21대, 제22대",
+  "committees": null
+ },
+ {
+  "member_id": "MQK9493H",
+  "name": "윤종군",
+  "hanja_name": "尹鍾君",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "국토교통위원회"
+ },
+ {
+  "member_id": "3TP65086",
+  "name": "윤종오",
+  "hanja_name": "尹鍾五",
+  "party": "진보당",
+  "party_raw": "무소속/진보당",
+  "era": "제20대, 제22대",
+  "committees": "국토교통위원회, 국회운영위원회"
+ },
+ {
+  "member_id": "JC14718Q",
+  "name": "윤준병",
+  "hanja_name": "尹準炳",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당",
+  "era": "제21대, 제22대",
+  "committees": "농림축산식품해양수산위원회"
+ },
+ {
+  "member_id": "8X15119P",
+  "name": "윤한홍",
+  "hanja_name": "尹漢洪",
+  "party": "국민의힘",
+  "party_raw": "새누리당/미래통합당/국민의힘",
+  "era": "제20대, 제21대, 제22대",
+  "committees": "정무위원회"
+ },
+ {
+  "member_id": "M0A1658U",
+  "name": "윤호중",
+  "hanja_name": "尹昊重",
+  "party": "더불어민주당",
+  "party_raw": "열린우리당/민주통합당/더불어민주당/더불어민주당/더불어민주당",
+  "era": "제17대, 제19대, 제20대, 제21대, 제22대",
+  "committees": "교육위원회"
+ },
+ {
+  "member_id": "O7R5461J",
+  "name": "윤후덕",
+  "hanja_name": "尹厚德",
+  "party": "더불어민주당",
+  "party_raw": "민주통합당/더불어민주당/더불어민주당/더불어민주당",
+  "era": "제19대, 제20대, 제21대, 제22대",
+  "committees": "재정경제기획위원회"
+ },
+ {
+  "member_id": "AEO5706C",
+  "name": "이강일",
+  "hanja_name": "李康一",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "정무위원회"
+ },
+ {
+  "member_id": "I7R13867",
+  "name": "이개호",
+  "hanja_name": "李介昊",
+  "party": "더불어민주당",
+  "party_raw": "새정치민주연합/더불어민주당/더불어민주당/더불어민주당",
+  "era": "제19대, 제20대, 제21대, 제22대",
+  "committees": "농림축산식품해양수산위원회"
+ },
+ {
+  "member_id": "7YC6702R",
+  "name": "이건태",
+  "hanja_name": "李建泰",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "기후에너지환경노동위원회, 예산결산특별위원회"
+ },
+ {
+  "member_id": "4A067125",
+  "name": "이광재",
+  "hanja_name": "李光宰",
+  "party": "더불어민주당",
+  "party_raw": "열린우리당/통합민주당/더불어민주당/더불어민주당",
+  "era": "제17대, 제18대, 제21대, 제22대",
+  "committees": "예산결산특별위원회, 재정경제기획위원회"
+ },
+ {
+  "member_id": "95J3282H",
+  "name": "이광희",
+  "hanja_name": "李廣熙",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "성평등가족위원회, 행정안전위원회"
+ },
+ {
+  "member_id": "W3U3344O",
+  "name": "이기헌",
+  "hanja_name": "李寄憲",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "제9회전국동시지방선거투표용지부족사태등국민참정권침해진상규명및선거관리개혁을위한국정조사특별위원회, 예산결산특별위원회, 외교통일위원회, 정보위원회"
+ },
+ {
+  "member_id": "ROS6754L",
+  "name": "이달희",
+  "hanja_name": "李達姬",
+  "party": "국민의미래",
+  "party_raw": "국민의미래",
+  "era": "제22대",
+  "committees": "과학기술정보방송통신위원회"
+ },
+ {
+  "member_id": "OSV9142K",
+  "name": "이만희",
+  "hanja_name": "李晩熙",
+  "party": "국민의힘",
+  "party_raw": "새누리당/미래통합당/국민의힘",
+  "era": "제20대, 제21대, 제22대",
+  "committees": "농림축산식품해양수산위원회"
+ },
+ {
+  "member_id": "HFV52269",
+  "name": "이병진",
+  "hanja_name": "李炳鎭",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "예산결산특별위원회, 2025 아시아태평양경제협력체(APEC) 정상회의 지원 특별위원회, 농림축산식품해양수산위원회"
+ },
+ {
+  "member_id": "W8W95421",
+  "name": "이상식",
+  "hanja_name": "李相植",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "순직 해병 수사 방해 및 사건 은폐 등의 진실규명을 위한 국정조사특별위원회, 행정안전위원회"
+ },
+ {
+  "member_id": "8L52480G",
+  "name": "이상휘",
+  "hanja_name": "李相輝",
+  "party": "국민의힘",
+  "party_raw": "국민의힘",
+  "era": "제22대",
+  "committees": "과학기술정보방송통신위원회"
+ },
+ {
+  "member_id": "WXJ8352N",
+  "name": "이성권",
+  "hanja_name": "李成權",
+  "party": "국민의힘",
+  "party_raw": "한나라당/국민의힘",
+  "era": "제17대, 제22대",
+  "committees": "기후에너지환경노동위원회, 예산결산특별위원회"
+ },
+ {
+  "member_id": "N2P9317N",
+  "name": "이성윤",
+  "hanja_name": "李盛潤",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "법제사법위원회"
+ },
+ {
+  "member_id": "WTR5885Y",
+  "name": "이소영",
+  "hanja_name": "李素永",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당",
+  "era": "제21대, 제22대",
+  "committees": "국무총리(한성숙) 임명동의에 관한 인사청문특별위원회, 기후위기 특별위원회, 기후에너지환경노동위원회"
+ },
+ {
+  "member_id": "MRS4949T",
+  "name": "이소희",
+  "hanja_name": "李昭熙",
+  "party": "국민의힘",
+  "party_raw": "국민의힘",
+  "era": "제22대",
+  "committees": "문화체육관광위원회"
+ },
+ {
+  "member_id": "0R68099X",
+  "name": "이수진",
+  "hanja_name": "李壽珍",
+  "party": "더불어민주당",
+  "party_raw": "더불어시민당/더불어민주당",
+  "era": "제21대, 제22대",
+  "committees": "연금개혁 특별위원회, 보건복지위원회, 성평등가족위원회"
+ },
+ {
+  "member_id": "S9U45255",
+  "name": "이양수",
+  "hanja_name": "李亮壽",
+  "party": "국민의힘",
+  "party_raw": "새누리당/미래통합당/국민의힘",
+  "era": "제20대, 제21대, 제22대",
+  "committees": "정무위원회"
+ },
+ {
+  "member_id": "JG77046J",
+  "name": "이언주",
+  "hanja_name": "李彦周",
+  "party": "더불어민주당",
+  "party_raw": "민주통합당/더불어민주당/더불어민주당",
+  "era": "제19대, 제20대, 제22대",
+  "committees": "산업통상자원중소벤처기업위원회"
+ },
+ {
+  "member_id": "EBH1101V",
+  "name": "이연희",
+  "hanja_name": "李蓮喜",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "과학기술정보방송통신위원회, 성평등가족위원회, 예산결산특별위원회"
+ },
+ {
+  "member_id": "9JF4562W",
+  "name": "이용선",
+  "hanja_name": "李庸瑄",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당",
+  "era": "제21대, 제22대",
+  "committees": "국토교통위원회"
+ },
+ {
+  "member_id": "6K79158C",
+  "name": "이용우",
+  "hanja_name": "李庸宇",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "기후에너지환경노동위원회"
+ },
+ {
+  "member_id": "DAV7257X",
+  "name": "이원택",
+  "hanja_name": "李源澤",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당",
+  "era": "제21대, 제22대",
+  "committees": "산불피해지원대책 특별위원회, 농림축산식품해양수산위원회"
+ },
+ {
+  "member_id": "DWK26447",
+  "name": "이인선",
+  "hanja_name": "李仁善",
+  "party": "국민의힘",
+  "party_raw": "국민의힘/국민의힘",
+  "era": "제21대, 제22대",
+  "committees": "재정경제기획위원회"
+ },
+ {
+  "member_id": "3ZR4438W",
+  "name": "이인영",
+  "hanja_name": "李仁榮",
+  "party": "더불어민주당",
+  "party_raw": "열린우리당/민주통합당/더불어민주당/더불어민주당/더불어민주당",
+  "era": "제17대, 제19대, 제20대, 제21대, 제22대",
+  "committees": "보건복지위원회, 정보위원회"
+ },
+ {
+  "member_id": "3LP22204",
+  "name": "이재강",
+  "hanja_name": "李在康",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "외교통일위원회"
+ },
+ {
+  "member_id": "RKS3658I",
+  "name": "이재관",
+  "hanja_name": "李在官",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "농림축산식품해양수산위원회"
+ },
+ {
+  "member_id": "IUD9392R",
+  "name": "이재명",
+  "hanja_name": "李在明",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당",
+  "era": "제21대, 제22대",
+  "committees": "외교통일위원회"
+ },
+ {
+  "member_id": "UQ282145",
+  "name": "이재정",
+  "hanja_name": "李在汀",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당/더불어민주당",
+  "era": "제20대, 제21대, 제22대",
+  "committees": "문화체육관광위원회"
+ },
+ {
+  "member_id": "O0I2045I",
+  "name": "이정문",
+  "hanja_name": "李楨文",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당",
+  "era": "제21대, 제22대",
+  "committees": "문화체육관광위원회"
+ },
+ {
+  "member_id": "5762459L",
+  "name": "이정헌",
+  "hanja_name": "李政憲",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "과학기술정보방송통신위원회, 국회운영위원회"
+ },
+ {
+  "member_id": "HSW1214Q",
+  "name": "이종배",
+  "hanja_name": "李鍾培",
+  "party": "국민의힘",
+  "party_raw": "새누리당/새누리당/미래통합당/국민의힘",
+  "era": "제19대, 제20대, 제21대, 제22대",
+  "committees": "기후위기 특별위원회, 기후에너지환경노동위원회, 예산결산특별위원회"
+ },
+ {
+  "member_id": "NLS46526",
+  "name": "이종욱",
+  "hanja_name": "李琮煜",
+  "party": "국민의힘",
+  "party_raw": "국민의힘",
+  "era": "제22대",
+  "committees": null
+ },
+ {
+  "member_id": "WI719547",
+  "name": "이주영",
+  "hanja_name": "李주鍈",
+  "party": "개혁신당",
+  "party_raw": "개혁신당",
+  "era": "제22대",
+  "committees": "교육위원회"
+ },
+ {
+  "member_id": "RBM5454A",
+  "name": "이주희",
+  "hanja_name": "李周禧",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "기후위기 특별위원회, 과학기술정보방송통신위원회, 국회운영위원회, 성평등가족위원회"
+ },
+ {
+  "member_id": "QWL7778X",
+  "name": "이준석",
+  "hanja_name": "李埈錫",
+  "party": "개혁신당",
+  "party_raw": "개혁신당",
+  "era": "제22대",
+  "committees": "제9회전국동시지방선거투표용지부족사태등국민참정권침해진상규명및선거관리개혁을위한국정조사특별위원회, 예산결산특별위원회, 재정경제기획위원회"
+ },
+ {
+  "member_id": "29V4537Y",
+  "name": "이진숙",
+  "hanja_name": "李眞淑",
+  "party": "국민의힘",
+  "party_raw": "국민의힘",
+  "era": "제22대",
+  "committees": "재정경제기획위원회"
+ },
+ {
+  "member_id": "TZP9391O",
+  "name": "이철규",
+  "hanja_name": "李喆圭",
+  "party": "국민의힘",
+  "party_raw": "무소속/미래통합당/국민의힘",
+  "era": "제20대, 제21대, 제22대",
+  "committees": null
+ },
+ {
+  "member_id": "V2R7430Z",
+  "name": "이춘석",
+  "hanja_name": "李春錫",
+  "party": "더불어민주당",
+  "party_raw": "통합민주당/민주통합당/더불어민주당/더불어민주당",
+  "era": "제18대, 제19대, 제20대, 제22대",
+  "committees": "재정경제기획위원회"
+ },
+ {
+  "member_id": "K5F2023J",
+  "name": "이학영",
+  "hanja_name": "李學永",
+  "party": "더불어민주당",
+  "party_raw": "민주통합당/더불어민주당/더불어민주당/더불어민주당",
+  "era": "제19대, 제20대, 제21대, 제22대",
+  "committees": "기후에너지환경노동위원회"
+ },
+ {
+  "member_id": "0698755I",
+  "name": "이해민",
+  "hanja_name": "李海珉",
+  "party": "조국혁신당",
+  "party_raw": "조국혁신당",
+  "era": "제22대",
+  "committees": "정무위원회"
+ },
+ {
+  "member_id": "CCU1009B",
+  "name": "이해식",
+  "hanja_name": "李海植",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당",
+  "era": "제21대, 제22대",
+  "committees": "제9회전국동시지방선거투표용지부족사태등국민참정권침해진상규명및선거관리개혁을위한국정조사특별위원회, 행정안전위원회"
+ },
+ {
+  "member_id": "EVH1507C",
+  "name": "이헌승",
+  "hanja_name": "李憲昇",
+  "party": "국민의힘",
+  "party_raw": "새누리당/새누리당/미래통합당/국민의힘",
+  "era": "제19대, 제20대, 제21대, 제22대",
+  "committees": "기후위기 특별위원회, 정무위원회"
+ },
+ {
+  "member_id": "2S73768V",
+  "name": "이훈기",
+  "hanja_name": "李勳基",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "기획재정위원회, 과학기술정보방송통신위원회"
+ },
+ {
+  "member_id": "B7789327",
+  "name": "인요한",
+  "hanja_name": "印曜翰",
+  "party": "국민의미래",
+  "party_raw": "국민의미래",
+  "era": "제22대",
+  "committees": "문화체육관광위원회, 외교통일위원회, 보건복지위원회"
+ },
+ {
+  "member_id": "CST4991F",
+  "name": "임광현",
+  "hanja_name": "林光鉉",
+  "party": "더불어민주연합",
+  "party_raw": "더불어민주연합",
+  "era": "제22대",
+  "committees": "국회운영위원회, 기획재정위원회"
+ },
+ {
+  "member_id": "JVK71445",
+  "name": "임문영",
+  "hanja_name": "林文泳",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "산업통상자원중소벤처기업위원회"
+ },
+ {
+  "member_id": "X639721U",
+  "name": "임미애",
+  "hanja_name": "林美愛",
+  "party": "더불어민주연합",
+  "party_raw": "더불어민주연합",
+  "era": "제22대",
+  "committees": "국회운영위원회, 농림축산식품해양수산위원회"
+ },
+ {
+  "member_id": "4T026790",
+  "name": "임오경",
+  "hanja_name": "林五卿",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당",
+  "era": "제21대, 제22대",
+  "committees": "문화체육관광위원회"
+ },
+ {
+  "member_id": "EH27538E",
+  "name": "임이자",
+  "hanja_name": "林利子",
+  "party": "국민의힘",
+  "party_raw": "새누리당/미래통합당/국민의힘",
+  "era": "제20대, 제21대, 제22대",
+  "committees": "재정경제기획위원회"
+ },
+ {
+  "member_id": "RAJ1024Z",
+  "name": "임종득",
+  "hanja_name": "林鍾得",
+  "party": "국민의힘",
+  "party_raw": "국민의힘",
+  "era": "제22대",
+  "committees": "국방위원회, 예산결산특별위원회"
+ },
+ {
+  "member_id": "FH777496",
+  "name": "임호선",
+  "hanja_name": "林昊宣",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당",
+  "era": "제21대, 제22대",
+  "committees": "예산결산특별위원회, 행정안전위원회"
+ },
+ {
+  "member_id": "RPN2293B",
+  "name": "장경태",
+  "hanja_name": "張耿態",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당",
+  "era": "제21대, 제22대",
+  "committees": "순직 해병 수사 방해 및 사건 은폐 등의 진실규명을 위한 국정조사특별위원회, 국토교통위원회"
+ },
+ {
+  "member_id": "KFM1081G",
+  "name": "장동혁",
+  "hanja_name": "張東赫",
+  "party": "국민의힘",
+  "party_raw": "국민의힘/국민의힘",
+  "era": "제21대, 제22대",
+  "committees": "순직 해병 수사 방해 및 사건 은폐 등의 진실규명을 위한 국정조사특별위원회"
+ },
+ {
+  "member_id": "CIZ8557P",
+  "name": "장종태",
+  "hanja_name": "張鐘泰",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "국토교통위원회"
+ },
+ {
+  "member_id": "2NV6751W",
+  "name": "장철민",
+  "hanja_name": "張喆敏",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당",
+  "era": "제21대, 제22대",
+  "committees": "산업통상자원중소벤처기업위원회"
+ },
+ {
+  "member_id": "TJW93720",
+  "name": "전용기",
+  "hanja_name": "田溶冀",
+  "party": "더불어민주당",
+  "party_raw": "더불어시민당/더불어민주당",
+  "era": "제21대, 제22대",
+  "committees": "순직 해병 수사 방해 및 사건 은폐 등의 진실규명을 위한 국정조사특별위원회, 제9회전국동시지방선거투표용지부족사태등국민참정권침해진상규명및선거관리개혁을위한국정조사특별위원회, 국토교통위원회, 국회운영위원회"
+ },
+ {
+  "member_id": "FYG6302V",
+  "name": "전은수",
+  "hanja_name": "全恩秀",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "산업통상자원중소벤처기업위원회, 성평등가족위원회"
+ },
+ {
+  "member_id": "9YO73104",
+  "name": "전재수",
+  "hanja_name": "田載秀",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당/더불어민주당",
+  "era": "제20대, 제21대, 제22대",
+  "committees": "산업통상자원중소벤처기업위원회, 문화체육관광위원회"
+ },
+ {
+  "member_id": "P8A4624C",
+  "name": "전종덕",
+  "hanja_name": "全鍾德",
+  "party": "더불어민주연합",
+  "party_raw": "더불어민주연합",
+  "era": "제22대",
+  "committees": "연금개혁 특별위원회, 보건복지위원회"
+ },
+ {
+  "member_id": "QUR40502",
+  "name": "전진숙",
+  "hanja_name": "全眞淑",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "보건복지위원회, 예산결산특별위원회"
+ },
+ {
+  "member_id": "25G2571T",
+  "name": "전현희",
+  "hanja_name": "全賢姬",
+  "party": "더불어민주당",
+  "party_raw": "통합민주당/더불어민주당/더불어민주당",
+  "era": "제18대, 제20대, 제22대",
+  "committees": "정무위원회"
+ },
+ {
+  "member_id": "DAY6557K",
+  "name": "정동만",
+  "hanja_name": "鄭東萬",
+  "party": "국민의힘",
+  "party_raw": "미래통합당/국민의힘",
+  "era": "제21대, 제22대",
+  "committees": null
+ },
+ {
+  "member_id": "ARP89147",
+  "name": "정동영",
+  "hanja_name": "鄭東泳",
+  "party": "더불어민주당",
+  "party_raw": "새정치국민회의/새천년민주당/무소속/국민의당/더불어민주당",
+  "era": "제15대, 제16대, 제18대, 제20대, 제22대",
+  "committees": "순직 해병 수사 방해 및 사건 은폐 등의 진실규명을 위한 국정조사특별위원회, 기획재정위원회, 과학기술정보방송통신위원회"
+ },
+ {
+  "member_id": "CGW7415Z",
+  "name": "정성국",
+  "hanja_name": "鄭聖國",
+  "party": "국민의힘",
+  "party_raw": "국민의힘",
+  "era": "제22대",
+  "committees": null
+ },
+ {
+  "member_id": "V429892C",
+  "name": "정성호",
+  "hanja_name": "鄭成湖",
+  "party": "더불어민주당",
+  "party_raw": "열린우리당/민주통합당/더불어민주당/더불어민주당/더불어민주당",
+  "era": "제17대, 제19대, 제20대, 제21대, 제22대",
+  "committees": "재정경제기획위원회"
+ },
+ {
+  "member_id": "8XE7026P",
+  "name": "정연욱",
+  "hanja_name": "鄭然旭",
+  "party": "국민의힘",
+  "party_raw": "국민의힘",
+  "era": "제22대",
+  "committees": "문화체육관광위원회"
+ },
+ {
+  "member_id": "NA61091D",
+  "name": "정을호",
+  "hanja_name": "鄭乙虎",
+  "party": "더불어민주연합",
+  "party_raw": "더불어민주연합",
+  "era": "제22대",
+  "committees": "교육위원회, 국회운영위원회"
+ },
+ {
+  "member_id": "LT72093S",
+  "name": "정일영",
+  "hanja_name": "鄭日永",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당",
+  "era": "제21대, 제22대",
+  "committees": "국토교통위원회"
+ },
+ {
+  "member_id": "LJK4960Z",
+  "name": "정점식",
+  "hanja_name": "鄭点植",
+  "party": "국민의힘",
+  "party_raw": "자유한국당/미래통합당/국민의힘",
+  "era": "제20대, 제21대, 제22대",
+  "committees": "국회운영위원회"
+ },
+ {
+  "member_id": "IC499858",
+  "name": "정준호",
+  "hanja_name": "鄭俊鎬",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "문화체육관광위원회, 예산결산특별위원회"
+ },
+ {
+  "member_id": "9HE7226N",
+  "name": "정진욱",
+  "hanja_name": "丁秦旭",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "산업통상자원중소벤처기업위원회"
+ },
+ {
+  "member_id": "2385336L",
+  "name": "정청래",
+  "hanja_name": "鄭淸來",
+  "party": "더불어민주당",
+  "party_raw": "열린우리당/민주통합당/더불어민주당/더불어민주당",
+  "era": "제17대, 제19대, 제21대, 제22대",
+  "committees": "외교통일위원회"
+ },
+ {
+  "member_id": "XG348314",
+  "name": "정춘생",
+  "hanja_name": "鄭春生",
+  "party": "조국혁신당",
+  "party_raw": "조국혁신당",
+  "era": "제22대",
+  "committees": "제9회전국동시지방선거투표용지부족사태등국민참정권침해진상규명및선거관리개혁을위한국정조사특별위원회, 성평등가족위원회, 행정안전위원회"
+ },
+ {
+  "member_id": "UHB5553T",
+  "name": "정태호",
+  "hanja_name": "鄭泰浩",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당",
+  "era": "제21대, 제22대",
+  "committees": "예산결산특별위원회, 재정경제기획위원회"
+ },
+ {
+  "member_id": "BNV6535N",
+  "name": "정혜경",
+  "hanja_name": "鄭惠경",
+  "party": "더불어민주연합",
+  "party_raw": "더불어민주연합",
+  "era": "제22대",
+  "committees": "기후위기 특별위원회, 기후에너지환경노동위원회, 예산결산특별위원회"
+ },
+ {
+  "member_id": "PFG2137X",
+  "name": "정희용",
+  "hanja_name": "鄭熙溶",
+  "party": "국민의힘",
+  "party_raw": "미래통합당/국민의힘",
+  "era": "제21대, 제22대",
+  "committees": "농림축산식품해양수산위원회"
+ },
+ {
+  "member_id": "5KV82250",
+  "name": "조경태",
+  "hanja_name": "趙慶泰",
+  "party": "국민의힘",
+  "party_raw": "열린우리당/통합민주당/민주통합당/새누리당/미래통합당/국민의힘",
+  "era": "제17대, 제18대, 제19대, 제20대, 제21대, 제22대",
+  "committees": "농림축산식품해양수산위원회"
+ },
+ {
+  "member_id": "8TU8443O",
+  "name": "조계원",
+  "hanja_name": "趙啓垣",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "문화체육관광위원회"
+ },
+ {
+  "member_id": "T3E4932G",
+  "name": "조국",
+  "hanja_name": "曺國",
+  "party": "조국혁신당",
+  "party_raw": "조국혁신당",
+  "era": "제22대",
+  "committees": "국방위원회"
+ },
+ {
+  "member_id": "IWK63872",
+  "name": "조배숙",
+  "hanja_name": "趙培淑",
+  "party": "국민의미래",
+  "party_raw": "새천년민주당/열린우리당/통합민주당/국민의당/국민의미래",
+  "era": "제16대, 제17대, 제18대, 제20대, 제22대",
+  "committees": "법제사법위원회, 예산결산특별위원회"
+ },
+ {
+  "member_id": "FYI20317",
+  "name": "조승래",
+  "hanja_name": "趙承來",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당/더불어민주당",
+  "era": "제20대, 제21대, 제22대",
+  "committees": "재정경제기획위원회"
+ },
+ {
+  "member_id": "ME83002L",
+  "name": "조승환",
+  "hanja_name": "趙承煥",
+  "party": "국민의힘",
+  "party_raw": "국민의힘",
+  "era": "제22대",
+  "committees": "농림축산식품해양수산위원회"
+ },
+ {
+  "member_id": "MQU41854",
+  "name": "조은희",
+  "hanja_name": "趙恩禧",
+  "party": "국민의힘",
+  "party_raw": "국민의힘/국민의힘",
+  "era": "제21대, 제22대",
+  "committees": "기후위기 특별위원회, 예산결산특별위원회, 행정안전위원회"
+ },
+ {
+  "member_id": "ZKB18611",
+  "name": "조인철",
+  "hanja_name": "趙寅喆",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "국토교통위원회, 예산결산특별위원회"
+ },
+ {
+  "member_id": "IN328264",
+  "name": "조정식",
+  "hanja_name": "趙正湜",
+  "party": "더불어민주당",
+  "party_raw": "열린우리당/통합민주당/민주통합당/더불어민주당/더불어민주당/더불어민주당",
+  "era": "제17대, 제18대, 제19대, 제20대, 제21대, 제22대",
+  "committees": null
+ },
+ {
+  "member_id": "WJL30106",
+  "name": "조정훈",
+  "hanja_name": "趙廷訓",
+  "party": "국민의힘",
+  "party_raw": "시대전환/국민의힘",
+  "era": "제21대, 제22대",
+  "committees": "국무총리(한성숙) 임명동의에 관한 인사청문특별위원회, 예산결산특별위원회"
+ },
+ {
+  "member_id": "3NI5978A",
+  "name": "조지연",
+  "hanja_name": "趙志娟",
+  "party": "국민의힘",
+  "party_raw": "국민의힘",
+  "era": "제22대",
+  "committees": "기후위기 특별위원회, 국회운영위원회, 기후에너지환경노동위원회, 예산결산특별위원회"
+ },
+ {
+  "member_id": "GJK57930",
+  "name": "주진우",
+  "hanja_name": "朱晋佑",
+  "party": "국민의힘",
+  "party_raw": "국민의힘",
+  "era": "제22대",
+  "committees": "순직 해병 수사 방해 및 사건 은폐 등의 진실규명을 위한 국정조사특별위원회, 제9회전국동시지방선거투표용지부족사태등국민참정권침해진상규명및선거관리개혁을위한국정조사특별위원회, 기후에너지환경노동위원회"
+ },
+ {
+  "member_id": "T465023H",
+  "name": "주철현",
+  "hanja_name": "朱哲鉉",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당",
+  "era": "제21대, 제22대",
+  "committees": "농림축산식품해양수산위원회"
+ },
+ {
+  "member_id": "8SV6917G",
+  "name": "주호영",
+  "hanja_name": "朱豪英",
+  "party": "국민의힘",
+  "party_raw": "한나라당/한나라당/새누리당/무소속/미래통합당/국민의힘",
+  "era": "제17대, 제18대, 제19대, 제20대, 제21대, 제22대",
+  "committees": "문화체육관광위원회"
+ },
+ {
+  "member_id": "68P7228G",
+  "name": "진선미",
+  "hanja_name": "陳善美",
+  "party": "더불어민주당",
+  "party_raw": "민주통합당/더불어민주당/더불어민주당/더불어민주당",
+  "era": "제19대, 제20대, 제21대, 제22대",
+  "committees": "문화체육관광위원회"
+ },
+ {
+  "member_id": "3C23171A",
+  "name": "진성준",
+  "hanja_name": "陳聲準",
+  "party": "더불어민주당",
+  "party_raw": "민주통합당/더불어민주당/더불어민주당",
+  "era": "제19대, 제21대, 제22대",
+  "committees": "국방위원회"
+ },
+ {
+  "member_id": "QDU1100U",
+  "name": "진종오",
+  "hanja_name": "秦鍾午",
+  "party": "국민의미래",
+  "party_raw": "국민의미래",
+  "era": "제22대",
+  "committees": "문화체육관광위원회"
+ },
+ {
+  "member_id": "KNP22261",
+  "name": "차규근",
+  "hanja_name": "車圭根",
+  "party": "조국혁신당",
+  "party_raw": "조국혁신당",
+  "era": "제22대",
+  "committees": "산업통상자원중소벤처기업위원회"
+ },
+ {
+  "member_id": "RC885085",
+  "name": "차지호",
+  "hanja_name": "車智浩",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "기후위기 특별위원회, 외교통일위원회"
+ },
+ {
+  "member_id": "1S05899F",
+  "name": "채현일",
+  "hanja_name": "蔡鉉一",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "행정안전위원회"
+ },
+ {
+  "member_id": "A494529E",
+  "name": "천준호",
+  "hanja_name": "千俊鎬",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당",
+  "era": "제21대, 제22대",
+  "committees": "국방위원회, 국회운영위원회"
+ },
+ {
+  "member_id": "YGB8604T",
+  "name": "천하람",
+  "hanja_name": "千하람",
+  "party": "개혁신당",
+  "party_raw": "개혁신당",
+  "era": "제22대",
+  "committees": "국방위원회, 국회운영위원회"
+ },
+ {
+  "member_id": "I5I2468R",
+  "name": "최기상",
+  "hanja_name": "崔基相",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당",
+  "era": "제21대, 제22대",
+  "committees": "예산결산특별위원회, 정무위원회"
+ },
+ {
+  "member_id": "YS38221N",
+  "name": "최민희",
+  "hanja_name": "崔民熙",
+  "party": "더불어민주당",
+  "party_raw": "민주통합당/더불어민주당",
+  "era": "제19대, 제22대",
+  "committees": "문화체육관광위원회"
+ },
+ {
+  "member_id": "UOS16250",
+  "name": "최보윤",
+  "hanja_name": "崔寶允",
+  "party": "국민의미래",
+  "party_raw": "국민의미래",
+  "era": "제22대",
+  "committees": "제9회전국동시지방선거투표용지부족사태등국민참정권침해진상규명및선거관리개혁을위한국정조사특별위원회"
+ },
+ {
+  "member_id": "WJG74792",
+  "name": "최수진",
+  "hanja_name": "崔秀珍",
+  "party": "국민의미래",
+  "party_raw": "국민의미래",
+  "era": "제22대",
+  "committees": "국회운영위원회, 행정안전위원회"
+ },
+ {
+  "member_id": "UF53617M",
+  "name": "최은석",
+  "hanja_name": "崔殷碩",
+  "party": "국민의힘",
+  "party_raw": "국민의힘",
+  "era": "제22대",
+  "committees": "재정경제기획위원회"
+ },
+ {
+  "member_id": "CC78321E",
+  "name": "최혁진",
+  "hanja_name": "崔赫振",
+  "party": "더불어민주연합",
+  "party_raw": "더불어민주연합",
+  "era": "제22대",
+  "committees": "국무총리(한성숙) 임명동의에 관한 인사청문특별위원회, 과학기술정보방송통신위원회"
+ },
+ {
+  "member_id": "A0P4646G",
+  "name": "최형두",
+  "hanja_name": "崔炯斗",
+  "party": "국민의힘",
+  "party_raw": "미래통합당/국민의힘",
+  "era": "제21대, 제22대",
+  "committees": "과학기술정보방송통신위원회, 예산결산특별위원회"
+ },
+ {
+  "member_id": "G152611B",
+  "name": "추경호",
+  "hanja_name": "秋慶鎬",
+  "party": "국민의힘",
+  "party_raw": "새누리당/미래통합당/국민의힘",
+  "era": "제20대, 제21대, 제22대",
+  "committees": "정무위원회, 보건복지위원회, 정보위원회, 교육위원회, 국회운영위원회"
+ },
+ {
+  "member_id": "URV1689Q",
+  "name": "추미애",
+  "hanja_name": "秋美愛",
+  "party": "더불어민주당",
+  "party_raw": "새정치국민회의/새천년민주당/통합민주당/민주통합당/더불어민주당/더불어민주당",
+  "era": "제15대, 제16대, 제18대, 제19대, 제20대, 제22대",
+  "committees": "산업통상자원중소벤처기업위원회, 법제사법위원회, 윤석열정부의비상계엄선포를통한내란진상규명국정조사특별위원회, 윤석열정부의비상계엄선포를통한내란혐의진상규명국정조사특별위원회, 국방위원회, 국회운영위원회"
+ },
+ {
+  "member_id": "JQA21112",
+  "name": "한기호",
+  "hanja_name": "韓起鎬",
+  "party": "국민의힘",
+  "party_raw": "한나라당/새누리당/미래통합당/국민의힘",
+  "era": "제18대, 제19대, 제21대, 제22대",
+  "committees": "국방위원회, 예산결산특별위원회"
+ },
+ {
+  "member_id": "5DC8083A",
+  "name": "한동훈",
+  "hanja_name": "韓東勳",
+  "party": "무소속",
+  "party_raw": "무소속",
+  "era": "제22대",
+  "committees": "예산결산특별위원회, 외교통일위원회"
+ },
+ {
+  "member_id": "8JG4358H",
+  "name": "한민수",
+  "hanja_name": "韓玟洙",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "기획재정위원회, 정무위원회"
+ },
+ {
+  "member_id": "H5476989",
+  "name": "한병도",
+  "hanja_name": "韓秉道",
+  "party": "더불어민주당",
+  "party_raw": "열린우리당/더불어민주당/더불어민주당",
+  "era": "제17대, 제21대, 제22대",
+  "committees": "교육위원회, 국회운영위원회, 정보위원회"
+ },
+ {
+  "member_id": "XPP2564T",
+  "name": "한정애",
+  "hanja_name": "韓貞愛",
+  "party": "더불어민주당",
+  "party_raw": "민주통합당/더불어민주당/더불어민주당/더불어민주당",
+  "era": "제19대, 제20대, 제21대, 제22대",
+  "committees": "외교통일위원회"
+ },
+ {
+  "member_id": "BCQ55105",
+  "name": "한준호",
+  "hanja_name": "韓俊鎬",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당",
+  "era": "제21대, 제22대",
+  "committees": "과학기술정보방송통신위원회"
+ },
+ {
+  "member_id": "Q918403D",
+  "name": "한지아",
+  "hanja_name": "韓智雅",
+  "party": "국민의미래",
+  "party_raw": "국민의미래",
+  "era": "제22대",
+  "committees": null
+ },
+ {
+  "member_id": "T4I4862D",
+  "name": "한창민",
+  "hanja_name": "韓昌旼",
+  "party": "더불어민주연합",
+  "party_raw": "더불어민주연합",
+  "era": "제22대",
+  "committees": "정무위원회"
+ },
+ {
+  "member_id": "HHB5652A",
+  "name": "허성무",
+  "hanja_name": "許成武",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "산업통상자원중소벤처기업위원회, 예산결산특별위원회"
+ },
+ {
+  "member_id": "FU53642G",
+  "name": "허영",
+  "hanja_name": "許榮",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당",
+  "era": "제21대, 제22대",
+  "committees": "국토교통위원회, 예산결산특별위원회"
+ },
+ {
+  "member_id": "VCP96419",
+  "name": "허종식",
+  "hanja_name": "許琮植",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당",
+  "era": "제21대, 제22대",
+  "committees": "보건복지위원회, 예산결산특별위원회"
+ },
+ {
+  "member_id": "5MD4184K",
+  "name": "홍기원",
+  "hanja_name": "洪起元",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당",
+  "era": "제21대, 제22대",
+  "committees": "외교통일위원회"
+ },
+ {
+  "member_id": "RJH6314D",
+  "name": "황명선",
+  "hanja_name": "黃明善",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "순직 해병 수사 방해 및 사건 은폐 등의 진실규명을 위한 국정조사특별위원회, 행정안전위원회"
+ },
+ {
+  "member_id": "0YT3774N",
+  "name": "황운하",
+  "hanja_name": "黃雲夏",
+  "party": "조국혁신당",
+  "party_raw": "더불어민주당/조국혁신당",
+  "era": "제21대, 제22대",
+  "committees": "국토교통위원회"
+ },
+ {
+  "member_id": "T6A6557F",
+  "name": "황정아",
+  "hanja_name": "黃靖雅",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당",
+  "era": "제22대",
+  "committees": "과학기술정보방송통신위원회"
+ },
+ {
+  "member_id": "0VU8517U",
+  "name": "황희",
+  "hanja_name": "黃熙",
+  "party": "더불어민주당",
+  "party_raw": "더불어민주당/더불어민주당/더불어민주당",
+  "era": "제20대, 제21대, 제22대",
+  "committees": "국토교통위원회"
+ }
+]

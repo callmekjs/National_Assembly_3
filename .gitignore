@@ -1,0 +1,35 @@
+# 환경변수 - 절대 커밋하지 않는다
+.env
+.env.local
+frontend/.env
+frontend/.env.local
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# Node
+node_modules/
+frontend/node_modules/
+frontend/dist/
+
+# 데이터 (원본 회의록 PDF는 용량이 크므로 제외)
+data/raw/
+data/pdfs/
+incoming_data/
+
+# ETL 산출물 (1.9GB — 파이프라인으로 재생성 가능). 단 리포트·평가 결과는 보존
+data/v1/*
+!data/v1/reports/
+
+# 개인 작업 파일
+claude.txt
+스크린샷/
+
+# IDE
+.vscode/
+.idea/
+data/v1/reports/turns_quality/
