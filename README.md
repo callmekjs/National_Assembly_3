@@ -132,9 +132,13 @@ npm run dev    # → http://localhost:5173
   - [x] RAG-0 기반 정비 → [x] RAG-1 조회 API → [x] RAG-2 키워드 검색 → [x] RAG-3 벡터 검색
   - → [x] RAG-4 하이브리드 → [x] RAG-5 검색 평가 → [x] RAG-6 답변 생성(qa/report 모드)
   - → [x] RAG-7 /query 통합(Grounding 판정 + query_logs) → [x] RAG-8 프론트(출처 패널·원문 모달)
-- [ ] 3단계: 정책 도메인 분석 기능 (쟁점/시계열/행위자) — 진행 중
-  - [x] 1차 정당 모듈: 22대 의원-정당 매핑 + **발언 시점 기준 여야 판정** + 발언 자격(role) 게이트
+- [ ] 3단계: 정책 도메인 분석 기능 (쟁점/시계열/행위자) — 진행 중, 세부 로드맵 POL-0~9 (`docs/progress.md`)
+  - [x] POL-0 정당 모듈: 22대 의원-정당 매핑 + **발언 시점 기준 여야 판정** + 발언 자격(role) 게이트
     (국회의원만 정당 라벨, 행정부는 "정부측", 후보자·증인은 무표기 — `docs/party_module_spec.md`)
+  - [x] POL-1 enrichment 실태 조사: ETL-5 필드 감사 — stance_signals·bill_refs·policy_domain
+    사용 불가 판정, **입장 분석은 LLM 판정으로 확정** (분석을 불량 재료 위에 쌓기 전에 차단)
+  - [x] POL-2 행위자 프로필 API: `/actors/{name}` — 발언 통계·여야 이력·주요 언급 기관·최근 발언
+  - [ ] POL-3~9: 쟁점 사전 → 타임라인 → 입장 분석 → 여야 구도 → eval → 통합 → 프론트
 - [ ] 4단계: GovTech 배포 버전
 
 ---
