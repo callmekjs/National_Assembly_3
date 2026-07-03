@@ -106,6 +106,17 @@ def ruling_party(meeting_date: str) -> str | None:
     return None
 
 
+def member_party(speaker: str | None) -> str | None:
+    """이름 → 정당 (자격 게이트 없이 members 조회만 — 행위자 프로필용).
+
+    동명이인이 서로 다른 정당이면 None (party_label 과 동일 원칙).
+    """
+    if not speaker:
+        return None
+    party = _load_map().get(_norm(speaker))
+    return None if party in (None, _AMBIGUOUS) else party
+
+
 def party_label(
     speaker: str | None, meeting_date: str | None, role: str | None = None
 ) -> str | None:

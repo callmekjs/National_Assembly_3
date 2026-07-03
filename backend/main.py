@@ -10,6 +10,7 @@ from openai import OpenAIError
 from psycopg2.extras import RealDictCursor
 from pydantic import BaseModel
 
+from actors import actor_profile
 from answer import MODE_CONFIG, NO_EVIDENCE, generate_answer
 from db import init_pool, close_pool, get_conn
 from grounding import judge, pre_gate
@@ -278,6 +279,15 @@ def answer_endpoint(req: AnswerRequest):
         return generate_answer(req.question, req.mode, req.committee, req.date_from, req.date_to)
     except OpenAIError as e:
         raise HTTPException(status_code=502, detail=f"LLM 호출 실패: {type(e).__name__}")
+
+
+@app.get("/actors/{name}")
+def get_actor(name: str):
+    """행위자 프로필 (POL-2) — 발언 통계·정당 여야 이력·주요 언급 기관·최근 발언."""
+    profile = actor_profile(name)
+    if profile is None:
+        raise HTTPException(status_code=404, detail=f"발언 기록 없음: {name}")
+    return profile
 
 
 @app.get("/citations/{chunk_id}")

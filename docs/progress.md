@@ -607,7 +607,7 @@ National_Assembly_3/
 |---|------|------|----------|------|
 | POL-0 | 행위자 기초 (정당 모듈) | 22대 의원-정당 매핑 + 시점별 여야 판정 + 발언 자격 게이트 + 근거 블록 주입 | "여야별" 질문 grounding FULL | ✅ |
 | POL-1 | enrichment 실태 조사 | ETL-5 필드(policy_domain·bill_refs·utterance_type·stance_signals·mentions) **커버리지·품질 리포트** — 만든 뒤 한 번도 분석에 안 쓴 데이터의 실태부터 (게이트의 게이트 교훈) | 필드별 커버리지·정확도 스팟체크 리포트, 사용 가능/불가 판정 | ✅ |
-| POL-2 | 행위자 프로필 API | `/actors/{name}`: 발언 통계(위원회·기간·정책 도메인 분포), 정당·여야 이력, 대표 발언 — 기존 chunks 집계라 데이터 준비 완료 | 특정 의원 curl 한 번에 프로필 JSON | ⬜ |
+| POL-2 | 행위자 프로필 API | `/actors/{name}`: 발언 통계(위원회·기간·정책 도메인 분포), 정당·여야 이력, 대표 발언 — 기존 chunks 집계라 데이터 준비 완료 | 특정 의원 curl 한 번에 프로필 JSON | ✅ |
 | POL-3 | 쟁점 사전 구축 | 이슈 정의 방식 **결정 지점**: LLM 클러스터링 vs 수동 시드 사전(하이브리드 검색으로 청크 확장). 22대 주요 이슈 20~30개 + 이슈↔청크 매핑 | 이슈 목록 + 매핑, 무작위 스팟체크 통과 | ⬜ |
 | POL-4 | 쟁점 타임라인 | 이슈별 월별 발언량·참여 위원회·주요 회의 시계열 API | `/issues/{id}/timeline` 정합성 스팟체크 (원본 대조) | ⬜ |
 | POL-5 | 입장(stance) 분석 | 이슈×행위자 입장(찬성/반대/우려/중립) — stance_signals 규칙 vs LLM 판정 **결정 지점**. 모든 입장에 근거 발언 인용 필수 (신뢰 원칙) | 이슈 1개의 행위자별 입장+근거 매트릭스 | ⬜ |
@@ -639,6 +639,19 @@ National_Assembly_3/
 - **POL-2 활용 가능 재료**: mentions(정규화 후) + utterance_type(question/statement) + members
 - (선택) enricher v2 재설계는 v1.3 재처리 묶음에 포함 검토 — 활용형 매칭(stance),
   법명 사전 기반 추출(bill_refs). 단 POL-5 를 LLM 으로 가면 stance v2 는 불필요할 수 있음
+
+### POL-2 구현 기록 — 행위자 프로필 API (2026-07-03)
+
+- **`backend/actors.py` + `GET /actors/{name}`**: 발언 통계(turn 단위 집계 — 청크 분할
+  중복 방지), 위원회·월별 분포(POL-4 시계열 준비물), **정권 구간별 여야 이력**
+  (RULING_PERIODS × party_label 재사용), question/statement 비율(POL-1 검증 이진만),
+  top 언급 기관(별칭 정규화 — `canonical_org`로 금융위/금융위원회 병합), 최근 발언 5건
+  (is_short 제외, chunk_id → /citations 연결). 미등록 인물 party=null, 발언 없으면 404
+- **party.py 에 `member_party()` 추가** (자격 게이트 없는 순수 조회 — 프로필용)
+- **테스트**: test_actors.py 10케이스 (정규화·여야 이력) ALL PASS
+- **스모크**: 김병주(민주, 국방위 1,655턴, 야당→여당 이력, question 56.7%, top 국방부) /
+  유영하(**한자 별칭 매칭으로 2,219턴** — 한글 조회로 柳榮夏 발언 포착) /
+  조태열(비의원 — party null) / 없는 이름 404
 
 **순서 근거:**
 - POL-1 을 모든 분석보다 먼저: ETL-5 enrichment 는 생성 후 검증 없이 쌓여 있음 —
