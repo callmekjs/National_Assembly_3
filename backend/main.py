@@ -1,3 +1,4 @@
+import datetime
 import json
 import time
 import uuid
@@ -8,7 +9,7 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from openai import OpenAIError
 from psycopg2.extras import RealDictCursor
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from actors import actor_profile
 from answer import MODE_CONFIG, NO_EVIDENCE, generate_answer
@@ -39,26 +40,28 @@ app.add_middleware(
 )
 
 
+# 날짜는 date 타입으로 받아 잘못된 값("2025-13-01" 등)을 422 로 거른다 — str 로 두면
+# SQL 까지 흘러가 500. question 길이 제한은 임베딩 API 한도(8,192토큰)·비용 방어.
 class QueryRequest(BaseModel):
-    question: str
+    question: str = Field(min_length=2, max_length=1000)
     mode: Literal["qa", "report"] = "qa"
     committee: str | None = None
-    date_from: str | None = None
-    date_to: str | None = None
+    date_from: datetime.date | None = None
+    date_to: datetime.date | None = None
 
 
 class AnswerRequest(BaseModel):
-    question: str
+    question: str = Field(min_length=2, max_length=1000)
     mode: Literal["qa", "report"] = "qa"
     committee: str | None = None
-    date_from: str | None = None
-    date_to: str | None = None
+    date_from: datetime.date | None = None
+    date_to: datetime.date | None = None
 
 
 class FeedbackRequest(BaseModel):
     query_id: str
-    rating: int
-    comment: str | None = None
+    rating: int = Field(ge=1, le=5)  # 프론트: 👍=5, 👎=1
+    comment: str | None = Field(None, max_length=2000)
 
 
 @app.get("/health")
@@ -80,16 +83,21 @@ def health():
         return {"status": "degraded", "db": "error", "detail": type(e).__name__}
 
 
-def _log_query(req: QueryRequest, result: dict, grounding: str, latency_ms: int) -> str | None:
-    """query_logs 1행 저장 → query_id. 로그는 부가 기능 — 실패해도 답변은 반환한다."""
+def _log_query(req: QueryRequest, result: dict, grounding: str, latency_ms: int,
+               source_block: str | None = None) -> str | None:
+    """query_logs 1행 저장 → query_id. 로그는 부가 기능 — 실패해도 답변은 반환한다.
+
+    source_block: LLM 에 실제로 들어간 근거 블록 — 이상 답변 사후 재현·품질 평가 재료.
+    """
     try:
         with get_conn() as conn, conn.cursor() as cur:
             cur.execute(
                 """
                 INSERT INTO query_logs
                   (question, mode, committee, date_from, date_to,
-                   answer, grounding, citations, invalid_citations, usage, latency_ms)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                   answer, grounding, citations, invalid_citations, usage, latency_ms,
+                   source_block)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 RETURNING query_id
                 """,
                 (
@@ -99,6 +107,7 @@ def _log_query(req: QueryRequest, result: dict, grounding: str, latency_ms: int)
                     json.dumps(result["invalid_citations"], ensure_ascii=False),
                     json.dumps(result["usage"], ensure_ascii=False) if result["usage"] else None,
                     latency_ms,
+                    source_block,
                 ),
             )
             return str(cur.fetchone()[0])
@@ -115,10 +124,14 @@ def query(req: QueryRequest):
          → 사후 판정 → query_logs 저장
     """
     t0 = time.time()
-    hits = hybrid_search(
-        req.question, req.committee, req.date_from, req.date_to,
-        limit=MODE_CONFIG[req.mode]["limit"],
-    )
+    try:
+        # 벡터 검색의 질문 임베딩도 OpenAI 호출 — 장애 시 500 이 아니라 502 로
+        hits = hybrid_search(
+            req.question, req.committee, req.date_from, req.date_to,
+            limit=MODE_CONFIG[req.mode]["limit"],
+        )
+    except OpenAIError as e:
+        raise HTTPException(status_code=502, detail=f"임베딩 호출 실패: {type(e).__name__}")
 
     gate = pre_gate(hits)
     if gate is not None:
@@ -139,7 +152,9 @@ def query(req: QueryRequest):
         grounding, ungrounded = judge(result)
 
     latency_ms = int((time.time() - t0) * 1000)
-    query_id = _log_query(req, result, grounding, latency_ms)
+    # 근거 블록은 로그에만 저장 — API 응답에 그대로 내보내면 응답이 수십 KB 로 불어난다
+    source_block = result.pop("source_block", None)
+    query_id = _log_query(req, result, grounding, latency_ms, source_block)
 
     response = {"query_id": query_id, "grounding": grounding, "latency_ms": latency_ms, **result}
     if ungrounded:
@@ -167,8 +182,8 @@ def get_committees():
 @app.get("/meetings")
 def get_meetings(
     committee: str | None = Query(None, description="위원회 약칭 (예: 과방위)"),
-    date_from: str | None = Query(None, description="YYYY-MM-DD"),
-    date_to: str | None = Query(None, description="YYYY-MM-DD"),
+    date_from: datetime.date | None = Query(None, description="YYYY-MM-DD"),
+    date_to: datetime.date | None = Query(None, description="YYYY-MM-DD"),
     limit: int = Query(100, ge=1, le=1000),
     offset: int = Query(0, ge=0),
 ):
@@ -236,8 +251,8 @@ def get_speakers(
 def search_keyword_endpoint(
     q: str = Query(..., min_length=2, description="검색어"),
     committee: str | None = Query(None, description="위원회 약칭"),
-    date_from: str | None = None,
-    date_to: str | None = None,
+    date_from: datetime.date | None = None,
+    date_to: datetime.date | None = None,
     limit: int = Query(20, ge=1, le=100),
 ):
     """키워드 검색 (RAG-2). 하이브리드 검색의 한 축 — 디버그·검증용 노출."""
@@ -249,13 +264,16 @@ def search_keyword_endpoint(
 def search_vector_endpoint(
     q: str = Query(..., min_length=2, description="검색어 (의미 검색)"),
     committee: str | None = Query(None, description="위원회 약칭"),
-    date_from: str | None = None,
-    date_to: str | None = None,
+    date_from: datetime.date | None = None,
+    date_to: datetime.date | None = None,
     speaker: str | None = Query(None, description="발언자 이름 (정확 일치)"),
     limit: int = Query(20, ge=1, le=100),
 ):
     """벡터(의미) 검색 (RAG-3). 하이브리드 검색의 다른 한 축 — 디버그·검증용 노출."""
-    results = vector_search(q, committee, date_from, date_to, speaker, limit)
+    try:
+        results = vector_search(q, committee, date_from, date_to, speaker, limit)
+    except OpenAIError as e:
+        raise HTTPException(status_code=502, detail=f"임베딩 호출 실패: {type(e).__name__}")
     return {"query": q, "count": len(results), "results": results}
 
 
@@ -263,12 +281,15 @@ def search_vector_endpoint(
 def search_hybrid_endpoint(
     q: str = Query(..., min_length=2, description="검색어"),
     committee: str | None = Query(None, description="위원회 약칭"),
-    date_from: str | None = None,
-    date_to: str | None = None,
+    date_from: datetime.date | None = None,
+    date_to: datetime.date | None = None,
     limit: int = Query(10, ge=1, le=50),
 ):
     """하이브리드 검색 (RAG-4) — 키워드+벡터 RRF 융합. /query 의 검색 엔진."""
-    results = hybrid_search(q, committee, date_from, date_to, limit)
+    try:
+        results = hybrid_search(q, committee, date_from, date_to, limit)
+    except OpenAIError as e:
+        raise HTTPException(status_code=502, detail=f"임베딩 호출 실패: {type(e).__name__}")
     return {"query": q, "count": len(results), "results": results}
 
 

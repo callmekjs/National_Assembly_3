@@ -33,6 +33,7 @@ from search_vector import _get_client
 MODEL = "gpt-4o-mini"
 TEMPERATURE = 0.2          # 사실 서술 위주 — 창의성 억제
 NEIGHBOR_TRUNC = 500       # 인접 턴 보조 맥락 절단 길이 (토큰 예산 보호)
+EVIDENCE_TURN_MAX = 4000   # 근거 턴 전문 복원 상한 — 초과 시 검색 조각 중심 창(window)
 NO_EVIDENCE = "제공된 회의록에서 확인할 수 없습니다."
 
 # gpt-4o-mini 단가 (USD / 1M tokens) — usage.est_cost_usd 계산용
@@ -243,11 +244,73 @@ def build_source_block(
     return "\n\n".join(parts)
 
 
+def _assemble_turn(frags: list[dict], hit_chunk_id: str, max_len: int = EVIDENCE_TURN_MAX) -> str:
+    """turn 조각들을 chunk_index 순으로 이어붙인다. 상한 초과 시 검색된 조각을
+    중심으로 앞뒤 조각을 번갈아 붙인다 — 근거 조각 자체는 절대 잘리지 않는다."""
+    frags = sorted(frags, key=lambda f: f["chunk_index"])
+    joined = " ".join(f["text"] for f in frags)
+    if len(joined) <= max_len:
+        return joined
+
+    idx = next((i for i, f in enumerate(frags) if f["chunk_id"] == hit_chunk_id), 0)
+    lo, hi = idx - 1, idx + 1
+    used = len(frags[idx]["text"])
+    while True:
+        progressed = False
+        if lo >= 0 and used + len(frags[lo]["text"]) + 1 <= max_len:
+            used += len(frags[lo]["text"]) + 1
+            lo -= 1
+            progressed = True
+        if hi < len(frags) and used + len(frags[hi]["text"]) + 1 <= max_len:
+            used += len(frags[hi]["text"]) + 1
+            hi += 1
+            progressed = True
+        if not progressed:
+            break
+
+    # 남은 예산은 경계 조각의 끝/머리 일부로 채운다 — 조각 경계는 문장 중간일 수
+    # 있어 이어붙이면 연속 텍스트가 된다 (조각이 ~2,500자라 통짜로는 예산에 잘 안 맞음)
+    parts = [f["text"] for f in frags[lo + 1:hi]]
+    remaining = max_len - used
+    if lo >= 0 and remaining > 4:
+        take = (remaining // 2 if hi < len(frags) else remaining) - 2
+        parts.insert(0, "…" + frags[lo]["text"][-take:])
+        remaining -= take + 2
+    if hi < len(frags) and remaining > 4:
+        parts.append(frags[hi]["text"][:remaining - 2] + "…")
+    return " ".join(parts)
+
+
 def _fetch_texts(chunk_ids: list[str]) -> dict[str, str]:
-    """선택된 청크의 전문 일괄 조회 — 검색 응답의 snippet(200자)은 답변 근거로 부족."""
-    with get_conn() as conn, conn.cursor() as cur:
-        cur.execute("SELECT chunk_id, text FROM chunks WHERE chunk_id = ANY(%s)", (chunk_ids,))
-        return dict(cur.fetchall())
+    """각 근거 청크가 속한 turn 의 조각 전체를 복원해 반환.
+
+    hybrid_search 는 같은 turn 의 조각 중 최고 순위 1개만 남기므로(중복 제거),
+    그 조각만 근거로 쓰면 긴 발언의 앞뒤 맥락이 잘린다. turn 전문을 복원하되
+    EVIDENCE_TURN_MAX 를 넘으면 검색된 조각 중심의 창만 쓴다 (토큰 예산 보호).
+    검색 응답의 snippet(200자)은 답변 근거로 부족해 어차피 재조회가 필요하다.
+    """
+    turn_of = {cid: cid.rsplit("_chunk_", 1)[0] for cid in chunk_ids}
+    with get_conn() as conn, conn.cursor(cursor_factory=RealDictCursor) as cur:
+        cur.execute(
+            """
+            SELECT turn_id, chunk_id, chunk_index, text
+            FROM chunks WHERE turn_id = ANY(%s)
+            ORDER BY turn_id, chunk_index
+            """,
+            (sorted(set(turn_of.values())),),
+        )
+        rows = cur.fetchall()
+
+    by_turn: dict[str, list[dict]] = {}
+    for r in rows:
+        by_turn.setdefault(r["turn_id"], []).append(r)
+
+    texts: dict[str, str] = {}
+    for cid, tid in turn_of.items():
+        frags = by_turn.get(tid)
+        if frags:
+            texts[cid] = _assemble_turn(frags, cid)
+    return texts
 
 
 def _fetch_neighbors(hits: list[dict]) -> dict[int, dict]:
@@ -323,7 +386,7 @@ def generate_answer(
         return {
             "answer": NO_EVIDENCE, "mode": mode,
             "sources": [], "citations": [], "cited_numbers": [], "invalid_citations": [],
-            "usage": None,
+            "usage": None, "source_block": None,
         }
 
     texts = _fetch_texts([h["chunk_id"] for h in hits])
@@ -367,6 +430,8 @@ def generate_answer(
         "citations": [_source_summary(s) for s in sources if s["n"] in cited],
         "cited_numbers": cited,
         "invalid_citations": invalid,
+        # LLM 에 실제로 들어간 근거 블록 — query_logs 저장용 (API 응답에선 제거됨)
+        "source_block": block,
         "usage": {
             "model": MODEL,
             "input_tokens": in_tok,

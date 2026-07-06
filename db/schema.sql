@@ -103,11 +103,15 @@ CREATE TABLE IF NOT EXISTS query_logs (
   invalid_citations JSONB NOT NULL DEFAULT '[]',
   usage      JSONB,                            -- 토큰·비용 (사전차단 시 NULL)
   latency_ms INT,
+  source_block TEXT,                           -- LLM 에 실제로 들어간 근거 블록 (디버깅 재현용, 사전차단 시 NULL)
   created_at TIMESTAMPTZ DEFAULT now(),
   rating     INT,                              -- /feedback
   feedback_comment TEXT,
   feedback_at TIMESTAMPTZ
 );
+
+-- 기존 DB 마이그레이션 (CREATE IF NOT EXISTS 는 기존 테이블에 컬럼을 못 더한다)
+ALTER TABLE query_logs ADD COLUMN IF NOT EXISTS source_block TEXT;
 
 CREATE INDEX IF NOT EXISTS idx_query_logs_created_at ON query_logs(created_at);
 CREATE INDEX IF NOT EXISTS idx_query_logs_grounding  ON query_logs(grounding);
