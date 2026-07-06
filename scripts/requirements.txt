@@ -3,3 +3,5 @@ beautifulsoup4==4.12.3
 lxml==5.3.0
 psycopg2-binary==2.9.12
 python-dotenv==1.0.1
+pdfplumber==0.11.10       # PDF 텍스트 추출 (extractor_v1)
+openai==2.21.0            # 임베딩 생성 (embeddings_v1) — backend 와 동일 버전
