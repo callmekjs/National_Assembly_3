@@ -31,7 +31,8 @@ import psycopg2
 from psycopg2.extras import Json, execute_values
 from dotenv import load_dotenv
 
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
+if __name__ == "__main__":  # import 시(테스트 등) 부작용 방지 — 직접 실행할 때만 래핑
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 
 PROJECT_ROOT = Path(__file__).parent.parent
 CHUNKS_ROOT  = PROJECT_ROOT / "data" / "v1" / "chunks"
@@ -115,8 +116,28 @@ def upsert_meeting(cur, source_id: str, committee_id: int | None, chunk: dict) -
     )
 
 
-def insert_chunks(cur, chunks: list[dict], committee_id: int | None) -> None:
+def insert_chunks(cur, chunks: list[dict], committee_id: int | None) -> tuple[int, int]:
+    """chunks 를 DELETE 후 재삽입. 반환: (임베딩 보존 수, 임베딩 유실 수).
+
+    chunks DELETE 는 embeddings_openai 로 ON DELETE CASCADE 되어 임베딩까지
+    지워진다 — 내용(embed_text)이 같은 청크의 임베딩은 임시 테이블에 보관했다가
+    복원해, 재적재 때마다 전체 재임베딩(OpenAI 비용)이 발생하는 것을 막는다.
+    """
     source_id = chunks[0]["source_id"]
+
+    cur.execute("DROP TABLE IF EXISTS _emb_backup")
+    cur.execute(
+        """
+        CREATE TEMP TABLE _emb_backup ON COMMIT DROP AS
+        SELECT e.chunk_id, e.embedding, e.model, e.created_at,
+               md5(ch.embed_text) AS embed_md5
+        FROM embeddings_openai e JOIN chunks ch USING (chunk_id)
+        WHERE ch.source_id = %s
+        """,
+        (source_id,),
+    )
+    saved = cur.rowcount
+
     cur.execute("DELETE FROM chunks WHERE source_id = %s", (source_id,))
 
     rows = []
@@ -139,6 +160,18 @@ def insert_chunks(cur, chunks: list[dict], committee_id: int | None) -> None:
         rows,
         page_size=1000,
     )
+
+    # chunk_id 가 여전히 존재하고 embed_text 가 그대로인 것만 복원
+    cur.execute(
+        """
+        INSERT INTO embeddings_openai (chunk_id, embedding, model, created_at)
+        SELECT b.chunk_id, b.embedding, b.model, b.created_at
+        FROM _emb_backup b JOIN chunks ch ON ch.chunk_id = b.chunk_id
+        WHERE md5(ch.embed_text) = b.embed_md5
+        """
+    )
+    restored = cur.rowcount
+    return restored, saved - restored
 
 
 def rebuild_speakers(cur) -> int:
@@ -188,6 +221,8 @@ def main() -> None:
 
     total_chunks = 0
     loaded_sources = 0
+    emb_restored = 0
+    emb_lost = 0
     skipped = []
     mismatches = []
 
@@ -209,7 +244,7 @@ def main() -> None:
             with conn.cursor() as cur:
                 committee_id = upsert_committee(cur, chunks[0])
                 upsert_meeting(cur, sid, committee_id, chunks[0])
-                insert_chunks(cur, chunks, committee_id)
+                restored, lost = insert_chunks(cur, chunks, committee_id)
                 # 행 수 검증
                 cur.execute("SELECT COUNT(*) FROM chunks WHERE source_id = %s", (sid,))
                 db_count = cur.fetchone()[0]
@@ -220,6 +255,8 @@ def main() -> None:
             conn.commit()
             total_chunks += db_count
             loaded_sources += 1
+            emb_restored += restored
+            emb_lost += lost
         except Exception as e:
             conn.rollback()
             skipped.append((sid, f"오류: {type(e).__name__} {str(e)[:80]}"))
@@ -245,6 +282,9 @@ def main() -> None:
     print(f"  meetings   : {meeting_count:>8,}  (적재 source {loaded_sources}/{len(source_ids)})")
     print(f"  speakers   : {speaker_count:>8,}")
     print(f"  chunks     : {total_chunks:>8,}")
+    print(f"  embeddings : 보존 {emb_restored:,} / 유실 {emb_lost:,} (내용 변경·삭제분)")
+    if emb_lost:
+        print("    → 유실분은 scripts/embeddings_v1.py 재실행으로 다시 채우세요.")
     if skipped:
         print(f"\n  건너뜀 {len(skipped)}건:")
         for sid, reason in skipped[:20]:
