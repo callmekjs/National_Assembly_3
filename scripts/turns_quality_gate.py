@@ -16,7 +16,8 @@ import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
+if __name__ == "__main__":  # import 시(테스트 등) 부작용 방지 — 직접 실행할 때만 래핑
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 
 INPUT_ROOT  = Path(__file__).parent.parent / "data" / "v1" / "parsed"
 REPORT_ROOT = Path(__file__).parent.parent / "data" / "v1" / "reports" / "turns_quality"

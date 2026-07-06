@@ -18,18 +18,16 @@ import os
 import sys
 from pathlib import Path
 
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
+if __name__ == "__main__":  # pytest 캡처와 충돌 방지 — 직접 실행할 때만 래핑
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 sys.path.insert(0, str(Path(__file__).parent.parent / "backend"))
 
 from grounding import judge, pre_gate, sim_threshold  # noqa: E402
 
-FAILURES = []
-
 
 def check(name: str, cond: bool):
     print(f"[{'PASS' if cond else 'FAIL'}] {name}")
-    if not cond:
-        FAILURES.append(name)
+    assert cond, name  # pytest 에서도 실패가 실패로 잡히게
 
 
 def hit(kw_rank=None, vec_score=None):
@@ -129,12 +127,7 @@ def main():
     test_pre_gate()
     test_threshold_env()
     test_judge()
-
-    print()
-    if FAILURES:
-        print(f"FAIL — {len(FAILURES)}건: {FAILURES}")
-        sys.exit(1)
-    print("ALL PASS")
+    print("\nALL PASS")
 
 
 if __name__ == "__main__":

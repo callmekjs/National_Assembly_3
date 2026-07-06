@@ -17,7 +17,8 @@ import io
 import sys
 from pathlib import Path
 
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
+if __name__ == "__main__":  # pytest 캡처와 충돌 방지 — 직접 실행할 때만 래핑
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 sys.path.insert(0, str(Path(__file__).parent.parent / "backend"))
 
 import answer  # noqa: E402
@@ -33,14 +34,10 @@ from answer import (  # noqa: E402
     strip_boilerplate,
 )
 
-FAILURES = []
-
-
 def check(name: str, cond: bool, detail: str = ""):
     status = "PASS" if cond else "FAIL"
     print(f"[{status}] {name}" + (f" — {detail}" if detail and not cond else ""))
-    if not cond:
-        FAILURES.append(name)
+    assert cond, f"{name}" + (f" — {detail}" if detail else "")  # pytest 실패 반영
 
 
 # ── 1. 인용 파서 ──────────────────────────────────────────────────────────────
@@ -139,6 +136,30 @@ def test_restore_turn_text():
 
     long_frags = [{"chunk_index": 1, "text": "가" * 800}]
     check("복원: 500자 절단", len(restore_turn_text(long_frags)) == 500)
+
+
+def test_assemble_turn():
+    from answer import _assemble_turn
+
+    def frag(i, text):
+        return {"chunk_id": f"t_turn_0001_chunk_{i:03d}", "chunk_index": i, "text": text}
+
+    # 상한 이내 → 전 조각 순서대로 복원 (입력 순서가 섞여 있어도)
+    frags = [frag(2, "둘째."), frag(1, "첫째."), frag(3, "셋째.")]
+    check("근거복원: 상한 이내면 turn 전문", _assemble_turn(frags, "t_turn_0001_chunk_002") == "첫째. 둘째. 셋째.")
+
+    # 상한 초과 → 검색된 조각 중심 창. 조각당 400자 × 5, 상한 1000 → 검색 조각 ± 이웃만
+    big = [frag(i, f"{i}" * 400) for i in range(1, 6)]
+    out = _assemble_turn(big, "t_turn_0001_chunk_003", max_len=1000)
+    check("근거복원: 상한 초과 시 검색 조각 포함", "3" * 400 in out, len(out))
+    check("근거복원: 상한 준수", len(out) <= 1000, len(out))
+    check("근거복원: 이웃 조각이 먼저 붙음", ("2" * 400 in out) or ("4" * 400 in out))
+    check("근거복원: 잘린 경계는 … 표기", "…" in out, out[:50])
+
+    # 검색 조각 자체가 상한보다 커도 잘리지 않는다
+    huge = [frag(1, "가" * 5000), frag(2, "나" * 100)]
+    out = _assemble_turn(huge, "t_turn_0001_chunk_001", max_len=1000)
+    check("근거복원: 근거 조각은 절대 안 잘림", out == "가" * 5000, len(out))
 
 
 def test_neighbor_turn_ids():
@@ -241,17 +262,13 @@ def main():
     test_build_source_block()
     test_display_speaker()
     test_restore_turn_text()
+    test_assemble_turn()
     test_neighbor_turn_ids()
     test_no_evidence()
     test_mode_config()
     test_strip_boilerplate()
     test_build_user_message()
-
-    print()
-    if FAILURES:
-        print(f"FAIL — {len(FAILURES)}건: {FAILURES}")
-        sys.exit(1)
-    print("ALL PASS")
+    print("\nALL PASS")
 
 
 if __name__ == "__main__":

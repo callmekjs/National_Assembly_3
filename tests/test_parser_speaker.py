@@ -5,13 +5,15 @@ parser_v1 발언자 추출 단위 테스트.
 실행: python tests/test_parser_speaker.py
 """
 
+import io
 import sys
 from pathlib import Path
 
+if __name__ == "__main__":  # pytest 캡처와 충돌 방지 — 직접 실행할 때만 래핑
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 
-# parser_v1 가 import 시점에 stdout 을 UTF-8 로 래핑한다 (여기서 중복 래핑하지 않는다)
-from parser_v1 import _extract_speaker, _NON_SPEAKER_HDR  # noqa: E402
+from parser_v1 import _extract_speaker, _NON_SPEAKER_HDR, _NON_SPEAKER_NAMES  # noqa: E402
 
 # (header_line, expected_name, expected_role) — v1.0에서 잘 되던 기존 패턴 (회귀 방지)
 REGRESSION_CASES = [
@@ -79,44 +81,55 @@ GARBAGE_HEADERS = [
 ]
 
 
-def main() -> None:
-    failed = 0
-
-    print("=== 회귀 테스트 (v1.0 기존 패턴) ===")
-    for header, exp_name, exp_role in REGRESSION_CASES:
+def _run_speaker_cases(cases) -> list[str]:
+    """(header, 기대 이름, 기대 role) 케이스 실행 — 실패 목록 반환 + 케이스별 출력."""
+    failures = []
+    for header, exp_name, exp_role in cases:
         name, role, _ = _extract_speaker(header)
         ok = (name == exp_name and role == exp_role)
         mark = "✓" if ok else "✗"
         if not ok:
-            failed += 1
-        print(f"  {mark} {header[:30]!r} → name={name!r} role={role!r}"
-              + ("" if ok else f"  [기대: {exp_name}/{exp_role}]"))
-
-    print("\n=== 신규 패턴 테스트 (v1.1) ===")
-    for header, exp_name, exp_role in NEW_CASES:
-        name, role, _ = _extract_speaker(header)
-        ok = (name == exp_name and role == exp_role)
-        mark = "✓" if ok else "✗"
-        if not ok:
-            failed += 1
+            failures.append(f"{header!r} → {name!r}/{role!r} (기대 {exp_name}/{exp_role})")
         print(f"  {mark} {header[:34]!r} → name={name!r} role={role!r}"
               + ("" if ok else f"  [기대: {exp_name}/{exp_role}]"))
+    return failures
 
-    print("\n=== 잡음 제외 테스트 ===")
+
+def test_regression_cases():
+    print("=== 회귀 테스트 (v1.0 기존 패턴) ===")
+    failures = _run_speaker_cases(REGRESSION_CASES)
+    assert not failures, failures
+
+
+def test_new_cases():
+    print("=== 신규 패턴 테스트 (v1.1) ===")
+    failures = _run_speaker_cases(NEW_CASES)
+    assert not failures, failures
+
+
+def test_garbage_headers():
+    print("=== 잡음 제외 테스트 ===")
+    failures = []
     for header in GARBAGE_HEADERS:
         blocked_by_hdr = bool(_NON_SPEAKER_HDR.match(header))
         name, _, _ = _extract_speaker(header)
         # 헤더 패턴에서 걸리거나, 이름이 안 뽑히면 (파서 본문의 _NON_SPEAKER_NAMES 필터 포함) OK
-        from parser_v1 import _NON_SPEAKER_NAMES
         ok = blocked_by_hdr or not name or name in _NON_SPEAKER_NAMES
         mark = "✓" if ok else "✗"
         if not ok:
-            failed += 1
+            failures.append(f"{header!r} → name={name!r}")
         print(f"  {mark} {header[:34]!r} → 제외됨={ok} (hdr차단={blocked_by_hdr}, name={name!r})")
+    assert not failures, failures
 
+
+def main() -> None:
+    test_regression_cases()
+    print()
+    test_new_cases()
+    print()
+    test_garbage_headers()
     total = len(REGRESSION_CASES) + len(NEW_CASES) + len(GARBAGE_HEADERS)
-    print(f"\n결과: {total - failed}/{total} 통과" + ("" if failed == 0 else f"  ← 실패 {failed}건!"))
-    sys.exit(1 if failed else 0)
+    print(f"\n결과: {total}/{total} 통과")
 
 
 if __name__ == "__main__":

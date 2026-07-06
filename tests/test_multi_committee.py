@@ -18,19 +18,17 @@ import io
 import sys
 from pathlib import Path
 
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
+if __name__ == "__main__":  # pytest 캡처와 충돌 방지 — 직접 실행할 때만 래핑
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 sys.path.insert(0, str(Path(__file__).parent.parent / "backend"))
 
 from query_parser import extract_filters  # noqa: E402
 from search_hybrid import _balance_by_committee  # noqa: E402
 
-FAILURES = []
-
 
 def check(name: str, cond: bool, got=None):
     print(f"[{'PASS' if cond else 'FAIL'}] {name}" + ("" if cond else f" — got: {got!r}"))
-    if not cond:
-        FAILURES.append(name)
+    assert cond, f"{name} — got: {got!r}"  # pytest 에서도 실패가 실패로 잡히게
 
 
 def committees_of(q: str):
@@ -101,12 +99,7 @@ def main():
     test_aliases()
     test_multi_detection()
     test_balance()
-
-    print()
-    if FAILURES:
-        print(f"FAIL — {len(FAILURES)}건: {FAILURES}")
-        sys.exit(1)
-    print("ALL PASS")
+    print("\nALL PASS")
 
 
 if __name__ == "__main__":
