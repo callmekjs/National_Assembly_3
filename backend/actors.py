@@ -91,22 +91,24 @@ def actor_profile(name: str) -> dict | None:
         ut_total = sum(ut.values()) or 1
         utterance_types = {k: round(v / ut_total, 3) for k, v in sorted(ut.items())}
 
+        # turn 단위 집계 — mentions 는 turn 에서 추출되어 분할 청크마다 복사되므로
+        # 청크 단위 count(*) 는 긴 발언을 중복 카운트한다. 별칭 병합 후에도 같은
+        # turn 이 두 번 세지지 않도록 (org, turn_id) 쌍을 집합으로 센다.
         cur.execute(
             """
-            SELECT v AS org, count(*) AS cnt
+            SELECT DISTINCT v AS org, turn_id
             FROM chunks, jsonb_array_elements_text(mentions) AS v
             WHERE speaker = ANY(%s)
-            GROUP BY v
             """,
             (variants,),
         )
-        merged: dict[str, int] = {}
+        merged: dict[str, set] = {}
         for r in cur.fetchall():
             key = canonical_org(r["org"])
-            merged[key] = merged.get(key, 0) + r["cnt"]
+            merged.setdefault(key, set()).add(r["turn_id"])
         top_mentions = [
-            {"org": org, "count": cnt}
-            for org, cnt in sorted(merged.items(), key=lambda kv: -kv[1])[:10]
+            {"org": org, "count": len(turn_ids)}
+            for org, turn_ids in sorted(merged.items(), key=lambda kv: -len(kv[1]))[:10]
         ]
 
         cur.execute(
