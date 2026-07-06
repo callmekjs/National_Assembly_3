@@ -1,6 +1,6 @@
 # 국회 RAG 서비스 — 개발 진행 현황
 
-최종 업데이트: 2026-07-02
+최종 업데이트: 2026-07-06
 
 ---
 
@@ -661,6 +661,42 @@ National_Assembly_3/
 - 쟁점 사전(POL-3)이 시계열·입장·구도의 전제 — 여기가 3단계 최대 결정 지점
 - 정식 eval 은 POL-7 이지만, 각 단계 완료 기준에 스팟체크를 내장 (eval 은 초반부터 — 마스터 4-11)
 - 결정 지점 2곳: POL-3 이슈 정의 방식, POL-5 입장 판정 방식 — 실데이터 검증으로 그때 결정
+
+## 코드 전수 검토 + 1차 수정 (2026-07-06)
+
+> 전체 코드베이스 검토(병렬 리뷰 3축: 백엔드/ETL/프론트+테스트) + 외부 리뷰(친구) 지적을
+> 통합해 수정 항목 30건 도출 — 전체 목록·진행 상태는 **`docs/fix_checklist.md`** (13/30 완료).
+> 총평: 알고리즘 코어(검색·grounding·정당 라벨)는 견고, 약점은 운영 경계면
+> (재실행 안전성·에러 경로·배포 설정)에 집중.
+
+### 1차 수정 완료 (13건, 전부 검증 통과)
+
+| 수정 | 파일 | 검증 |
+|------|------|------|
+| **재적재 시 임베딩 전량 유실 방지** — DELETE 의 ON DELETE CASCADE 가 embeddings_openai 까지 삭제 → 임시 테이블 백업 후 embed_text md5 동일분만 복원, 요약에 보존/유실 표시 | `scripts/jsonl_to_postgres.py` | 4,092임베딩 회의 재적재 → 전량 보존, 전체 419,882 불변 |
+| 한글 IME 조합 중 Enter 조기 제출 — `isComposing` 가드 | `frontend/.../QueryForm.jsx` | lint + build 통과 |
+| **검색 적중 발언의 turn 전문 복원** — hybrid 가 같은 turn 조각 중 1개만 남겨 긴 발언 맥락이 잘림 → `_fetch_texts` 가 turn 복원 (상한 4,000자, 초과 시 적중 조각 중심 창 + 경계 조각 부분 포함 `…` 표기) | `backend/answer.py` | 9조각(2만자) 발언 2,437→4,000자 복원, 단위테스트 6건 |
+| **LLM 근거 블록 로그** — query_logs.source_block 컬럼 (+ALTER 마이그레이션). 이상 답변 사후 재현·답변 품질 평가셋(POL-7)의 재료. API 응답엔 미노출 | `backend/main.py` `answer.py` `db/schema.sql` | E2E: 실질의 1건 10,591자 저장 확인 |
+| top_mentions 청크 단위 중복 카운트 — (org, turn_id) DISTINCT 쌍 집합 집계 (별칭 병합 이중 카운트도 방지) | `backend/actors.py` | 실 DB 프로필 조회 정상 |
+| 입력 검증 — 날짜 `datetime.date` 타입(불량 날짜 422), rating 1~5(👍=5/👎=1), question 2~1,000자, comment ≤2,000자 | `backend/main.py` | 서버 기동 후 422 확인 |
+| 임베딩 OpenAI 장애 시 500→502 — `/query`·`/search/vector`·`/search/hybrid` 의 임베딩 호출을 OpenAIError 처리로 | `backend/main.py` | — |
+| **pytest 무조건 통과 함정 제거** — check() 가 print 만 하고 assert 없음 + `test_*` 명명으로 pytest 가 수집해 전부 초록 → assert 화, parser/quality_gates 도 test 함수화, 데이터 없으면 skip | `tests/` 7개 | pytest 33건 실수집·통과 + 직접 실행 병행 |
+| stdout 재래핑 import 부작용 — pytest 캡처 충돌 원인 → 전부 `if __name__ == "__main__":` 가드 | `tests/` 7개 + `scripts/` 16개 | 직접 실행 출력 동일 |
+| (검토 중 발견) test_actors↔test_party 가 `party._party_map` 전역 공유로 pytest 일괄 실행 시 상호 오염 → 각 테스트가 자기 맵 주입 | `tests/test_party.py` | assert 도입 직후 3건 실패로 표면화 → 수정 |
+| (검토 중 발견) test_party 한자 상수가 리터럴 — 에디터 유니코드 정규화 시 NFKC 테스트 무력화 → 이스케이프 표기 (파일 자체 관례 준수) | `tests/test_party.py` | U+F9C9/U+67F3 코드포인트 확인 |
+| scripts/requirements.txt 에 pdfplumber·openai 누락 | `scripts/requirements.txt` | import 전수 대조 — 누락 0 |
+
+### 미수정 주요 항목 (fix_checklist.md 3~6순위)
+
+- **ETL 재실행 안전성**: 비원자적 쓰기+존재=완료 스킵 (중단 시 반쪽 파일 영구 고착),
+  정정본 PDF 미반영(SHA-256 미사용), 소스별 실패 exit 0 삼킴, ○(U+25CB) 마커 파서-게이트 불일치
+- **서버 안정성**: 풀 고갈 시 즉시 PoolError(동시 6+ 요청 500), 죽은 연결 반납
+- **배포 준비**: CORS·API 주소 하드코딩, 죽은 env 키 3개, **HNSW·trgm 인덱스 생성 SQL 이 저장소에 없음**,
+  LIKE 와일드카드 미이스케이프, 프론트 타임아웃/취소 없음
+- **중장기**: 답변 품질 평가셋(source_block 로그 축적 후 — POL-7 연계), 날짜 범위 질문
+  (첫 날짜 하루로 축소), role=NULL 정당 오라벨, 22대 하드코딩 4파일 중복, HTTP API 계층 테스트
+
+---
 
 ## v1.3 개선 예정 (청크 ID 무효화 변경 묶음 — 다음 재처리 때 한 번에)
 
