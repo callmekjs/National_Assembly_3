@@ -9,6 +9,7 @@
 """
 
 import io
+import os
 import re
 import sys
 import time
@@ -130,14 +131,31 @@ def make_filename(row: dict, pdf_url: str) -> str:
     return f"{date}_{mtg_no}_{pdf_id}.pdf"
 
 
-def download_pdf(session: requests.Session, url: str, dest: Path) -> None:
-    """PDF를 다운로드한다. 중복 파일도 덮어쓴다."""
+def download_pdf(session: requests.Session, url: str, dest: Path, refresh: bool = False) -> bool:
+    """PDF 다운로드. 반환: 실제 다운로드 True / 기존 파일 스킵 False.
+
+    - 기본은 증분 모드 (있으면 스킵) — --refresh 로 전체 재다운로드
+    - 임시 파일(.part)에 받아 %PDF 매직 바이트 확인 후 os.replace —
+      끊긴 다운로드 잔해나 HTTP 200 에러 페이지(HTML)가 .pdf 로 남는 것 방지
+    """
     dest.parent.mkdir(parents=True, exist_ok=True)
+    if dest.exists() and not refresh:
+        return False
+
+    tmp = dest.with_name(dest.name + ".part")
     resp = session.get(url, timeout=60, stream=True)
     resp.raise_for_status()
-    with open(dest, "wb") as f:
-        for chunk in resp.iter_content(chunk_size=8192):
-            f.write(chunk)
+    try:
+        with open(tmp, "wb") as f:
+            for chunk in resp.iter_content(chunk_size=8192):
+                f.write(chunk)
+        with open(tmp, "rb") as f:
+            if f.read(5) != b"%PDF-":
+                raise ValueError("응답이 PDF 가 아님 (에러 페이지일 가능성)")
+        os.replace(tmp, dest)
+    finally:
+        tmp.unlink(missing_ok=True)  # 실패 시 잔해 제거 (성공 시엔 이미 이동되어 없음)
+    return True
 
 
 def crawl_committee(
@@ -146,15 +164,17 @@ def crawl_committee(
     folder:       str,
     full_name:    str,
     committee_cd: str,
-) -> None:
+    refresh:      bool = False,
+) -> int:
+    """위원회 1개 크롤링. 반환: 오류 건수."""
     print(f"\n{'='*60}")
     print(f"[{folder}] {full_name}  (committeeCd={committee_cd})")
 
     rows = fetch_all_rows(session, csrf, committee_cd)
     print(f"  수집 완료: {len(rows)}건")
 
-    out_dir              = OUTPUT_ROOT / folder
-    downloaded = errors  = 0
+    out_dir                        = OUTPUT_ROOT / folder
+    downloaded = skipped = errors  = 0
 
     for row in rows:
         pdf_url = row.get("pdfLinkUrl", "")
@@ -167,38 +187,46 @@ def crawl_committee(
         dest  = out_dir / fname
 
         try:
-            download_pdf(session, pdf_url, dest)
-            print(f"  ↓ {fname}")
-            downloaded += 1
+            if download_pdf(session, pdf_url, dest, refresh=refresh):
+                print(f"  ↓ {fname}")
+                downloaded += 1
+                time.sleep(DELAY)  # 실제 다운로드 때만 대기 (스킵은 서버 부하 없음)
+            else:
+                skipped += 1
         except Exception as exc:
             print(f"  [오류] {fname}: {exc}")
             errors += 1
+            time.sleep(DELAY)
 
-        time.sleep(DELAY)
-
-    print(f"  완료 - 다운로드 {downloaded} / 오류 {errors}")
+    print(f"  완료 - 다운로드 {downloaded} / 스킵(기존) {skipped} / 오류 {errors}")
+    return errors
 
 
 def main() -> None:
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 
-    targets = set(sys.argv[1:])
+    args = sys.argv[1:]
+    refresh = "--refresh" in args           # 기존 파일도 다시 받기 (기본: 증분 — 있으면 스킵)
+    targets = set(a for a in args if not a.startswith("--"))
     session = make_session()
     OUTPUT_ROOT.mkdir(parents=True, exist_ok=True)
 
     print("CSRF 토큰 발급 중...")
     csrf = get_csrf(session)
-    print("CSRF 발급 완료\n")
+    print("CSRF 발급 완료" + (" (--refresh: 전체 재다운로드)" if refresh else " (증분 모드)") + "\n")
 
+    total_errors = 0
     for folder, (full_name, committee_cd) in COMMITTEES.items():
         if targets and folder not in targets:
             continue
         try:
-            crawl_committee(session, csrf, folder, full_name, committee_cd)
+            total_errors += crawl_committee(session, csrf, folder, full_name, committee_cd, refresh)
         except Exception as exc:
             print(f"\n[치명 오류] {folder}: {exc}")
+            total_errors += 1
 
-    print("\n모든 위원회 크롤링 완료")
+    print("\n모든 위원회 크롤링 완료" + (f" — 오류 {total_errors}건" if total_errors else ""))
+    sys.exit(1 if total_errors else 0)
 
 
 if __name__ == "__main__":
