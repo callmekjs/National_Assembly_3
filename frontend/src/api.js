@@ -2,18 +2,32 @@
 // 127.0.0.1 고정: localhost 는 Windows 에서 IPv6 우선 시도로 +2초 (progress.md 실측)
 const API_BASE = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
 
-async function request(path, options) {
+// 백엔드가 멈추면 fetch 가 영원히 안 끝나 화면이 '생성 중...'에 잠기던 문제 —
+// 요청별 타임아웃 (report 모드 실측 10~18초라 /query 는 여유 있게)
+const DEFAULT_TIMEOUT_MS = 20000
+const QUERY_TIMEOUT_MS = 90000
+
+async function request(path, options = {}, timeoutMs = DEFAULT_TIMEOUT_MS) {
   let res
   try {
-    res = await fetch(`${API_BASE}${path}`, options)
-  } catch {
+    res = await fetch(`${API_BASE}${path}`, { ...options, signal: AbortSignal.timeout(timeoutMs) })
+  } catch (e) {
+    if (e.name === 'TimeoutError' || e.name === 'AbortError') {
+      throw new Error('응답이 너무 오래 걸립니다. 잠시 후 다시 시도해주세요.')
+    }
     throw new Error('서버에 연결할 수 없습니다. 백엔드가 실행 중인지 확인하세요.')
   }
   if (res.status === 502) {
     throw new Error('답변 생성에 실패했습니다. 다시 시도해주세요.')
   }
   if (!res.ok) {
-    throw new Error(`요청이 실패했습니다 (HTTP ${res.status})`)
+    // 백엔드 detail (예: "query_id 형식이 UUID 가 아닙니다") 을 버리지 않고 표시
+    let detail = ''
+    try {
+      const body = await res.json()
+      if (typeof body.detail === 'string') detail = body.detail
+    } catch { /* JSON 아니면 무시 */ }
+    throw new Error(detail || `요청이 실패했습니다 (HTTP ${res.status})`)
   }
   return res.json()
 }
@@ -23,7 +37,7 @@ export function postQuery(question, mode) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ question, mode }),
-  })
+  }, QUERY_TIMEOUT_MS)
 }
 
 export function getCitation(chunkId) {
