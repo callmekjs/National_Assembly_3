@@ -29,7 +29,11 @@ import psycopg2
 from psycopg2.extras import execute_values
 from dotenv import load_dotenv
 from openai import OpenAI
-from openai import APIError, APITimeoutError, RateLimitError, APIConnectionError
+from openai import APIConnectionError, APITimeoutError, InternalServerError, RateLimitError
+
+# 재시도는 일시 오류만 — base APIError 를 잡으면 영구 오류(401 잘못된 키, 400 입력
+# 초과 등)까지 6회(~2분) 재시도한 뒤에야 실패해 원인 파악만 늦어진다
+_RETRYABLE = (RateLimitError, APITimeoutError, APIConnectionError, InternalServerError)
 
 if __name__ == "__main__":  # import 시(테스트 등) 부작용 방지 — 직접 실행할 때만 래핑
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
@@ -82,14 +86,15 @@ def make_batches(rows: list[tuple[str, str]]):
 
 
 def embed_with_retry(client: OpenAI, texts: list[str]) -> list[list[float]]:
-    """임베딩 API 호출. rate limit/일시 오류는 지수 백오프로 재시도."""
+    """임베딩 API 호출. 일시 오류(rate limit·타임아웃·연결·5xx)만 지수 백오프 재시도.
+    영구 오류(401/400/403 등)는 즉시 전파 — 재시도해도 결과가 같다."""
     for attempt in range(MAX_RETRIES):
         try:
             resp = client.embeddings.create(model=EMBEDDING_MODEL, input=texts)
             # index 순서 보장
             data = sorted(resp.data, key=lambda d: d.index)
             return [d.embedding for d in data]
-        except (RateLimitError, APITimeoutError, APIConnectionError, APIError) as e:
+        except _RETRYABLE as e:
             if attempt == MAX_RETRIES - 1:
                 raise
             wait = 2 ** (attempt + 1)
