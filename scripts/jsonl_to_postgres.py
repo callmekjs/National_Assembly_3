@@ -120,17 +120,21 @@ def insert_chunks(cur, chunks: list[dict], committee_id: int | None) -> tuple[in
     """chunks 를 DELETE 후 재삽입. 반환: (임베딩 보존 수, 임베딩 유실 수).
 
     chunks DELETE 는 embeddings_openai 로 ON DELETE CASCADE 되어 임베딩까지
-    지워진다 — 내용(embed_text)이 같은 청크의 임베딩은 임시 테이블에 보관했다가
-    복원해, 재적재 때마다 전체 재임베딩(OpenAI 비용)이 발생하는 것을 막는다.
+    지워진다 — 임베딩을 **내용(embed_text) 기준**으로 보관했다가 복원한다.
+    chunk_id 가 바뀌어도(순번→해시, 파서 재번호, 청킹 변경) 내용만 같으면
+    재사용되므로, v1.3 재처리처럼 chunk_id 가 전량 바뀌는 경우에도 바뀐 내용만
+    재임베딩한다 (임베딩은 모델 고정이라 같은 텍스트 = 같은 벡터 → 재사용 안전).
     """
     source_id = chunks[0]["source_id"]
 
     cur.execute("DROP TABLE IF EXISTS _emb_backup")
+    # 내용(embed_text md5)당 임베딩 1개만 보관 — 같은 텍스트 중복 청크는 벡터가
+    # 동일하므로 아무거나 하나면 충분 (복원 시 카티전 곱 방지)
     cur.execute(
         """
         CREATE TEMP TABLE _emb_backup ON COMMIT DROP AS
-        SELECT e.chunk_id, e.embedding, e.model, e.created_at,
-               md5(ch.embed_text) AS embed_md5
+        SELECT DISTINCT ON (md5(ch.embed_text))
+               md5(ch.embed_text) AS embed_md5, e.embedding, e.model
         FROM embeddings_openai e JOIN chunks ch USING (chunk_id)
         WHERE ch.source_id = %s
         """,
@@ -161,17 +165,19 @@ def insert_chunks(cur, chunks: list[dict], committee_id: int | None) -> tuple[in
         page_size=1000,
     )
 
-    # chunk_id 가 여전히 존재하고 embed_text 가 그대로인 것만 복원
+    # 새 청크에 내용(embed_text md5) 매칭으로 임베딩 복원. 한 내용이 여러 새 청크로
+    # 갈라져도(청킹 변경) 각 청크가 같은 벡터를 받음 — DISTINCT ON 으로 청크당 1행.
     cur.execute(
         """
-        INSERT INTO embeddings_openai (chunk_id, embedding, model, created_at)
-        SELECT b.chunk_id, b.embedding, b.model, b.created_at
-        FROM _emb_backup b JOIN chunks ch ON ch.chunk_id = b.chunk_id
-        WHERE md5(ch.embed_text) = b.embed_md5
-        """
+        INSERT INTO embeddings_openai (chunk_id, embedding, model)
+        SELECT DISTINCT ON (ch.chunk_id) ch.chunk_id, b.embedding, b.model
+        FROM chunks ch JOIN _emb_backup b ON md5(ch.embed_text) = b.embed_md5
+        WHERE ch.source_id = %s
+        """,
+        (source_id,),
     )
     restored = cur.rowcount
-    return restored, saved - restored
+    return restored, len(chunks) - restored
 
 
 def rebuild_speakers(cur) -> int:
@@ -282,9 +288,9 @@ def main() -> None:
     print(f"  meetings   : {meeting_count:>8,}  (적재 source {loaded_sources}/{len(source_ids)})")
     print(f"  speakers   : {speaker_count:>8,}")
     print(f"  chunks     : {total_chunks:>8,}")
-    print(f"  embeddings : 보존 {emb_restored:,} / 유실 {emb_lost:,} (내용 변경·삭제분)")
+    print(f"  embeddings : 재사용 {emb_restored:,} / 신규필요 {emb_lost:,} (내용 바뀐 청크)")
     if emb_lost:
-        print("    → 유실분은 scripts/embeddings_v1.py 재실행으로 다시 채우세요.")
+        print("    → 신규필요분은 scripts/embeddings_v1.py 재실행으로 채우세요 (증분).")
     if skipped:
         print(f"\n  건너뜀 {len(skipped)}건:")
         for sid, reason in skipped[:20]:

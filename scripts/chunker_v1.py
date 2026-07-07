@@ -26,16 +26,18 @@ from stage_io import report_failures, write_jsonl_atomic
 if __name__ == "__main__":  # import 시(테스트 등) 부작용 방지 — 직접 실행할 때만 래핑
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 
-CHUNKER_VERSION = "v1.0"
+CHUNKER_VERSION = "v1.1"   # v1.1: 한국어 문장분할 보강 (공백 없는 경계 + 길이 강제 분할)
 
 INPUT_ROOT  = Path(__file__).parent.parent / "data" / "v1" / "enriched"
 OUTPUT_ROOT = Path(__file__).parent.parent / "data" / "v1" / "chunks"
 
 SHORT_THRESHOLD = 150   # 자 미만 → short chunk
 LONG_THRESHOLD  = 2500  # 자 초과 → 분할
+HARD_SPLIT_MAX  = 3000  # 문장 경계 못 찾을 때 강제 절단 상한 (임베딩 8,192토큰 방어)
 
-# 문장 경계: 마침표/느낌표/물음표 뒤 공백 또는 줄바꿈
-_SENT_SPLIT = re.compile(r"(?<=[.!?。])\s+")
+# 문장 경계: 구두점(. ! ? 。) 뒤에서 분할. 공백이 있든(정상) 없든("했습니다.그리고"
+# — PDF 추출로 공백 소실) 모두 자른다. 소수점 숫자(3.14)는 뒤가 숫자라 제외.
+_SENT_SPLIT = re.compile(r"(?<=[.!?。])(?=\s)|(?<=[.!?。])(?=[^\d\s])")
 
 
 def _embed_text(turn: dict, text: str) -> str:
@@ -48,9 +50,19 @@ def _embed_text(turn: dict, text: str) -> str:
     return f"{committee} {meeting_date} {speaker}{role_str} 발언: {text}"
 
 
+def _hard_split(s: str, size: int = HARD_SPLIT_MAX) -> list[str]:
+    """문장 경계가 없는 초장문을 size 단위로 강제 절단 (임베딩 토큰 한도 방어).
+    한 '문장'이 8,192토큰을 넘으면 임베딩 배치 전체가 400 으로 죽던 문제 방지."""
+    return [s[i:i + size] for i in range(0, len(s), size)]
+
+
 def _split_long(text: str, max_len: int = LONG_THRESHOLD) -> list[str]:
-    """긴 텍스트를 문장 단위로 나눠 max_len 이하 청크로 묶는다."""
-    sentences = _SENT_SPLIT.split(text)
+    """긴 텍스트를 문장 단위로 나눠 max_len 이하 청크로 묶는다.
+    구두점이 없어 한 조각이 여전히 너무 길면 길이 기준으로 강제 분할한다."""
+    sentences = []
+    for sent in _SENT_SPLIT.split(text):
+        sentences.extend(_hard_split(sent) if len(sent) > HARD_SPLIT_MAX else [sent])
+
     chunks, buf = [], ""
     for sent in sentences:
         if buf and len(buf) + len(sent) + 1 > max_len:
