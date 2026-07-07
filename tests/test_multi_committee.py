@@ -58,6 +58,21 @@ def test_multi_detection():
     check("복수: 같은 위원회 중복 제거", got == ["외통위"], got)
 
 
+def test_invalid_dates():
+    # 실존하지 않는 날짜는 필터 미적용 (크래시·SQL 오류 대신 일반 텍스트 취급)
+    _, _, df, dt = extract_filters("2025년 13월 국정감사 논의")
+    check("날짜: 13월은 필터 미적용", df is None and dt is None, (df, dt))
+    _, _, df, dt = extract_filters("2025년 2월 30일 회의 내용")
+    check("날짜: 2월 30일은 필터 미적용", df is None and dt is None, (df, dt))
+    _, _, df, dt = extract_filters("2025-13-01 논의")
+    check("날짜: ISO 오타도 필터 미적용", df is None and dt is None, (df, dt))
+    # 정상 날짜는 기존 동작 유지 (회귀 방지)
+    _, _, df, dt = extract_filters("2025년 7월 14일 논의")
+    check("날짜: 정상 일자는 exact", df == "2025-07-14" and dt == "2025-07-14", (df, dt))
+    _, _, df, dt = extract_filters("2024년 12월 논의")
+    check("날짜: 정상 월은 월 범위", df == "2024-12-01" and dt == "2024-12-31", (df, dt))
+
+
 def hit(cid, committee, rrf):
     return {"chunk_id": cid, "committee": committee, "rrf": rrf}
 
@@ -98,6 +113,7 @@ def test_balance():
 def main():
     test_aliases()
     test_multi_detection()
+    test_invalid_dates()
     test_balance()
     print("\nALL PASS")
 

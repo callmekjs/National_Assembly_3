@@ -14,6 +14,7 @@
       조사 제거 + 불용어 제거를 거친 내용어 토큰
 """
 
+import datetime
 import re
 
 # ── 위원회 인식 (정식명·통용 표기 → 약칭) ───────────────────────────────────
@@ -62,10 +63,18 @@ _STOPWORDS = frozenset([
 ])
 
 
+def _safe_iso(year: int, month: int, day: int) -> str | None:
+    """실존하는 날짜만 ISO 문자열로. "2025년 13월 40일" 같은 오타는 None —
+    필터를 포기하고 일반 텍스트로 취급한다 (잘못된 날짜가 SQL 까지 가면 500)."""
+    try:
+        return datetime.date(year, month, day).isoformat()
+    except ValueError:
+        return None
+
+
 def _last_day_of_month(year: int, month: int) -> int:
     if month == 12:
         return 31
-    import datetime
     return (datetime.date(year, month + 1, 1) - datetime.timedelta(days=1)).day
 
 
@@ -82,21 +91,25 @@ def extract_filters(q: str):
 
     m = _DATE_FULL_RE.search(cleaned)
     if m:
-        y, mo, d = int(m.group(1)), int(m.group(2)), int(m.group(3))
-        date_from = date_to = f"{y:04d}-{mo:02d}-{d:02d}"
-        cleaned = cleaned.replace(m.group(0), " ")
+        iso = _safe_iso(int(m.group(1)), int(m.group(2)), int(m.group(3)))
+        if iso:
+            date_from = date_to = iso
+            cleaned = cleaned.replace(m.group(0), " ")
     else:
         m = _DATE_ISO_RE.search(cleaned)
         if m:
-            date_from = date_to = m.group(0)
-            cleaned = cleaned.replace(m.group(0), " ")
+            iso = _safe_iso(int(m.group(1)), int(m.group(2)), int(m.group(3)))
+            if iso:
+                date_from = date_to = iso
+                cleaned = cleaned.replace(m.group(0), " ")
         else:
             m = _DATE_MONTH_RE.search(cleaned)
             if m:
                 y, mo = int(m.group(1)), int(m.group(2))
-                date_from = f"{y:04d}-{mo:02d}-01"
-                date_to = f"{y:04d}-{mo:02d}-{_last_day_of_month(y, mo):02d}"
-                cleaned = cleaned.replace(m.group(0), " ")
+                if 1 <= mo <= 12:
+                    date_from = f"{y:04d}-{mo:02d}-01"
+                    date_to = f"{y:04d}-{mo:02d}-{_last_day_of_month(y, mo):02d}"
+                    cleaned = cleaned.replace(m.group(0), " ")
 
     # 위원회는 전부 감지 (findall) — 위원회명은 의미 정보라 질문에서 제거하지 않는다 (벡터 축에 유용)
     found = [COMMITTEE_MAP[m] for m in _COMMITTEE_RE.findall(cleaned)]
