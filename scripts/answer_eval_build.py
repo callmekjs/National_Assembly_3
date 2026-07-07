@@ -12,6 +12,7 @@
 """
 
 import io
+import os
 import json
 import sys
 import time
@@ -25,7 +26,8 @@ if __name__ == "__main__":
 EVAL_DIR = Path(__file__).parent.parent / "data" / "eval"
 PROTO = EVAL_DIR / "prototype_75q_full.json"
 REVAL = EVAL_DIR / "revalidation_report.json"
-OUT = EVAL_DIR / "answer_eval_set.json"
+# 출력 경로는 환경변수로 override 가능 (reranker ON/OFF 비교 시 파일 분리)
+OUT = EVAL_DIR / os.environ.get("ANSWER_EVAL_OUT", "answer_eval_set.json")
 
 # 1단계에서 '지목 대상 부재 — 거절이 정답'으로 확정된 문항 (killer feature 시험)
 EXPECT_REFUSAL_IDS = {"eval_044", "eval_054", "eval_061", "eval_067"}

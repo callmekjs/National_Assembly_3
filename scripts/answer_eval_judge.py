@@ -25,7 +25,8 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "backend"))
 if __name__ == "__main__":
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 
-EVAL_SET = Path(__file__).parent.parent / "data" / "eval" / "answer_eval_set.json"
+import os  # noqa: E402
+EVAL_SET = Path(__file__).parent.parent / "data" / "eval" / os.environ.get("ANSWER_EVAL_OUT", "answer_eval_set.json")
 JUDGE_MODEL = "gpt-4o"  # 채점은 피채점(gpt-4o-mini)보다 상위 모델로 — 자기채점 편향 완화
 
 SYSTEM = """당신은 국회 회의록 RAG 답변을 채점하는 엄격한 심사관이다.
