@@ -22,6 +22,17 @@ from query_parser import content_tokens
 MAX_TERMS = 8  # 토큰 폭발 방지
 
 
+def _like_escape(term: str) -> str:
+    """ILIKE 패턴 특수문자 이스케이프 — 질문 속 "50%" 의 % 가 와일드카드로 해석돼
+    "50" 포함 전부와 매칭(점수 오염)되는 것 방지. Postgres 기본 ESCAPE 는 백슬래시."""
+    return term.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+
+
+def _pat(term: str) -> str:
+    """검색어 → 부분일치 ILIKE 패턴 (내용은 이스케이프, 양끝 % 만 와일드카드)."""
+    return f"%{_like_escape(term)}%"
+
+
 def _terms_from_query(q: str) -> tuple[list[str], list[str]]:
     """
     질문 → (구문 후보, 토큰 후보). 각 후보는 별칭으로 확장된다.
@@ -70,29 +81,29 @@ def keyword_search(
     #       ORDER BY DESC 에서 NULL 이 맨 위로 올라간다. 반드시 COALESCE 로 0 처리.
     for ph in phrases:                              # 구문 일치 +2
         score_parts.append("COALESCE((ch.text ILIKE %s)::int, 0) * 2")
-        params.append(f"%{ph}%")
+        params.append(_pat(ph))
     for tok in tokens:                              # 토큰 일치 +1
         score_parts.append("COALESCE((ch.text ILIKE %s)::int, 0)")
-        params.append(f"%{tok}%")
+        params.append(_pat(tok))
     for tok in tokens:                              # 발언자 일치 +3
         score_parts.append("COALESCE((ch.speaker ILIKE %s)::int, 0) * 3")
-        params.append(f"%{tok}%")
+        params.append(_pat(tok))
     for tok in tokens:                              # 역할(직책) 일치 +2
         score_parts.append("COALESCE((ch.role ILIKE %s)::int, 0) * 2")
-        params.append(f"%{tok}%")
+        params.append(_pat(tok))
 
     score_sql = " + ".join(score_parts)
 
     # WHERE: 토큰·구문 중 하나라도 본문·발언자·역할에 존재 (OR — 마스터 3-5)
     for term in phrases + tokens:
         match_conds.append("ch.text ILIKE %s")
-        params.append(f"%{term}%")
+        params.append(_pat(term))
     for tok in tokens:
         match_conds.append("ch.speaker ILIKE %s")
-        params.append(f"%{tok}%")
+        params.append(_pat(tok))
     for tok in tokens:
         match_conds.append("ch.role ILIKE %s")
-        params.append(f"%{tok}%")
+        params.append(_pat(tok))
     where = ["(" + " OR ".join(match_conds) + ")"]
 
     if committee:
