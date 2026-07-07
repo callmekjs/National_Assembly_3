@@ -23,7 +23,10 @@ INPUT_ROOT  = Path(__file__).parent.parent / "data" / "v1" / "parsed"
 REPORT_ROOT = Path(__file__).parent.parent / "data" / "v1" / "reports" / "turns_quality"
 
 _DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
-_MARKER_RE = re.compile(r"^[◯○◎]")
+# 파서(parser_v1 MARKER_RE)와 동일 집합으로 통일 — ○(U+25CB)는 2026-07-07 전수 조사에서
+# 767개 source 전체 줄 시작 0회(본문 중간 1회뿐)로 실사용 없음 확인. 새 마커 의심 시
+# inspect_pdf_samples.py 로 조사 후 파서·게이트를 함께 갱신할 것.
+_MARKER_RE = re.compile(r"^[◯◎]")
 
 _NON_SPEAKER = frozenset([
     "출석", "정부측", "기타", "참석자", "의안", "보고사항", "부록",
