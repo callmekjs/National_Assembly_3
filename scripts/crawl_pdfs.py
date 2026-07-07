@@ -22,23 +22,14 @@ from bs4 import BeautifulSoup
 BASE_URL = "https://www.assembly.go.kr"
 LIST_API = f"{BASE_URL}/portal/cnts/cntsCmmit/listMtgRcord.json"
 
-# (폴더명: (위원회 전체명, committeeCd))
-# committeeCd는 API 응답 cmmnCdList에서 확인한 실제 코드
-COMMITTEES = {
-    "과방위":    ("과학기술정보방송통신위원회",       "9700479"),
-    "외통위":    ("외교통일위원회",                "9700409"),
-    "정무위":    ("정무위원회",                    "9700008"),
-    "기재위":    ("재정경제기획위원회",              "9700590"),
-    "행안위":    ("행정안전위원회",                "9700480"),
-    "복지위":    ("보건복지위원회",                "9700341"),
-    "국토위":    ("국토교통위원회",                "9700407"),
-    "산자중기위": ("산업통상자원중소벤처기업위원회",   "9700481"),
-    "국방위":    ("국방위원회",                    "9700019"),
-}
+# 위원회 정의는 공용 모듈 단일 출처 (committees.py — 4개 스크립트 공유)
+from committees import ASSEMBLY_BEGIN_DATE, COMMITTEES as _COMMITTEE_ROWS
 
-CSRF_MENU_NO = "600238"    # CSRF 발급 전용 (API 필터링과 무관)
-BEGIN_DATE   = "20240530"  # 제22대 국회 개원일
-END_DATE     = ""          # 빈 문자열 = 현재까지
+COMMITTEES = {folder: (name, cd) for folder, name, cd in _COMMITTEE_ROWS}
+
+CSRF_MENU_NO = "600238"              # CSRF 발급 전용 (API 필터링과 무관)
+BEGIN_DATE   = ASSEMBLY_BEGIN_DATE   # 개원일
+END_DATE     = ""                    # 빈 문자열 = 현재까지
 PAGE_SIZE    = 100
 DELAY        = 0.5         # 요청 간 대기(초)
 OUTPUT_ROOT  = Path(__file__).parent.parent / "incoming_data"

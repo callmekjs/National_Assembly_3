@@ -27,17 +27,8 @@ if __name__ == "__main__":  # import 시(테스트 등) 부작용 방지 — 직
 INPUT_ROOT  = Path(__file__).parent.parent / "incoming_data"
 OUTPUT_ROOT = Path(__file__).parent.parent / "data" / "v1" / "extract"
 
-FOLDER_TO_COMMITTEE = {
-    "과방위":    "과학기술정보방송통신위원회",
-    "외통위":    "외교통일위원회",
-    "정무위":    "정무위원회",
-    "기재위":    "재정경제기획위원회",
-    "행안위":    "행정안전위원회",
-    "복지위":    "보건복지위원회",
-    "국토위":    "국토교통위원회",
-    "산자중기위": "산업통상자원중소벤처기업위원회",
-    "국방위":    "국방위원회",
-}
+# 위원회 정의는 공용 모듈 단일 출처 (committees.py)
+from committees import FOLDER_TO_COMMITTEE  # noqa: E402
 
 
 def extract_date_hint(file_name: str) -> str:
