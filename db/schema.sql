@@ -85,8 +85,8 @@ CREATE INDEX IF NOT EXISTS idx_chunks_committee_id   ON chunks(committee_id);
 CREATE INDEX IF NOT EXISTS idx_chunks_meeting_date   ON chunks(meeting_date);
 CREATE INDEX IF NOT EXISTS idx_chunks_speaker        ON chunks(speaker);
 
--- 벡터 검색 인덱스(HNSW)와 한국어 키워드 검색 인덱스는
--- 임베딩 적재(ETL-8) / 검색 구현 단계에서 별도로 생성한다.
+-- 벡터 검색 인덱스(HNSW)와 한국어 키워드 검색 인덱스(pg_trgm)는
+-- db/indexes.sql 로 생성한다 (대량 적재 시 DROP→적재→재생성 운용을 위해 분리).
 
 -- 6. 질의 로그 (RAG-7). /query 호출마다 1행 — 답변·신뢰등급·비용 기록,
 --    /feedback 이 rating 컬럼을 UPDATE 한다 (질문당 피드백 1개 — 별도 테이블은 YAGNI).

@@ -1,5 +1,6 @@
 import datetime
 import json
+import os
 import time
 import uuid
 from contextlib import asynccontextmanager
@@ -30,10 +31,17 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="국회 RAG API", version="0.2.0", lifespan=lifespan)
 
+# CORS 허용 출처 — 기본은 Vite dev server (localhost/127.0.0.1 어느 쪽으로 열어도
+# 동작하게 둘 다). 배포 시 .env 의 BACKEND_CORS_ORIGINS(쉼표 구분)로 교체.
+_cors_env = os.environ.get("BACKEND_CORS_ORIGINS", "")
+CORS_ORIGINS = (
+    [o.strip() for o in _cors_env.split(",") if o.strip()]
+    or ["http://localhost:5173", "http://127.0.0.1:5173"]
+)
+
 app.add_middleware(
     CORSMiddleware,
-    # Vite dev server — localhost/127.0.0.1 어느 쪽으로 열어도 동작하게 둘 다 허용
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origins=CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
