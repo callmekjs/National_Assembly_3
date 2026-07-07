@@ -7,7 +7,8 @@
   근본 해결은 코드가 근거 블록에 정당을 직접 표기해 추측할 필요를 없애는 것.
 
 판정:
-  party_label("엄태영", "2025-09-24") → "국민의힘(당시 야당)"
+  party_label("엄태영", "2025-09-24", "위원") → "국민의힘(당시 야당)"
+  - 자격(role) 필수: 국회의원 자격만 정당 라벨, 자격 불명(None)은 무표기 (2026-07-07)
   - 여야는 시점 의존: 코퍼스 기간(2024-05~2026-06) 중 정권교체(2025-06-04 취임)
   - 무소속은 여야 없이 "무소속"
   - 서로 다른 정당의 동명이인 → None (틀린 라벨보다 무표기 — 신뢰 원칙.
@@ -124,12 +125,18 @@ def party_label(
 
     - 국회의원 자격(ASSEMBLY_ROLES) → "정당(당시 여야)" / "무소속"
     - 행정부 자격 → "정부측" (members 에 있는 겸직 의원이라도 — 정동영 통일부장관 사례)
-    - 국회 스태프·증인·참고인·진술인·미상 → None
+    - 국회 스태프·증인·참고인·진술인·미상·자격 불명(role=None) → None
     """
     if not speaker or not meeting_date:
         return None
 
-    if role is not None and role not in ASSEMBLY_ROLES:
+    # 자격 불명(None)도 무표기 — role=NULL 이 게이트를 우회해 의원과 동명인
+    # 증인에게 정당이 붙을 수 있던 구멍 (2026-07-07 수정). 실측: role=NULL 은
+    # 전체 0.12%(494청크), 의원 이름 일치 114청크 — 라벨 손실은 미미하고
+    # "자격이 확인된 발언에만 라벨" 원칙이 구조적으로 보장된다.
+    if role not in ASSEMBLY_ROLES:
+        if role is None:
+            return None
         if role in STAFF_ROLES or role in WITNESS_ROLES or _NOMINEE_ROLE.search(role):
             return None
         if _EXECUTIVE_ROLE.search(role):

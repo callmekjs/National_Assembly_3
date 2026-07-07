@@ -32,6 +32,12 @@ YU_STD = "\u67F3\u69AE\u590F"     # 柳榮夏 표준 한자 (API 형)
 YU_COMPAT = "\uF9C9\u69AE\u590F"  # 柳榮夏 호환용 한자 (DB 저장형)
 
 
+def label(name, date):
+    """의원 자격 기준 판정 — 2026-07-07 role 필수화(자격 불명은 무표기) 이후
+    순수 정당·여야 로직 테스트는 자격을 명시해 호출한다."""
+    return party_label(name, date, "의원")
+
+
 def check(name: str, cond: bool, got=None):
     print(f"[{'PASS' if cond else 'FAIL'}] {name}" + ("" if cond else f" — got: {got!r}"))
     assert cond, f"{name} — got: {got!r}"  # pytest 에서도 실패가 실패로 잡히게
@@ -61,35 +67,35 @@ def test_ruling_periods():
     check("여야: 2025-06-03 집권당 국민의힘", ruling_party("2025-06-03") == "국민의힘")
     check("여야: 2025-06-04 집권당 더불어민주당", ruling_party("2025-06-04") == "더불어민주당")
 
-    got = party_label("엄태영", "2024-09-24")
+    got = label("엄태영", "2024-09-24")
     check("여야: 정권교체 전 국민의힘=여당", got == "국민의힘(당시 여당)", got)
-    got = party_label("엄태영", "2025-09-24")
+    got = label("엄태영", "2025-09-24")
     check("여야: 정권교체 후 국민의힘=야당", got == "국민의힘(당시 야당)", got)
-    got = party_label("김병주", "2025-11-27")
+    got = label("김병주", "2025-11-27")
     check("여야: 정권교체 후 민주당=여당", got == "더불어민주당(당시 여당)", got)
 
 
 def test_nfkc_matching():
     _install_base_map()
-    got = party_label(YU_COMPAT, "2025-01-01")
+    got = label(YU_COMPAT, "2025-01-01")
     check("NFKC: 호환용 한자 발언자 매칭", got == "국민의힘(당시 여당)", got)
-    got = party_label("유영하", "2025-01-01")
+    got = label("유영하", "2025-01-01")
     check("NFKC: 한글 이름도 매칭", got == "국민의힘(당시 여당)", got)
 
 
 def test_duplicates():
     _install_base_map()
-    got = party_label("박지원", "2025-01-01")
+    got = label("박지원", "2025-01-01")
     check("동명이인: 같은 정당이면 정상 표기", got == "더불어민주당(당시 야당)", got)
-    got = party_label("김철수", "2025-01-01")
+    got = label("김철수", "2025-01-01")
     check("동명이인: 다른 정당이면 None", got is None, got)
 
 
 def test_edge():
     _install_base_map()
-    check("무소속: 여야 없이 표기", party_label("윤종오", "2025-01-01") == "무소속")
-    check("미등록(장관·증인): None", party_label("조태열", "2025-01-01") is None)
-    check("None 안전", party_label(None, "2025-01-01") is None and party_label("엄태영", None) is None)
+    check("무소속: 여야 없이 표기", label("윤종오", "2025-01-01") == "무소속")
+    check("미등록(장관·증인): None", label("조태열", "2025-01-01") is None)
+    check("None 안전", label(None, "2025-01-01") is None and label("엄태영", None) is None)
 
 
 def test_normalize_party():
@@ -104,11 +110,11 @@ def test_satellite_side():
     # 표기는 위성정당, 여야 판정만 모정당 기준
     rows = ROWS + [("강선영", "姜善英", "국민의미래"), ("전종덕", "全鍾德", "더불어민주연합")]
     party._party_map = _build_map(rows)
-    got = party_label("강선영", "2024-09-01")
+    got = label("강선영", "2024-09-01")
     check("위성 여야: 국민의미래 → 국힘 정권에서 여당", got == "국민의미래(당시 여당)", got)
-    got = party_label("강선영", "2025-09-01")
+    got = label("강선영", "2025-09-01")
     check("위성 여야: 정권교체 후 야당", got == "국민의미래(당시 야당)", got)
-    got = party_label("전종덕", "2025-09-01")
+    got = label("전종덕", "2025-09-01")
     check("위성 여야: 더불어민주연합 → 민주 정권에서 여당", got == "더불어민주연합(당시 여당)", got)
 
 
@@ -141,6 +147,8 @@ def test_role_gate():
     check("자격: 국회 스태프(수석전문위원) 무표기 — '수석' 오폭 방지",
           party_label("김일수", "2024-10-01", "수석전문위원") is None)
     check("자격: 미상 role 무표기", party_label("엄태영", "2025-09-24", "OO연구소장") is None)
+    check("자격: role=None(불명)도 무표기 — 동명 증인 오라벨 방지",
+          party_label("엄태영", "2025-09-24", None) is None)
 
 
 def test_aliases_merge():
