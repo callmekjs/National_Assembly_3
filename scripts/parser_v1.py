@@ -15,6 +15,8 @@ import sys
 from collections import Counter
 from pathlib import Path
 
+from stage_io import report_failures, write_jsonl_atomic
+
 if __name__ == "__main__":  # import 시(테스트 등) 부작용 방지 — 직접 실행할 때만 래핑
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 
@@ -27,6 +29,9 @@ INPUT_ROOT  = Path(__file__).parent.parent / "data" / "v1" / "normalized"
 OUTPUT_ROOT = Path(__file__).parent.parent / "data" / "v1" / "parsed"
 
 # ── 발언자 마커 ───────────────────────────────────────────────────────────────
+# turns_quality_gate._MARKER_RE 와 같은 집합 유지 — 한쪽만 바꾸면 발언이 앞 턴에
+# 이어붙거나(파서) 가짜 경고(게이트)가 난다. ○(U+25CB)는 2026-07-07 전수 조사에서
+# 실사용 0회 확인으로 제외.
 MARKER_RE = re.compile(r"[◯◎]")
 
 # ── 비발언 헤더 패턴 — 이 패턴으로 시작하는 헤더는 턴에서 제외 ─────────────────
@@ -315,12 +320,7 @@ def parse_source(source_id: str) -> tuple[int, str | None]:
         return 0, "빈 파일"
 
     turns = split_turns(pages)
-
-    out_dir.mkdir(parents=True, exist_ok=True)
-    with open(out_path, "w", encoding="utf-8") as f:
-        for t in turns:
-            f.write(json.dumps(t, ensure_ascii=False) + "\n")
-
+    write_jsonl_atomic(out_path, turns)
     return len(turns), None
 
 
@@ -336,17 +336,18 @@ def main() -> None:
     if targets:
         source_ids = [s for s in source_ids if any(s.startswith(t) for t in targets)]
 
-    total_turns = total_errors = 0
+    total_turns = 0
+    failures: list[tuple[str, str]] = []
     for source_id in source_ids:
         n, err = parse_source(source_id)
         if err:
             print(f"  [오류] {source_id}: {err}")
-            total_errors += 1
+            failures.append((source_id, err))
         else:
             print(f"  ✓ {source_id}  ({n}턴)")
             total_turns += n
 
-    print(f"\n파싱 완료 — 총 {total_turns}턴 / 오류 {total_errors}개")
+    print(f"\n파싱 완료 — 총 {total_turns}턴 / 오류 {len(failures)}개")
     print(f"출력 위치: {OUTPUT_ROOT}")
 
     # 버려진 헤더 리포트 — 새 발언자 패턴 발견용
@@ -360,6 +361,11 @@ def main() -> None:
             for hdr, cnt in DROPPED_HEADERS.most_common():
                 f.write(f"{cnt:6d}  {hdr}\n")
         print(f"버려진 헤더: {sum(DROPPED_HEADERS.values())}건 → {report_path}")
+
+    fail_path = report_failures("parser", failures)
+    if fail_path:
+        print(f"실패 목록: {fail_path}")
+        sys.exit(1)
 
 
 if __name__ == "__main__":

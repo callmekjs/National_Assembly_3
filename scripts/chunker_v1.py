@@ -21,6 +21,8 @@ import re
 import sys
 from pathlib import Path
 
+from stage_io import report_failures, write_jsonl_atomic
+
 if __name__ == "__main__":  # import 시(테스트 등) 부작용 방지 — 직접 실행할 때만 래핑
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 
@@ -138,12 +140,7 @@ def chunk_source(source_id: str) -> tuple[int, str | None]:
         return 0, "빈 파일"
 
     chunks = make_chunks(turns)
-
-    out_dir.mkdir(parents=True, exist_ok=True)
-    with open(out_path, "w", encoding="utf-8") as f:
-        for c in chunks:
-            f.write(json.dumps(c, ensure_ascii=False) + "\n")
-
+    write_jsonl_atomic(out_path, chunks)
     return len(chunks), None
 
 
@@ -159,18 +156,23 @@ def main() -> None:
     if targets:
         source_ids = [s for s in source_ids if any(s.startswith(t) for t in targets)]
 
-    total = errors = 0
+    total = 0
+    failures: list[tuple[str, str]] = []
     for sid in source_ids:
         n, err = chunk_source(sid)
         if err:
             print(f"  [오류] {sid}: {err}")
-            errors += 1
+            failures.append((sid, err))
         else:
             print(f"  ✓ {sid}  ({n}청크)")
             total += n
 
-    print(f"\n청킹 완료 — 총 {total}청크 / 오류 {errors}개")
+    print(f"\n청킹 완료 — 총 {total}청크 / 오류 {len(failures)}개")
     print(f"출력 위치: {OUTPUT_ROOT}")
+    fail_path = report_failures("chunker", failures)
+    if fail_path:
+        print(f"실패 목록: {fail_path}")
+        sys.exit(1)
 
 
 if __name__ == "__main__":

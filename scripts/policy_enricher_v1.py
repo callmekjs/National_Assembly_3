@@ -23,6 +23,8 @@ import re
 import sys
 from pathlib import Path
 
+from stage_io import report_failures, write_jsonl_atomic
+
 if __name__ == "__main__":  # import 시(테스트 등) 부작용 방지 — 직접 실행할 때만 래핑
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 
@@ -150,14 +152,8 @@ def enrich_source(source_id: str) -> tuple[int, str | None]:
             if line:
                 turns.append(json.loads(line))
 
-    enriched = [enrich_turn(t) for t in turns]
-
-    out_dir.mkdir(parents=True, exist_ok=True)
-    with open(out_path, "w", encoding="utf-8") as f:
-        for t in enriched:
-            f.write(json.dumps(t, ensure_ascii=False) + "\n")
-
-    return len(enriched), None
+    n = write_jsonl_atomic(out_path, (enrich_turn(t) for t in turns))
+    return n, None
 
 
 def main() -> None:
@@ -171,18 +167,23 @@ def main() -> None:
     if targets:
         source_ids = [s for s in source_ids if any(s.startswith(t) for t in targets)]
 
-    total = errors = 0
+    total = 0
+    failures: list[tuple[str, str]] = []
     for sid in source_ids:
         n, err = enrich_source(sid)
         if err:
             print(f"  [오류] {sid}: {err}")
-            errors += 1
+            failures.append((sid, err))
         else:
             print(f"  ✓ {sid}  ({n}턴 enriched)")
             total += n
 
-    print(f"\nenrich 완료 — 총 {total}턴 / 오류 {errors}개")
+    print(f"\nenrich 완료 — 총 {total}턴 / 오류 {len(failures)}개")
     print(f"출력 위치: {OUTPUT_ROOT}")
+    fail_path = report_failures("enricher", failures)
+    if fail_path:
+        print(f"실패 목록: {fail_path}")
+        sys.exit(1)
 
 
 if __name__ == "__main__":

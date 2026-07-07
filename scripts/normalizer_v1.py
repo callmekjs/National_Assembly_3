@@ -15,6 +15,8 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+from stage_io import report_failures, write_jsonl_atomic
+
 if __name__ == "__main__":  # import 시(테스트 등) 부작용 방지 — 직접 실행할 때만 래핑
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 
@@ -337,12 +339,7 @@ def normalize_source(source_id: str) -> tuple[int, str | None]:
     if not pages:
         return 0, "빈 파일"
 
-    out_dir.mkdir(parents=True, exist_ok=True)
-    with open(out_path, "w", encoding="utf-8") as f:
-        for page in pages:
-            norm = normalize_page(page)
-            f.write(json.dumps(norm, ensure_ascii=False) + "\n")
-
+    write_jsonl_atomic(out_path, (normalize_page(p) for p in pages))
     return len(pages), None
 
 
@@ -359,18 +356,23 @@ def main() -> None:
         source_ids = [s for s in source_ids
                       if any(s.startswith(t) for t in targets)]
 
-    total_pages = total_errors = 0
+    total_pages = 0
+    failures: list[tuple[str, str]] = []
     for source_id in source_ids:
         n, err = normalize_source(source_id)
         if err:
             print(f"  [오류] {source_id}: {err}")
-            total_errors += 1
+            failures.append((source_id, err))
         else:
             print(f"  ✓ {source_id}  ({n}페이지)")
             total_pages += n
 
-    print(f"\n정규화 완료 — 총 {total_pages}페이지 / 오류 {total_errors}개")
+    print(f"\n정규화 완료 — 총 {total_pages}페이지 / 오류 {len(failures)}개")
     print(f"출력 위치: {OUTPUT_ROOT}")
+    fail_path = report_failures("normalizer", failures)
+    if fail_path:
+        print(f"실패 목록: {fail_path}")
+        sys.exit(1)
 
 
 if __name__ == "__main__":

@@ -10,14 +10,16 @@ pdfplumber로 PDF를 페이지별 텍스트로 추출한다.
 
 EXTRACTOR_VERSION = "v1.0"
 
+import hashlib
 import io
-import json
 import re
 import sys
 import time
 from pathlib import Path
 
 import pdfplumber
+
+from stage_io import report_failures, write_jsonl_atomic
 
 if __name__ == "__main__":  # import 시(테스트 등) 부작용 방지 — 직접 실행할 때만 래핑
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
@@ -76,64 +78,84 @@ def extract_pdf(pdf_path: Path, folder: str, committee: str) -> tuple[list[dict]
     return pages, None
 
 
-def save_pages(pages: list[dict], source_id: str) -> Path:
-    out_dir = OUTPUT_ROOT / source_id
-    out_dir.mkdir(parents=True, exist_ok=True)
-    out_path = out_dir / "pages.jsonl"
-    with open(out_path, "w", encoding="utf-8") as f:
-        for p in pages:
-            f.write(json.dumps(p, ensure_ascii=False) + "\n")
+def _sha256(path: Path) -> str:
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for block in iter(lambda: f.read(1 << 20), b""):
+            h.update(block)
+    return h.hexdigest()
+
+
+def save_pages(pages: list[dict], source_id: str, pdf_path: Path) -> Path:
+    out_path = OUTPUT_ROOT / source_id / "pages.jsonl"
+    write_jsonl_atomic(out_path, pages)  # 중단돼도 반쪽 파일이 남지 않게
+    # 원본 PDF 지문 기록 — already_done 이 정정본(내용 바뀐 같은 이름 PDF)을 감지하는 근거
+    (OUTPUT_ROOT / source_id / "source.sha256").write_text(_sha256(pdf_path), encoding="utf-8")
     return out_path
 
 
-def already_done(source_id: str) -> bool:
-    return (OUTPUT_ROOT / source_id / "pages.jsonl").exists()
+def already_done(source_id: str, pdf_path: Path) -> bool:
+    """출력 존재 + 원본 PDF 해시 일치일 때만 완료 — 폴더 존재만 보면 국회가
+    정정본을 올려도 옛 추출 결과가 영원히 쓰인다 (2026-07-07 검토 수정)."""
+    out_path  = OUTPUT_ROOT / source_id / "pages.jsonl"
+    hash_path = OUTPUT_ROOT / source_id / "source.sha256"
+    if not out_path.exists():
+        return False
+    if not hash_path.exists():
+        return True  # 해시 기록 없는 구버전 산출물 — 백필 스크립트로 채우기 전까지 기존 동작
+    return hash_path.read_text(encoding="utf-8").strip() == _sha256(pdf_path)
 
 
-def process_folder(folder: str, committee: str) -> tuple[int, int]:
+def process_folder(folder: str, committee: str) -> tuple[int, list[tuple[str, str]]]:
     folder_path = INPUT_ROOT / folder
     if not folder_path.exists():
         print(f"  [SKIP] 폴더 없음: {folder_path}")
-        return 0, 0
+        return 0, []
 
     pdfs = sorted(folder_path.glob("*.pdf"))
-    done = errors = 0
+    done = 0
+    failures: list[tuple[str, str]] = []
 
     for pdf_path in pdfs:
         source_id = make_source_id(folder, pdf_path.stem)
-        if already_done(source_id):
+        if already_done(source_id, pdf_path):
             done += 1
             continue
 
         pages, err = extract_pdf(pdf_path, folder, committee)
         if err:
             print(f"  [오류] {pdf_path.name}: {err}")
-            errors += 1
+            failures.append((source_id, err))
             continue
 
-        save_pages(pages, source_id)
+        save_pages(pages, source_id, pdf_path)
         print(f"  ↓ {pdf_path.name}  ({len(pages)}페이지)")
         done += 1
         time.sleep(0.05)  # 파일 I/O 부하 완화
 
-    return done, errors
+    return done, failures
 
 
 def main() -> None:
     targets = set(sys.argv[1:])
 
-    total_done = total_errors = 0
+    total_done = 0
+    failures: list[tuple[str, str]] = []
     for folder, committee in FOLDER_TO_COMMITTEE.items():
         if targets and folder not in targets:
             continue
         print(f"\n[{folder}] {committee}")
-        d, e = process_folder(folder, committee)
-        total_done   += d
-        total_errors += e
-        print(f"  완료 {d} / 오류 {e}")
+        d, fails = process_folder(folder, committee)
+        total_done += d
+        failures.extend(fails)
+        print(f"  완료 {d} / 오류 {len(fails)}")
 
-    print(f"\n추출 완료 — 총 {total_done}개 / 오류 {total_errors}개")
+    print(f"\n추출 완료 — 총 {total_done}개 / 오류 {len(failures)}개")
     print(f"출력 위치: {OUTPUT_ROOT}")
+    fail_path = report_failures("extractor", failures)
+    if fail_path:
+        print(f"실패 목록: {fail_path}")
+        sys.exit(1)  # run_pipeline 이 감지해 멈추도록
 
 
 if __name__ == "__main__":
