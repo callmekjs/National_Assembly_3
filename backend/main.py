@@ -1,12 +1,13 @@
 import datetime
 import json
+import logging
 import os
 import time
 import uuid
 from contextlib import asynccontextmanager
 from typing import Literal
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from openai import OpenAIError
 from psycopg2.extras import RealDictCursor
@@ -19,6 +20,17 @@ from grounding import judge, pre_gate
 from search_keyword import keyword_search
 from search_vector import vector_search
 from search_hybrid import hybrid_search
+
+
+# 구조화 로깅 — print 는 레벨·시각이 없어 운영 중 추적 불가 (A+ 로드맵 기준 7)
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s %(levelname)s [%(name)s] %(message)s"
+)
+logger = logging.getLogger("assembly_rag")
+
+# query_logs 저장 실패 카운터 — 로그는 부가 기능이라 답변은 반환하지만,
+# 조용히 계속 실패하면 평가 재료가 새는 것 — /health 로 노출해 가시화
+_log_failures = 0
 
 
 @asynccontextmanager
@@ -46,6 +58,22 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.middleware("http")
+async def request_log_middleware(request: Request, call_next):
+    """요청 ID 부여 + 요청 단위 구조화 로그 — 이상 응답을 로그에서 역추적 가능하게."""
+    rid = uuid.uuid4().hex[:8]
+    request.state.request_id = rid
+    t0 = time.time()
+    response = await call_next(request)
+    response.headers["X-Request-ID"] = rid
+    logger.info(
+        "rid=%s %s %s -> %d (%.0fms)",
+        rid, request.method, request.url.path, response.status_code,
+        (time.time() - t0) * 1000,
+    )
+    return response
 
 
 # 날짜는 date 타입으로 받아 잘못된 값("2025-13-01" 등)을 422 로 거른다 — str 로 두면
@@ -86,6 +114,7 @@ def health():
             "db": "ok",
             "chunks": chunks,
             "embeddings": embeddings,
+            "log_failures": _log_failures,  # query_logs 저장 실패 누적 (0 이 정상)
         }
     except Exception as e:
         return {"status": "degraded", "db": "error", "detail": type(e).__name__}
@@ -119,8 +148,10 @@ def _log_query(req: QueryRequest, result: dict, grounding: str, latency_ms: int,
                 ),
             )
             return str(cur.fetchone()[0])
-    except Exception as e:
-        print(f"[query_logs] 저장 실패 (답변은 정상 반환): {type(e).__name__}: {e}")
+    except Exception:
+        global _log_failures
+        _log_failures += 1
+        logger.exception("query_logs 저장 실패 (답변은 정상 반환, 누적 %d회)", _log_failures)
         return None
 
 
@@ -163,6 +194,7 @@ def query(req: QueryRequest):
     # 근거 블록은 로그에만 저장 — API 응답에 그대로 내보내면 응답이 수십 KB 로 불어난다
     source_block = result.pop("source_block", None)
     query_id = _log_query(req, result, grounding, latency_ms, source_block)
+    logger.info("query_id=%s mode=%s grounding=%s latency_ms=%d", query_id, req.mode, grounding, latency_ms)
 
     response = {"query_id": query_id, "grounding": grounding, "latency_ms": latency_ms, **result}
     if ungrounded:

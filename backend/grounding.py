@@ -56,8 +56,16 @@ REFUSAL_BROAD = re.compile(
 
 
 def sim_threshold() -> float:
-    """사전차단 유사도 임계 — 호출 시점에 읽어 .env 변경이 재기동 없이도 테스트 가능."""
-    return float(os.environ.get("GROUNDING_SIM_THRESHOLD", "0.4"))
+    """사전차단 유사도 임계 — 호출 시점에 읽어 .env 변경이 재기동 없이도 테스트 가능.
+
+    파싱 불가 값(예: "0,4" 콤마 오타)은 기본 0.4 — env 오타가 매 /query 를
+    500 으로 만들던 문제 방지 (2026-07-07).
+    """
+    raw = os.environ.get("GROUNDING_SIM_THRESHOLD", "0.4")
+    try:
+        return float(raw)
+    except ValueError:
+        return 0.4
 
 
 def pre_gate(hits: list[dict]) -> str | None:
