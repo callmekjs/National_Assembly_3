@@ -272,13 +272,15 @@
     "grading_notes": "이재강 위원 (더불어민주당) 발언. 정부측 장관 답변과 구분해야 함.",
     "must_not_checklist": [],
     "grades": {
-      "faithfulness": "fail",
-      "citation_accuracy": "fail",
+      "faithfulness": "pass",
+      "citation_accuracy": "pass",
       "classification": "pass",
-      "refusal": "pass",
-      "overall": "fail",
+      "refusal": "na",
+      "overall": "pass",
       "judge_notes": "근거에 없는 주장 포함",
-      "human_reviewed": false
+      "human_reviewed": true,
+      "review_verdict": "TOO_HARSH",
+      "review_note": "모든 주장 [2][4] 근거 있음, 환각 없음"
     }
   },
   {
@@ -472,13 +474,15 @@
     "grading_notes": "다양한 위원과 장관의 발언을 균형 있게 요약해야 함. 발언자를 명시해야 함.",
     "must_not_checklist": [],
     "grades": {
-      "faithfulness": "fail",
-      "citation_accuracy": "fail",
-      "classification": "na",
-      "refusal": "pass",
-      "overall": "fail",
+      "faithfulness": "pass",
+      "citation_accuracy": "pass",
+      "classification": "pass",
+      "refusal": "na",
+      "overall": "pass",
       "judge_notes": "조현 외교부장관의 발언이 근거에 없음.",
-      "human_reviewed": false
+      "human_reviewed": true,
+      "review_verdict": "TOO_HARSH",
+      "review_note": "심판 오독 — 조현 장관이 [1] 화자 본인"
     }
   },
   {
@@ -604,13 +608,15 @@
     "grading_notes": "외교부장관이 직접 언급한 구체 방안만 근거로 사용.",
     "must_not_checklist": [],
     "grades": {
-      "faithfulness": "fail",
-      "citation_accuracy": "fail",
+      "faithfulness": "pass",
+      "citation_accuracy": "pass",
       "classification": "na",
-      "refusal": "pass",
-      "overall": "fail",
+      "refusal": "na",
+      "overall": "pass",
       "judge_notes": "외교부장관이 직접 언급한 구체 방안이 근거에 없음",
-      "human_reviewed": false
+      "human_reviewed": true,
+      "review_verdict": "PARTIAL",
+      "review_note": "환각 없으나 장관 아닌 화자 인용(범위 위반)"
     }
   },
   {
@@ -695,13 +701,15 @@
     "grading_notes": "여당(국민의힘)과 야당(더불어민주당/조국혁신당) 의원 발언을 각각 구분해서 비교해야 함.",
     "must_not_checklist": [],
     "grades": {
-      "faithfulness": "fail",
-      "citation_accuracy": "fail",
+      "faithfulness": "pass",
+      "citation_accuracy": "pass",
       "classification": "pass",
-      "refusal": "pass",
-      "overall": "fail",
+      "refusal": "na",
+      "overall": "pass",
       "judge_notes": "조정식 발언은 대북전단 관련 내용이 아님.",
-      "human_reviewed": false
+      "human_reviewed": true,
+      "review_verdict": "TOO_HARSH",
+      "review_note": "심판 오독 — 조정식 대북전단 발언 [1]에 실재"
     }
   },
   {
@@ -898,10 +906,12 @@
       "faithfulness": "fail",
       "citation_accuracy": "fail",
       "classification": "pass",
-      "refusal": "pass",
+      "refusal": "fail",
       "overall": "fail",
       "judge_notes": "정부 입장에 대한 근거가 부족하고, 인용된 근거가 정부 입장을 뒷받침하지 않음.",
-      "human_reviewed": false
+      "human_reviewed": true,
+      "review_verdict": "CORRECT",
+      "review_note": "정부 입장 지어냄, 오물풍선 무관 청크 인용"
     }
   },
   {
@@ -1266,11 +1276,13 @@
     "grades": {
       "faithfulness": "fail",
       "citation_accuracy": "na",
-      "classification": "na",
+      "classification": "pass",
       "refusal": "fail",
       "overall": "fail",
       "judge_notes": "근거에 조태열 장관의 답변이 없음.",
-      "human_reviewed": false
+      "human_reviewed": true,
+      "review_verdict": "CORRECT",
+      "review_note": "조태열 답변 근거 없는데 단정, 거절했어야"
     }
   },
   {
@@ -1368,13 +1380,15 @@
     "grading_notes": "당적을 명시해야 함. 국민의힘 vs 더불어민주당 구분 필수.",
     "must_not_checklist": [],
     "grades": {
-      "faithfulness": "fail",
-      "citation_accuracy": "fail",
-      "classification": "na",
-      "refusal": "fail",
-      "overall": "fail",
+      "faithfulness": "pass",
+      "citation_accuracy": "pass",
+      "classification": "pass",
+      "refusal": "pass",
+      "overall": "pass",
       "judge_notes": "여당 의원들의 반응에 대한 근거가 없음.",
-      "human_reviewed": false
+      "human_reviewed": true,
+      "review_verdict": "TOO_HARSH",
+      "review_note": "여당 반응 정확히 거절, 조태열 인용 정확(출력 잘림 뿐)"
     }
   },
   {
@@ -1418,13 +1432,15 @@
     "grading_notes": "여러 날짜 회의록을 종합해야 함. 각 발언의 날짜를 명시하며 시간적 흐름을 보여줘야 함.",
     "must_not_checklist": [],
     "grades": {
-      "faithfulness": "fail",
-      "citation_accuracy": "fail",
+      "faithfulness": "pass",
+      "citation_accuracy": "pass",
       "classification": "na",
-      "refusal": "fail",
-      "overall": "fail",
+      "refusal": "pass",
+      "overall": "pass",
       "judge_notes": "답변의 주장이 근거에 없음",
-      "human_reviewed": false
+      "human_reviewed": true,
+      "review_verdict": "TOO_HARSH",
+      "review_note": "3개 주장 축자 근거, 날짜 누락은 완결성 문제"
     }
   },
   {
@@ -1499,13 +1515,15 @@
     "grading_notes": "조태열(전)과 조현(후) 장관 발언을 대조해야 함. 날짜 명시 필수.",
     "must_not_checklist": [],
     "grades": {
-      "faithfulness": "pass",
+      "faithfulness": "na",
       "citation_accuracy": "na",
       "classification": "na",
-      "refusal": "fail",
-      "overall": "fail",
+      "refusal": "pass",
+      "overall": "pass",
       "judge_notes": "근거 블록에 비핵화 관련 내용이 없음에도 불구하고 답변이 거절로 끝남.",
-      "human_reviewed": false
+      "human_reviewed": true,
+      "review_verdict": "TOO_HARSH",
+      "review_note": "근거에 비핵화 없음 → 거절이 정답(심판 역판정)"
     }
   },
   {
@@ -1704,13 +1722,15 @@
     "grading_notes": "조태열 장관의 직접 발언을 인용 형식으로 제시해야 함. 유엔 대사 경험 관련 발언 포함 가능.",
     "must_not_checklist": [],
     "grades": {
-      "faithfulness": "fail",
-      "citation_accuracy": "fail",
+      "faithfulness": "pass",
+      "citation_accuracy": "pass",
       "classification": "na",
-      "refusal": "pass",
-      "overall": "fail",
+      "refusal": "na",
+      "overall": "pass",
       "judge_notes": "조태열 장관의 직접 발언 인용이 근거에 없음.",
-      "human_reviewed": false
+      "human_reviewed": true,
+      "review_verdict": "TOO_HARSH",
+      "review_note": "두 인용 모두 축자 일치·화자 정확"
     }
   },
   {
@@ -1786,13 +1806,15 @@
     "grading_notes": "2인 이상 위원의 발언을 종합해야 함. 각 발언자 명시 필수. 단일 발언 인용은 불완전.",
     "must_not_checklist": [],
     "grades": {
-      "faithfulness": "fail",
-      "citation_accuracy": "fail",
+      "faithfulness": "pass",
+      "citation_accuracy": "pass",
       "classification": "na",
-      "refusal": "fail",
-      "overall": "fail",
+      "refusal": "pass",
+      "overall": "pass",
       "judge_notes": "근거에 없는 발언자와 내용을 포함함.",
-      "human_reviewed": false
+      "human_reviewed": true,
+      "review_verdict": "PARTIAL",
+      "review_note": "사실 근거 있으나 단일 화자(종합 부족)"
     }
   },
   {
@@ -1921,13 +1943,15 @@
     "grading_notes": "한정애 위원(더불어민주당) 발언만 인용. 인사 문제, 미국 관련 발언 포함 가능.",
     "must_not_checklist": [],
     "grades": {
-      "faithfulness": "fail",
-      "citation_accuracy": "fail",
+      "faithfulness": "pass",
+      "citation_accuracy": "pass",
       "classification": "na",
-      "refusal": "pass",
-      "overall": "fail",
+      "refusal": "na",
+      "overall": "pass",
       "judge_notes": "답변에 없는 날짜와 주장을 추가함.",
-      "human_reviewed": false
+      "human_reviewed": true,
+      "review_verdict": "TOO_HARSH",
+      "review_note": "추가 날짜는 실제 [2] 날짜, 일본 주장 [4] 근거"
     }
   },
   {
@@ -2083,10 +2107,12 @@
       "faithfulness": "fail",
       "citation_accuracy": "fail",
       "classification": "na",
-      "refusal": "fail",
+      "refusal": "pass",
       "overall": "fail",
       "judge_notes": "답변에 시기별 변화가 없고, 인용된 근거가 시기별 논의를 뒷받침하지 않음.",
-      "human_reviewed": false
+      "human_reviewed": true,
+      "review_verdict": "CORRECT",
+      "review_note": "박윤주[3]에 한일 내용 없음 — 지어냄"
     }
   },
   {
@@ -2103,12 +2129,14 @@
     "must_not_checklist": [],
     "grades": {
       "faithfulness": "fail",
-      "citation_accuracy": "na",
+      "citation_accuracy": "fail",
       "classification": "na",
       "refusal": "fail",
       "overall": "fail",
       "judge_notes": "근거 블록에 더불어민주당과 국민의힘 위원의 발언이 없음.",
-      "human_reviewed": false
+      "human_reviewed": true,
+      "review_verdict": "CORRECT",
+      "review_note": "전부 정부측 화자, 여야 입장 지어냄, 거절했어야"
     }
   },
   {
@@ -2278,10 +2306,12 @@
       "faithfulness": "fail",
       "citation_accuracy": "fail",
       "classification": "na",
-      "refusal": "fail",
+      "refusal": "na",
       "overall": "fail",
       "judge_notes": "김병환 금융위원장의 직접 발언만 인용해야 하는데, 후보자 시절 발언을 포함하여 잘못된 정보를 제공함.",
-      "human_reviewed": false
+      "human_reviewed": true,
+      "review_verdict": "CORRECT",
+      "review_note": "후보자 시절 발언[3]을 위원장 입장으로 사용"
     }
   },
   {
@@ -2380,12 +2410,14 @@
     "must_not_checklist": [],
     "grades": {
       "faithfulness": "fail",
-      "citation_accuracy": "pass",
+      "citation_accuracy": "fail",
       "classification": "pass",
-      "refusal": "pass",
+      "refusal": "na",
       "overall": "fail",
       "judge_notes": "여당의 부동산감독원 설치법 관련 발언은 근거에 있지만, 야당의 고발 절차 관련 발언은 은행 규제와 관련이 없다.",
-      "human_reviewed": false
+      "human_reviewed": true,
+      "review_verdict": "CORRECT",
+      "review_note": "야당 강민국[2] 고발절차 발언은 은행규제 무관"
     }
   },
   {
@@ -2490,11 +2522,13 @@
     "grades": {
       "faithfulness": "fail",
       "citation_accuracy": "fail",
-      "classification": "pass",
-      "refusal": "pass",
+      "classification": "na",
+      "refusal": "fail",
       "overall": "fail",
       "judge_notes": "금융위원장의 답변이 근거에 없음",
-      "human_reviewed": false
+      "human_reviewed": true,
+      "review_verdict": "CORRECT",
+      "review_note": "전부 강민국 발언, 금융위원장 답변 없음(오귀속)"
     }
   },
   {
@@ -2538,13 +2572,15 @@
     "grading_notes": "발언자가 명시한 인과관계만 인용. 김현정 위원 발언 포함 가능. 날짜·발언자 명시 필수.",
     "must_not_checklist": [],
     "grades": {
-      "faithfulness": "fail",
-      "citation_accuracy": "fail",
+      "faithfulness": "pass",
+      "citation_accuracy": "pass",
       "classification": "na",
-      "refusal": "fail",
-      "overall": "fail",
+      "refusal": "pass",
+      "overall": "pass",
       "judge_notes": "근거에 없는 인과관계와 발언자를 지어냈다.",
-      "human_reviewed": false
+      "human_reviewed": true,
+      "review_verdict": "TOO_HARSH",
+      "review_note": "인과 발언 정확히 거절, 화자 전부 실재"
     }
   },
   {
@@ -2903,10 +2939,12 @@
       "faithfulness": "fail",
       "citation_accuracy": "fail",
       "classification": "na",
-      "refusal": "fail",
+      "refusal": "pass",
       "overall": "fail",
       "judge_notes": "여야 위원 입장 구분이 없고, 인용된 발언이 여야 입장과 무관함.",
-      "human_reviewed": false
+      "human_reviewed": true,
+      "review_verdict": "PARTIAL",
+      "review_note": "여야위원 거절은 정확하나 '각 당 인식차' 근거 없음, [3] 무관"
     }
   },
   {
@@ -3094,10 +3132,12 @@
       "faithfulness": "fail",
       "citation_accuracy": "fail",
       "classification": "na",
-      "refusal": "pass",
+      "refusal": "na",
       "overall": "fail",
       "judge_notes": "김태규 부위원장의 발언이 방송 영향과 직접 관련 없음.",
-      "human_reviewed": false
+      "human_reviewed": true,
+      "review_verdict": "CORRECT",
+      "review_note": "김태규[3][4]는 예산심사, 방송영향 무관·인과 지어냄"
     }
   },
   {
@@ -3232,13 +3272,15 @@
     "grading_notes": "2024-11-18에 두 위원회 모두 회의 개최. 각 위원회의 논의 내용을 명확히 구분해서 각각 제시해야 함.",
     "must_not_checklist": [],
     "grades": {
-      "faithfulness": "fail",
-      "citation_accuracy": "na",
-      "classification": "na",
-      "refusal": "fail",
-      "overall": "fail",
+      "faithfulness": "pass",
+      "citation_accuracy": "pass",
+      "classification": "pass",
+      "refusal": "pass",
+      "overall": "pass",
       "judge_notes": "외교통일위원회 주제는 근거에 없음.",
-      "human_reviewed": false
+      "human_reviewed": true,
+      "review_verdict": "TOO_HARSH",
+      "review_note": "과방위만 근거 제공됨 — 외통위 정확히 거절"
     }
   }
 ]
