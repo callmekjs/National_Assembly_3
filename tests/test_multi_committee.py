@@ -73,6 +73,22 @@ def test_invalid_dates():
     check("날짜: 정상 월은 월 범위", df == "2024-12-01" and dt == "2024-12-31", (df, dt))
 
 
+def test_date_ranges():
+    # "A부터 B까지" 기간 질문이 첫 날짜 하루로 축소되던 문제 (2026-07-07 수정)
+    _, _, df, dt = extract_filters("2025년 7월 14일부터 9월 1일까지의 논의")
+    check("기간: 일자~연도없는 일자", df == "2025-07-14" and dt == "2025-09-01", (df, dt))
+    _, _, df, dt = extract_filters("2024년 6월부터 8월까지 티메프 논의")
+    check("기간: 월~연도없는 월", df == "2024-06-01" and dt == "2024-08-31", (df, dt))
+    _, _, df, dt = extract_filters("2024년 6월과 2025년 1월의 논의 비교")
+    check("기간: 연도 있는 두 월", df == "2024-06-01" and dt == "2025-01-31", (df, dt))
+    _, _, df, dt = extract_filters("3월 국정감사 내용")
+    check("기간: 연도 없는 단독 표현은 미적용 (오탐 방지)", df is None and dt is None, (df, dt))
+    _, _, df, dt = extract_filters("2025년 1월 30일부터 2월 30일까지")
+    check("기간: 실존 않는 뒷날짜는 버림", df == "2025-01-30" and dt == "2025-01-30", (df, dt))
+    cleaned, _, _, _ = extract_filters("2024년 6월부터 8월까지 티메프 논의")
+    check("기간: 날짜 표현은 질문에서 제거", "6월" not in cleaned and "8월" not in cleaned, cleaned)
+
+
 def hit(cid, committee, rrf):
     return {"chunk_id": cid, "committee": committee, "rrf": rrf}
 
@@ -114,6 +130,7 @@ def main():
     test_aliases()
     test_multi_detection()
     test_invalid_dates()
+    test_date_ranges()
     test_balance()
     print("\nALL PASS")
 

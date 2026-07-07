@@ -40,9 +40,13 @@ _COMMITTEE_RE = re.compile(
 )
 
 # ── 날짜 인식: "2025년 7월 14일" / "2025년 7월" / "2025-07-14" ────────────────
+# 연도 없는 형태("9월 1일", "9월")는 범위 질문("7월 14일부터 9월 1일까지")의
+# 뒷날짜로만 쓰인다 — 연도 있는 날짜가 함께 있을 때 그 연도를 물려받는다.
 _DATE_FULL_RE = re.compile(r"(\d{4})\s*년\s*(\d{1,2})\s*월\s*(\d{1,2})\s*일")
 _DATE_MONTH_RE = re.compile(r"(\d{4})\s*년\s*(\d{1,2})\s*월(?!\s*\d)")
 _DATE_ISO_RE = re.compile(r"(\d{4})-(\d{2})-(\d{2})")
+_DATE_MD_RE = re.compile(r"(\d{1,2})\s*월\s*(\d{1,2})\s*일")
+_DATE_M_RE = re.compile(r"(\d{1,2})\s*월(?!\s*\d)")
 
 # ── 조사 (긴 것부터 매칭) ────────────────────────────────────────────────────
 _JOSA = sorted(
@@ -78,6 +82,78 @@ def _last_day_of_month(year: int, month: int) -> int:
     return (datetime.date(year, month + 1, 1) - datetime.timedelta(days=1)).day
 
 
+def _month_span(year: int, month: int) -> tuple[str, str] | None:
+    if not 1 <= month <= 12:
+        return None
+    return (f"{year:04d}-{month:02d}-01",
+            f"{year:04d}-{month:02d}-{_last_day_of_month(year, month):02d}")
+
+
+def _find_dates(text: str) -> list[dict]:
+    """텍스트 속 날짜 표현 전부 → [{span, from, to, year}] (등장 순).
+
+    수집 순서: 연도 있는 형태 먼저 → 연도 없는 형태("9월 1일", "9월")는
+    기존 매치와 겹치지 않을 때만, 앞선(없으면 뒤따르는) 연도를 물려받는다.
+    실존하지 않는 날짜는 버린다 (필터 미적용 — 일반 텍스트 취급).
+    """
+    found: list[dict] = []
+
+    def overlaps(s: int, e: int) -> bool:
+        return any(not (e <= f["span"][0] or s >= f["span"][1]) for f in found)
+
+    for m in _DATE_FULL_RE.finditer(text):
+        iso = _safe_iso(int(m.group(1)), int(m.group(2)), int(m.group(3)))
+        if iso:
+            found.append({"span": m.span(), "from": iso, "to": iso, "year": int(m.group(1))})
+    for m in _DATE_ISO_RE.finditer(text):
+        if not overlaps(*m.span()):
+            iso = _safe_iso(int(m.group(1)), int(m.group(2)), int(m.group(3)))
+            if iso:
+                found.append({"span": m.span(), "from": iso, "to": iso, "year": int(m.group(1))})
+    for m in _DATE_MONTH_RE.finditer(text):
+        if not overlaps(*m.span()):
+            span = _month_span(int(m.group(1)), int(m.group(2)))
+            if span:
+                found.append({"span": m.span(), "from": span[0], "to": span[1],
+                              "year": int(m.group(1))})
+
+    yearful = sorted(found, key=lambda f: f["span"][0])
+
+    def inherit_year(pos: int) -> int | None:
+        before = [f for f in yearful if f["span"][1] <= pos]
+        after = [f for f in yearful if f["span"][0] >= pos]
+        if before:
+            return before[-1]["year"]
+        return after[0]["year"] if after else None
+
+    if yearful:  # 연도 없는 표현은 연도 있는 날짜가 함께 있을 때만 (오탐 방지)
+        for m in _DATE_MD_RE.finditer(text):
+            if not overlaps(*m.span()):
+                y = inherit_year(m.start())
+                iso = _safe_iso(y, int(m.group(1)), int(m.group(2))) if y else None
+                if iso:
+                    found.append({"span": m.span(), "from": iso, "to": iso, "year": y})
+        for m in _DATE_M_RE.finditer(text):
+            if not overlaps(*m.span()):
+                y = inherit_year(m.start())
+                span = _month_span(y, int(m.group(1))) if y else None
+                if span:
+                    found.append({"span": m.span(), "from": span[0], "to": span[1], "year": y})
+
+    return sorted(found, key=lambda f: f["span"][0])
+
+
+def _remove_spans(text: str, spans: list[tuple[int, int]]) -> str:
+    """지정 구간들을 공백으로 치환 (replace 는 동일 문자열 오제거 위험)."""
+    out, prev = [], 0
+    for s, e in sorted(spans):
+        out.append(text[prev:s])
+        out.append(" ")
+        prev = e
+    out.append(text[prev:])
+    return "".join(out)
+
+
 def extract_filters(q: str):
     """질문 → (cleaned_q, committees, date_from, date_to). 못 찾으면 None.
 
@@ -89,27 +165,14 @@ def extract_filters(q: str):
     date_to = None
     cleaned = q
 
-    m = _DATE_FULL_RE.search(cleaned)
-    if m:
-        iso = _safe_iso(int(m.group(1)), int(m.group(2)), int(m.group(3)))
-        if iso:
-            date_from = date_to = iso
-            cleaned = cleaned.replace(m.group(0), " ")
-    else:
-        m = _DATE_ISO_RE.search(cleaned)
-        if m:
-            iso = _safe_iso(int(m.group(1)), int(m.group(2)), int(m.group(3)))
-            if iso:
-                date_from = date_to = iso
-                cleaned = cleaned.replace(m.group(0), " ")
-        else:
-            m = _DATE_MONTH_RE.search(cleaned)
-            if m:
-                y, mo = int(m.group(1)), int(m.group(2))
-                if 1 <= mo <= 12:
-                    date_from = f"{y:04d}-{mo:02d}-01"
-                    date_to = f"{y:04d}-{mo:02d}-{_last_day_of_month(y, mo):02d}"
-                    cleaned = cleaned.replace(m.group(0), " ")
+    # 날짜 표현 전부 수집 — 1개면 그 날짜(또는 월 범위), 2개 이상이면 기간으로 해석
+    # ("2025년 7월 14일부터 9월 1일까지" 가 첫 날짜 하루로 축소돼 이후 근거가
+    #  전부 배제 → 거짓 부정을 만들던 문제, 2026-07-07 수정)
+    dates = _find_dates(cleaned)
+    if dates:
+        date_from = min(f["from"] for f in dates)
+        date_to = max(f["to"] for f in dates)
+        cleaned = _remove_spans(cleaned, [f["span"] for f in dates])
 
     # 위원회는 전부 감지 (findall) — 위원회명은 의미 정보라 질문에서 제거하지 않는다 (벡터 축에 유용)
     found = [COMMITTEE_MAP[m] for m in _COMMITTEE_RE.findall(cleaned)]
