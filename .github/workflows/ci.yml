@@ -20,7 +20,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r backend/requirements.txt -r scripts/requirements.txt
-          pip install pytest pytest-cov
+          pip install pytest pytest-cov httpx  # httpx: TestClient (API 테스트)
       - name: Run tests with coverage
         run: pytest tests/ -v --cov=backend --cov=scripts --cov-report=term
 
