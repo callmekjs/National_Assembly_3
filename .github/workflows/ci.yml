@@ -23,6 +23,10 @@ jobs:
           pip install pytest pytest-cov httpx  # httpx: TestClient (API 테스트)
       - name: Run tests with coverage
         run: pytest tests/ -v --cov=backend --cov=scripts --cov-report=term
+      - name: Dependency vulnerability scan
+        run: |
+          pip install pip-audit
+          pip-audit -r backend/requirements.txt -r scripts/requirements.txt || true  # 리포트만 (빌드 실패 안 함)
 
   frontend-build:
     runs-on: ubuntu-latest
@@ -42,5 +46,7 @@ jobs:
         run: npm run lint
       - name: Test
         run: npm test
+      - name: Audit
+        run: npm audit --omit=dev || true  # 리포트만
       - name: Build
         run: npm run build

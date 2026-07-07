@@ -34,8 +34,9 @@
 
 ## 3순위 — 서버 안정성 (main.py / db.py)
 
-- [ ] **동시 6명부터 500** — `backend/db.py:26-58`
-  풀 고갈 시 즉시 예외 → 대기/재시도, 죽은 연결 반납 방지 (반납 전 상태 확인).
+- [x] **동시 6명부터 500** — `backend/db.py` (2026-07-07 완료: 풀 고갈 시 10초 한도
+  재시도 대기 + 대여 시 SELECT 1 로 죽은 연결 폐기·교체. 동시 12요청 12/12,
+  강제 절단 후 8/8 검증)
 - [x] **OpenAI 임베딩 에러가 500 으로 샘** — `backend/main.py` (2026-07-06 완료, /query·/search/vector·/search/hybrid 모두 502 매핑)
 - [x] **날짜 문자열 미검증** — `backend/main.py` (2026-07-06 완료, 전 엔드포인트 datetime.date 타입 → 잘못된 날짜 422 확인)
 - [x] **rating 무제한** — `backend/main.py` (2026-07-06 완료, 1~5 제한 — 프론트 👍=5/👎=1 확인)
@@ -66,14 +67,16 @@
 ## 5순위 — 설정·배포 준비
 
 - [x] **scripts/requirements.txt 에 `pdfplumber`, `openai` 추가** (2026-07-06 완료)
-- [ ] **죽은 env 키 정리** — `.env.example` 의 OPENAI_EMBEDDING_MODEL / OPENAI_CHAT_MODEL /
-  BACKEND_CORS_ORIGINS 를 코드가 실제로 읽게 하거나(권장: CORS 만) 예시에서 제거.
-- [ ] **CORS·API 주소 하드코딩** — `backend/main.py:35`, `frontend/src/api.js:3`
-- [ ] **검색 인덱스 생성 스크립트 부재** — HNSW·pg_trgm CREATE INDEX 를
-  `db/schema.sql` 또는 별도 `db/indexes.sql` 로 저장소에 커밋.
-- [ ] **키워드 검색 LIKE 와일드카드 미이스케이프** — `backend/search_keyword.py:71-95`
-  토큰의 `%`, `_`, `\` 이스케이프.
-- [ ] **frontend 요청 타임아웃/취소 없음** — `frontend/src/App.jsx:18-31` AbortController + 타임아웃.
+- [x] **죽은 env 키 정리** — `.env.example` (2026-07-07 완료: OPENAI_*_MODEL 제거 +
+  모델명이 코드 상수인 이유 주석, BACKEND_CORS_ORIGINS 는 코드가 실제로 읽음)
+- [x] **CORS·API 주소 하드코딩** — (2026-07-07 완료: BACKEND_CORS_ORIGINS 환경변수화,
+  api.js 는 VITE_API_URL 지원 기존재)
+- [x] **검색 인덱스 생성 스크립트 부재** — `db/indexes.sql` 신설 (2026-07-07 완료:
+  pg_trgm 3종 + HNSW, 실 DB 멱등 확인)
+- [x] **키워드 검색 LIKE 와일드카드 미이스케이프** — `backend/search_keyword.py`
+  (2026-07-07 완료: %·_·\\ 이스케이프, 50%% 오염 7,821→1,039건 실측, 테스트 신설)
+- [x] **frontend 요청 타임아웃/취소 없음** — `frontend/src/api.js` (2026-07-07 완료:
+  AbortSignal.timeout 일반 20초/query 90초 + 백엔드 detail 표시)
 - [x] **index.html lang="en" / title "frontend"** — (2026-07-07 완료: lang="ko",
   title "국회 회의록 RAG")
 - [ ] **rate limit·인증 없음** (2026-07-06 평가 보고서 기준 8 에서 추가) — 질문 1건 = LLM 비용이라
@@ -82,17 +85,17 @@
 ## 6순위 — 중장기 (시간 들여서)
 
 - [ ] **답변 품질 평가 세트** — Recall@5 와 별개로 "근거 해석 정확도", "여야 분류 정확도" 평가
-  (근거 블록 로그가 쌓이면 그걸 재료로 만들 수 있음 → 2순위 로그 항목 선행).
-- [ ] **날짜 범위 질문 처리** — `backend/query_parser.py:83-99`
-  "7월 14일부터 9월 1일까지" 가 첫 날짜 하루로 축소되는 문제.
-- [ ] **role=NULL 발언자 정당 오라벨** — `backend/party.py:129-139`
-  증인·참고인이 동명 의원과 겹치는 경우.
-- [ ] **22대 하드코딩 정리** — 위원회 코드/명칭이 crawl_pdfs.py, extractor_v1.py,
-  manifest_builder.py, inspect_pdf_samples.py 4곳에 중복 → 공용 모듈 1곳으로.
-- [ ] **HTTP API 계층 테스트** — FastAPI TestClient 로 /query 오케스트레이션, 502 매핑,
-  /feedback 검증, /citations 404 커버.
-- [ ] **로그 실패 관측성** (2026-07-06 평가 보고서 기준 7 에서 추가) — `_log_query` 실패가
-  print 로만 남음. 규모 확대 시 실패 카운터/알림 연결.
+  (source_block 로그 축적 중 + scripts/quality_report.py 검토 큐가 재료. 수동 라벨 필요 — 미완)
+- [x] **날짜 범위 질문 처리** — `backend/query_parser.py` (2026-07-07 완료: 날짜 전부 수집해
+  min~max 기간, 연도 없는 뒷날짜는 앞 연도 상속. 테스트 6건, eval 무회귀)
+- [x] **role=NULL 발언자 정당 오라벨** — `backend/party.py` (2026-07-07 완료: 자격 불명도
+  무표기. 실측 role=NULL 0.12%·의원일치 114청크 — 라벨 손실 미미)
+- [x] **22대 하드코딩 정리** — `scripts/committees.py` 신설 (2026-07-07 완료: 4파일 중복을
+  단일 출처로. import 검증 + 재실행 + 테스트 통과)
+- [x] **HTTP API 계층 테스트** — `tests/test_api.py` (2026-07-07 완료: TestClient 15건 —
+  사전차단·502·검증 422·404, DB 없으면 skip. 총 43건)
+- [x] **로그 실패 관측성** — `backend/main.py` (2026-07-07 완료: 구조화 로깅 + 요청 ID +
+  실패 카운터 /health 노출)
 
 ## 7순위 — A+ 로드맵 신규 항목 (2026-07-07 추가, 상용 수준 목표 시)
 
@@ -100,34 +103,37 @@
 > 기준 번호는 llm_comparison_report.md 의 10가지 평가 기준.
 
 **측정·자동화 (기준 4·9 — 추천 1·2순위)**
-- [ ] ★ **CI 구축** — GitHub Actions: push 마다 pytest + oxlint + vite build 자동 실행
-- [ ] 프론트 테스트 — vitest 최소 스모크 (렌더·에러 상태)
-- [ ] 커버리지 측정 — pytest-cov 리포트
-- [ ] (답변 평가셋·HTTP API 테스트는 6순위에 기존재)
+- [x] ★ **CI 구축** — `.github/workflows/ci.yml` (2026-07-07 완료: push 마다 pytest(커버리지)+
+  lint+vitest+build. 첫 run success 확인)
+- [x] 프론트 테스트 — `frontend/src/api.test.js` (2026-07-07 완료: vitest 5건, 에러 매핑)
+- [x] 커버리지 측정 — pytest-cov (2026-07-07 완료: CI 에서 --cov 리포트)
+  (답변 평가셋·HTTP API 테스트는 6순위에 기존재)
 
 **검색·답변 품질 (기준 2·3·5)**
-- [ ] eval 잔여 실패 2건 해소 — 윤후덕+재외국민 표현 불일치, 대일외교 시기별
+- [ ] eval 잔여 실패 2건 해소 — 윤후덕+재외국민 표현 불일치, 대일외교 시기별 (미완)
 - [ ] 재순위(reranker) 도입 실험 — 하이브리드 상위 30 → 재순위 후 상위 N
 - [ ] 답변-근거 일치 자동 검증 — 문장 단위 entailment 또는 LLM judge 2차 확인
 - [ ] 위원회 오배치 자동 검출을 grounding 판정에 편입 (현재 수동 휴리스틱)
 - [ ] 토큰 예산 eval 튜닝 — 근거 수·복원 상한(4,000자)을 답변 평가셋으로 최적화
 
 **성능·비용 (기준 6)**
-- [ ] ★ 검색 두 축 병렬화 — keyword/vector 순차 호출이 응답 2.3~3.8초의 큰 몫
+- [x] ★ 검색 두 축 병렬화 — `backend/search_hybrid.py` (2026-07-07 완료: 3.08→1.94s)
 - [ ] 답변 스트리밍 — 체감 지연 절반 (프론트 SSE 수신 포함)
-- [ ] 질문 임베딩 캐시 — 동일 질문 재질의 시 API 호출 생략
-- [ ] 일별 비용 집계 리포트 — query_logs.usage 집계 스크립트
+- [x] 질문 임베딩 캐시 — `backend/search_vector.py` (2026-07-07 완료: lru_cache, 2회차 0ms)
+- [x] 일별 비용 집계 리포트 — `scripts/quality_report.py` (2026-07-07 완료)
 
 **운영·관측성 (기준 7)**
-- [ ] 요청 ID 구조화 로깅 — print → logging, 요청 추적 가능하게
-- [ ] PARTIAL+ungrounded 자동 검토 큐 — 거절 문구 신종 변형 발굴 루프 자동화
-- [ ] 주간 품질 리포트 스크립트 — grounding 분포·비용·지연 추이
+- [x] 요청 ID 구조화 로깅 — `backend/main.py` (2026-07-07 완료)
+- [x] PARTIAL+ungrounded 자동 검토 큐 — `scripts/quality_report.py` (2026-07-07 완료:
+  무인용 PARTIAL·invalid citation 행을 검토 큐로 — 실데이터 3건 발굴 확인)
+- [x] 주간 품질 리포트 스크립트 — `scripts/quality_report.py` (2026-07-07 완료: grounding·비용·검토 큐)
 
 **공개 준비 (기준 8 — rate limit·CORS 는 5순위에 기존재)**
 - [ ] HTTPS 배포 (4단계에서)
-- [ ] 프롬프트 주입 점검 — 근거 블록(회의록 원문) 속 지시문이 무력화되는지 확인
+- [x] 프롬프트 주입 점검 — `backend/answer.py` (2026-07-07 완료: 실취약점 발견·방어 2겹, 재점검 통과)
 - [ ] 월 비용 상한 알림
-- [ ] 의존성 취약점 스캔 — pip-audit / npm audit 정기 실행
+- [x] 의존성 취약점 스캔 — CI 편입 (2026-07-07 완료: pip-audit + npm audit 리포트,
+  현재 npm 0건. 빌드는 실패시키지 않고 리포트만)
 
 **데이터 최신성 (기준 1·2·10)**
 - [ ] ★ 신규 회의록 자동 증분 인입 — 스케줄 크롤링 → 증분 파이프라인 → 증분 임베딩
