@@ -23,6 +23,7 @@
 from concurrent.futures import ThreadPoolExecutor
 
 from query_parser import extract_filters
+from reranker import RERANK_CANDIDATES, is_enabled as reranker_enabled, rerank
 from search_keyword import keyword_search
 from search_vector import vector_search
 
@@ -123,7 +124,12 @@ def hybrid_search(
     # 복수 위원회 질문이면 위원회별 근거 균형 배분 — 발언량 많은 위원회가
     # 상위를 독식하면 "A위와 B위 비교" 질문이 반쪽 답변이 된다 (2026-07-03 실측)
     if committees and len(committees) > 1:
-        results = _balance_by_committee(ranked, committees, limit)
+        # 재순위(켜져 있으면) 후 균형 배분 — 각 위원회 quota 는 유지하되 관련도 반영
+        pool = rerank(cleaned_q, ranked, RERANK_CANDIDATES) if reranker_enabled() else ranked
+        results = _balance_by_committee(pool, committees, limit)
+    elif reranker_enabled():
+        # 단일 주제: RRF 상위 후보를 재순위해 상위 limit 선택
+        results = rerank(cleaned_q, ranked, limit)
     else:
         results = ranked[:limit]
 
