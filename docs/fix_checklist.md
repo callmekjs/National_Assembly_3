@@ -38,24 +38,28 @@
 - [x] **날짜 문자열 미검증** — `backend/main.py` (2026-07-06 완료, 전 엔드포인트 datetime.date 타입 → 잘못된 날짜 422 확인)
 - [x] **rating 무제한** — `backend/main.py` (2026-07-06 완료, 1~5 제한 — 프론트 👍=5/👎=1 확인)
 - [x] **question 길이 무제한** — `backend/main.py` (2026-07-06 완료, 2~1000자 + comment 2000자 제한)
-- [ ] **query_parser 월 범위 미검증** — `backend/query_parser.py:43`
-  "2025년 13월" → 500. 월 1–12 검증 추가.
+- [x] **query_parser 월/일 범위 미검증** — `backend/query_parser.py` (2026-07-07 완료:
+  실존하지 않는 날짜("13월"·"2월 30일"·ISO 오타)는 필터 미적용으로 일반 텍스트 취급,
+  회귀 테스트 5건 추가)
 
 ## 4순위 — 재실행 안전성 (ETL)
 
-- [ ] **비원자적 쓰기 + 존재=완료 스킵** — `scripts/extractor_v1.py:82`, `normalizer_v1.py:327`,
-  `parser_v1.py:304`, `policy_enricher_v1.py:143`, `chunker_v1.py:127`
-  tmp 파일에 쓰고 `os.replace()` 로 마무리 (중단 시 반쪽 파일이 영구 고착되는 문제).
-- [ ] **정정본 PDF 미반영** — `scripts/extractor_v1.py:88-89`
-  `already_done` 을 폴더 존재가 아니라 manifest 의 SHA-256 비교로.
-- [ ] **소스별 실패가 exit 0 으로 삼켜짐** — 각 스테이지 `main()`
-  실패 목록을 파일로 남기고 실패 건수 > 0 이면 non-zero exit (run_pipeline 이 감지하도록).
-- [ ] **임베딩 재시도가 영구 오류(400/401)도 재시도** — `scripts/embeddings_v1.py:91`
-  base `APIError` 대신 재시도 가능한 예외만 잡기.
-- [ ] **PDF 다운로드 무결성** — `scripts/crawl_pdfs.py:133-140`
-  tmp 파일 + `%PDF` 매직 바이트 확인 후 os.replace. `dest.exists()` 스킵(증분 모드)도 추가.
-- [ ] **○(U+25CB) 마커 불일치** — `scripts/parser_v1.py:29` vs `turns_quality_gate.py:25`
-  파서 마커 정규식에 ○ 포함 여부 결정 후 파서·게이트 통일.
+- [x] **비원자적 쓰기 + 존재=완료 스킵** — 5개 스테이지 공통 (2026-07-07 완료:
+  공용 모듈 `scripts/stage_io.py` 신설 — tmp 쓰기 + os.replace. 중단 시뮬레이션 검증:
+  반쪽 파일·잔해 없음, 덮어쓰기 중단 시 기존 파일 무손상)
+- [x] **정정본 PDF 미반영** — `scripts/extractor_v1.py` (2026-07-07 완료: 추출 시
+  source.sha256 지문 기록, already_done 이 해시 비교 — 정정본 감지 검증 통과.
+  기존 767개 산출물 지문 백필 완료)
+- [x] **소스별 실패가 exit 0 으로 삼켜짐** — 5개 스테이지 (2026-07-07 완료:
+  실패 목록을 data/v1/reports/failures/{stage}_failures.txt 에 기록 + exit 1 로
+  run_pipeline 이 감지. 실패 0건이면 스테일 목록 자동 삭제)
+- [x] **임베딩 재시도가 영구 오류(400/401)도 재시도** — `scripts/embeddings_v1.py`
+  (2026-07-07 완료: 재시도는 RateLimit/Timeout/Connection/5xx 만 — 401·400 즉시 실패 검증)
+- [x] **PDF 다운로드 무결성** — `scripts/crawl_pdfs.py` (2026-07-07 완료: .part 임시 파일 +
+  %PDF 매직 확인 + os.replace, 기본 증분 모드(--refresh 로 전체 재다운로드), 오류 시 exit 1.
+  오프라인 5케이스 검증)
+- [x] **○(U+25CB) 마커 불일치** — (2026-07-07 완료: 767개 source 전수 조사 결과
+  ○ 줄 시작 0회(실사용 없음) → 게이트를 파서 기준 [◯◎] 으로 통일 + 양쪽 상호 참조 주석)
 
 ## 5순위 — 설정·배포 준비
 
@@ -68,7 +72,10 @@
 - [ ] **키워드 검색 LIKE 와일드카드 미이스케이프** — `backend/search_keyword.py:71-95`
   토큰의 `%`, `_`, `\` 이스케이프.
 - [ ] **frontend 요청 타임아웃/취소 없음** — `frontend/src/App.jsx:18-31` AbortController + 타임아웃.
-- [ ] **index.html lang="en" / title "frontend"** — `frontend/index.html:2,7`
+- [x] **index.html lang="en" / title "frontend"** — (2026-07-07 완료: lang="ko",
+  title "국회 회의록 RAG")
+- [ ] **rate limit·인증 없음** (2026-07-06 평가 보고서 기준 8 에서 추가) — 질문 1건 = LLM 비용이라
+  공개 배포 시 비용 공격에 무방비. 배포(4단계) 착수 조건.
 
 ## 6순위 — 중장기 (시간 들여서)
 
@@ -82,3 +89,5 @@
   manifest_builder.py, inspect_pdf_samples.py 4곳에 중복 → 공용 모듈 1곳으로.
 - [ ] **HTTP API 계층 테스트** — FastAPI TestClient 로 /query 오케스트레이션, 502 매핑,
   /feedback 검증, /citations 404 커버.
+- [ ] **로그 실패 관측성** (2026-07-06 평가 보고서 기준 7 에서 추가) — `_log_query` 실패가
+  print 로만 남음. 규모 확대 시 실패 카운터/알림 연결.
