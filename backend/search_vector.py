@@ -18,6 +18,7 @@ from openai import OpenAI
 from psycopg2.extras import RealDictCursor
 
 from db import get_conn
+from functools import lru_cache
 
 load_dotenv(Path(__file__).parent.parent / ".env")
 
@@ -38,8 +39,13 @@ def _get_client() -> OpenAI:
     return _client
 
 
+@lru_cache(maxsize=256)
 def embed_query(q: str) -> str:
-    """질문을 임베딩해 pgvector 리터럴 문자열로 반환."""
+    """질문을 임베딩해 pgvector 리터럴 문자열로 반환.
+
+    같은 질문 재질의(재시도·데모 반복·eval)에 API 호출 생략 — lru_cache 는
+    스레드 안전, 임베딩은 모델 고정이라 결과 불변 (2026-07-07, A+ 기준 6).
+    """
     resp = _get_client().embeddings.create(model=EMBEDDING_MODEL, input=[q])
     vec = resp.data[0].embedding
     return "[" + ",".join(f"{v:.7f}" for v in vec) + "]"

@@ -20,9 +20,15 @@
 디버그 필드: found_in, kw_rank, vec_rank, rrf_before_penalty, rrf(최종)
 """
 
+from concurrent.futures import ThreadPoolExecutor
+
 from query_parser import extract_filters
 from search_keyword import keyword_search
 from search_vector import vector_search
+
+# 두 축 병렬 실행용 (2026-07-07): 순차 호출이 응답의 큰 몫이었다 — 실측 평균
+# 3.08s → 병렬 후 아래 hybrid_search 참조. 워커 2면 충분 (요청당 축 2개).
+_executor = ThreadPoolExecutor(max_workers=4, thread_name_prefix="search")
 
 RRF_K = 60
 KEYWORD_WEIGHT = 1.2  # 키워드 축 가중치 (고유명사 중심 도메인 특성)
@@ -70,8 +76,12 @@ def hybrid_search(
     date_from = date_from or auto_from
     date_to = date_to or auto_to
 
-    kw_hits = keyword_search(cleaned_q, committees, date_from, date_to, limit=K_EACH)
+    # 두 축 병렬 실행 — 키워드(trgm 스캔)와 벡터(임베딩 API + HNSW)는 독립적
+    kw_future = _executor.submit(
+        keyword_search, cleaned_q, committees, date_from, date_to, K_EACH
+    )
     vec_hits = vector_search(cleaned_q, committees, date_from, date_to, limit=K_EACH)
+    kw_hits = kw_future.result()
 
     # Weighted RRF 합산 (chunk_id 기준)
     fused: dict[str, dict] = {}
