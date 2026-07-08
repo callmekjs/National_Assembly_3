@@ -29,6 +29,7 @@ BATCH_SIZE = 20          # LLM 판정 배치 크기
 DOC_CHARS = 600          # 판정에 보여줄 청크 발췌 길이 (reranker 와 동일)
 PER_QUERY_VEC = 100      # seed_query 당 벡터 후보 수 (hnsw.ef_search=100 이 상한)
 PER_KEYWORD_KW = 300     # seed_keyword 당 키워드 후보 수
+MAX_TRANSIENT_RETRIES = 5   # 일시 오류 재시도 상한 — 소진 시 예외 전파 (이슈 실패로 기록, embeddings_v1 패턴)
 _MODEL = "gpt-4o-mini"
 
 _REQUIRED = ("issue_id", "title", "type", "description",
@@ -143,7 +144,7 @@ def _judge_batch(client, issue: dict, batch: list[tuple[str, dict]]) -> list[int
     user = (f"쟁점: {issue['title']}\n정의: {issue['description']}\n\n발언 목록:\n{docs}")
     for attempt in range(2):          # 형식 위반 재시도 1회
         delay = 2
-        while True:                   # 일시 오류 재시도
+        for retry in range(MAX_TRANSIENT_RETRIES):  # 일시 오류 재시도
             try:
                 resp = client.chat.completions.create(
                     model=_MODEL, temperature=0,
@@ -152,7 +153,9 @@ def _judge_batch(client, issue: dict, batch: list[tuple[str, dict]]) -> list[int
                               {"role": "user", "content": user}],
                 )
                 break
-            except _transient_errors():
+            except _transient_errors() as e:
+                if retry == MAX_TRANSIENT_RETRIES - 1:
+                    raise
                 time.sleep(delay)
                 delay = min(delay * 2, 60)
         result = parse_judge_response(resp.choices[0].message.content, len(batch))
