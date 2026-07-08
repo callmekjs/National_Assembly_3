@@ -8,6 +8,8 @@
   python scripts/build_issue_map.py --dry-run     # 후보 수·예상 비용만
   python scripts/build_issue_map.py               # 전체 이슈 매핑
   python scripts/build_issue_map.py --issue martial-law   # 단일 이슈 재실행 (시드 수정 시)
+  python scripts/build_issue_map.py --issue X --judge-model gpt-4o --batch-size 10 --map-version v1.1
+      # 판정 모델·배치·버전 재지정 (예: mini 오판정 이슈 재판정)
 """
 
 import argparse
@@ -135,7 +137,8 @@ def _transient_errors():
     return _TRANSIENT
 
 
-def _judge_batch(client, issue: dict, batch: list[tuple[str, dict]]) -> list[int] | None:
+def _judge_batch(client, issue: dict, batch: list[tuple[str, dict]],
+                  model: str = _MODEL) -> list[int] | None:
     """배치 1개 판정. 형식 위반 1회 재시도, 일시 오류는 지수 백오프 (embeddings_v1 패턴)."""
     docs = "\n".join(
         f"[{i}] ({m['committee']} {m['date']}) {m['speaker'] or ''} {m['role'] or ''}: {m['text']}"
@@ -147,7 +150,7 @@ def _judge_batch(client, issue: dict, batch: list[tuple[str, dict]]) -> list[int
         for retry in range(MAX_TRANSIENT_RETRIES):  # 일시 오류 재시도
             try:
                 resp = client.chat.completions.create(
-                    model=_MODEL, temperature=0,
+                    model=model, temperature=0,
                     response_format={"type": "json_object"},
                     messages=[{"role": "system", "content": _JUDGE_SYSTEM},
                               {"role": "user", "content": user}],
@@ -164,7 +167,7 @@ def _judge_batch(client, issue: dict, batch: list[tuple[str, dict]]) -> list[int
     return None  # 2회 모두 형식 위반 → 배치 제외 (누락 우선)
 
 
-def store_mapping(issue: dict, rows: list[tuple]) -> int:
+def store_mapping(issue: dict, rows: list[tuple], map_version: str = MAP_VERSION) -> int:
     """이슈 단위 DELETE+재삽입 + 행수 검증 (jsonl_to_postgres 패턴). rows:
     (chunk_id, turn_id, vec_score, kw_hit)."""
     from db import get_conn
@@ -183,7 +186,7 @@ def store_mapping(issue: dict, rows: list[tuple]) -> int:
             INSERT INTO issue_chunks
               (issue_id, chunk_id, turn_id, vec_score, kw_hit, judge, map_version)
             VALUES %s
-        """, [(issue["issue_id"], cid, tid, vs, kh, "llm_relevant", MAP_VERSION)
+        """, [(issue["issue_id"], cid, tid, vs, kh, "llm_relevant", map_version)
               for cid, tid, vs, kh in rows])
         cur.execute("SELECT count(*) FROM issue_chunks WHERE issue_id = %s",
                     (issue["issue_id"],))
@@ -194,12 +197,15 @@ def store_mapping(issue: dict, rows: list[tuple]) -> int:
 
 
 def _est_cost_usd(n_candidates: int) -> float:
-    """판정 입력 비용 추정 — 후보당 발췌 600자 ≈ 540토큰(한국어 ~0.9tok/자) + 오버헤드."""
+    """판정 입력 비용 추정 — 후보당 발췌 600자 ≈ 540토큰(한국어 ~0.9tok/자) + 오버헤드.
+    gpt-4o-mini 단가 기준 (--judge-model 이 다르면 실제 비용과 다를 수 있음, main()에서 경고 출력)."""
     input_tokens = n_candidates * (DOC_CHARS * 0.9 + 60)
     return input_tokens / 1e6 * 0.15
 
 
-def process_issue(client, issue: dict, threshold: float, dry_run: bool) -> dict:
+def process_issue(client, issue: dict, threshold: float, dry_run: bool,
+                   judge_model: str = _MODEL, batch_size: int = BATCH_SIZE,
+                   map_version: str = MAP_VERSION) -> dict:
     t0 = time.time()
     cands = collect_candidates(issue)
     kept = cut_candidates(cands, threshold)
@@ -209,15 +215,15 @@ def process_issue(client, issue: dict, threshold: float, dry_run: bool) -> dict:
     meta = fetch_texts(list(kept))
     items = [(cid, meta[cid]) for cid in kept if cid in meta]
     relevant_ids, dropped = [], 0
-    for batch in make_batches(items):
-        result = _judge_batch(client, issue, batch)
+    for batch in make_batches(items, size=batch_size):
+        result = _judge_batch(client, issue, batch, model=judge_model)
         if result is None:
             dropped += 1
             continue
         relevant_ids += [batch[i][0] for i in result]
     rows = [(cid, meta[cid]["turn_id"], kept[cid]["vec_score"], kept[cid]["kw_hit"])
             for cid in relevant_ids]
-    n = store_mapping(issue, rows)
+    n = store_mapping(issue, rows, map_version=map_version)
     return {"issue_id": issue["issue_id"], "candidates": len(cands),
             "after_cut": len(kept), "mapped": n, "dropped_batches": dropped,
             "secs": round(time.time() - t0, 1)}
@@ -233,7 +239,14 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--dry-run", action="store_true", help="후보 수·예상 비용만")
     ap.add_argument("--issue", help="단일 이슈만 재실행 (issue_id)")
+    ap.add_argument("--judge-model", default=_MODEL, help="판정 LLM (기본: %(default)s)")
+    ap.add_argument("--batch-size", type=int, default=BATCH_SIZE, help="LLM 판정 배치 크기")
+    ap.add_argument("--map-version", default=MAP_VERSION, help="적재 시 찍을 map_version")
     args = ap.parse_args()
+
+    if args.judge_model != _MODEL:  # 비용 추정은 mini 단가 기준 — 실제와 다를 수 있음
+        print(f"[WARN] --judge-model={args.judge_model} — dry-run 비용 추정은 "
+              f"{_MODEL} 단가 기준이라 실제와 다를 수 있음")
 
     issues = load_seed(SEED_PATH)
     if args.issue:
@@ -250,7 +263,9 @@ def main():
     total_cost = 0.0
     for issue in issues:
         try:
-            r = process_issue(client, issue, threshold, args.dry_run)
+            r = process_issue(client, issue, threshold, args.dry_run,
+                               judge_model=args.judge_model, batch_size=args.batch_size,
+                               map_version=args.map_version)
         except Exception as e:
             failures.append((issue["issue_id"], f"{type(e).__name__}: {e}"))
             print(f"[FAIL] {issue['issue_id']}: {type(e).__name__}: {e}")
