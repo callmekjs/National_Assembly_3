@@ -91,6 +91,14 @@ def test_parse_judge_response():
     check("정수 아닌 항목은 버림", parse_judge_response('{"relevant": [0, "1"]}', 5) == [0])
 
 
+def test_sample_rows_deterministic():
+    from issue_spotcheck import sample_rows
+    rows = list(range(100))
+    a, b = sample_rows(rows, n=10, seed=42), sample_rows(rows, n=10, seed=42)
+    check("seed 고정 재현", a == b and len(a) == 10, (a, b))
+    check("표본보다 적으면 전부", sample_rows([1, 2], n=10, seed=42) == [1, 2])
+
+
 if __name__ == "__main__":
     import tempfile
     with tempfile.TemporaryDirectory() as d:
@@ -102,4 +110,5 @@ if __name__ == "__main__":
     test_cut_candidates()
     test_make_batches()
     test_parse_judge_response()
+    test_sample_rows_deterministic()
     print("ALL PASS")
