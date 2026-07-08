@@ -122,12 +122,28 @@ def test_feedback_and_citation_errors():
     check("출처: 미존재 chunk_id → 404", r.status_code == 404, r.status_code)
 
 
+def test_issues_list():
+    """이슈 목록 — 사전이 비어 있어도 200 + issues 키 (스키마만 보장)."""
+    if not HAS_DB:
+        print(_SKIP_MSG)
+        return
+    r = client.get("/issues")
+    check("issues: 200", r.status_code == 200, r.status_code)
+    body = r.json()
+    check("issues: 목록 키", isinstance(body.get("issues"), list), body)
+    if body["issues"]:
+        first = body["issues"][0]
+        check("issues: 필드", all(k in first for k in
+              ("issue_id", "title", "type", "description", "chunk_count", "turn_count")), first)
+
+
 def main_():
     test_health()
     test_validation_422()
     test_query_pre_gate_none()
     test_openai_error_502()
     test_feedback_and_citation_errors()
+    test_issues_list()
     print("\nALL PASS" if HAS_DB else "\nDB 없음 — 전체 건너뜀")
 
 

@@ -351,6 +351,21 @@ def get_actor(name: str):
     return profile
 
 
+@app.get("/issues")
+def list_issues():
+    """쟁점 사전 목록 (POL-3). 상세·타임라인은 POL-4 에서 확장한다."""
+    with get_conn() as conn, conn.cursor(cursor_factory=RealDictCursor) as cur:
+        cur.execute("""
+            SELECT i.issue_id, i.title, i.type, i.description,
+                   count(ic.chunk_id)          AS chunk_count,
+                   count(DISTINCT ic.turn_id)  AS turn_count
+            FROM issues i LEFT JOIN issue_chunks ic USING (issue_id)
+            GROUP BY i.issue_id, i.title, i.type, i.description
+            ORDER BY chunk_count DESC
+        """)
+        return {"issues": cur.fetchall()}
+
+
 @app.get("/citations/{chunk_id}")
 def get_citation(chunk_id: str):
     """출처 원문 조회 — 발언 전문 + 앞뒤 맥락 + 원본 PDF 페이지. (신뢰 설계의 핵심)"""
