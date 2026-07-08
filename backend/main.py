@@ -358,7 +358,8 @@ def list_issues():
         cur.execute("""
             SELECT i.issue_id, i.title, i.type, i.description,
                    count(ic.chunk_id)          AS chunk_count,
-                   count(DISTINCT ic.turn_id)  AS turn_count
+                   count(DISTINCT ic.turn_id)  AS turn_count,
+                   count(*) FILTER (WHERE ic.judge = 'llm_core') AS core_chunk_count
             FROM issues i LEFT JOIN issue_chunks ic USING (issue_id)
             GROUP BY i.issue_id, i.title, i.type, i.description
             ORDER BY chunk_count DESC, issue_id

@@ -3,7 +3,10 @@
   1. 이슈당 무작위 10청크(seed 고정) 발췌 → 판독용 마크다운 (사람이 O/X 판독)
   2. anchor_meetings 포함 여부 — 재현율 참고 체크 (게이트 아님, 경보 신호)
 
-게이트 (docs/issue_module_spec.md): 이슈 평균 정밀도 ≥90%.
+게이트 (docs/issue_module_spec.md 사용자 결정 4): 등급화(issue_tier_pass.py) 이후에는
+**core 등급 정밀도 ≥90%**. 표본은 judge='llm_core' 에서만 추출한다 (mention 은 게이트
+대상이 아니므로 표본에서 제외). 아직 등급화되지 않은 이슈(judge 가 전부 'llm_relevant')는
+기존처럼 전체 매핑에서 표본을 뽑는다 (하위 호환).
 미달 이슈는 description/시드 보정 후 build_issue_map.py --issue 재실행.
 
 실행: python scripts/issue_spotcheck.py
@@ -47,11 +50,21 @@ def main():
     with get_conn() as conn, conn.cursor() as cur:
         for issue in issues:
             iid = issue["issue_id"]
-            cur.execute("SELECT chunk_id FROM issue_chunks WHERE issue_id = %s ORDER BY chunk_id",
-                        (iid,))
-            all_ids = [r[0] for r in cur.fetchall()]
-            picked = sample_rows(all_ids)
-            lines += [f"## {issue['title']} (`{iid}`) — 매핑 {len(all_ids)}청크, 표본 {len(picked)}", ""]
+            cur.execute("SELECT chunk_id, judge FROM issue_chunks WHERE issue_id = %s "
+                        "ORDER BY chunk_id", (iid,))
+            rows = cur.fetchall()
+            judges = {j for _, j in rows}
+            tiered = bool(rows) and judges != {"llm_relevant"}  # 등급화 후 (core/mention 존재)
+            if tiered:
+                core_ids = [cid for cid, j in rows if j == "llm_core"]
+                n_mention = sum(1 for _, j in rows if j == "llm_mention")
+                picked = sample_rows(core_ids)
+                lines += [f"## {issue['title']} (`{iid}`) — core {len(core_ids)} · "
+                          f"mention {n_mention}, 표본 {len(picked)}", ""]
+            else:  # 등급화 전 — 기존 형식 (하위 호환)
+                all_ids = [cid for cid, _ in rows]
+                picked = sample_rows(all_ids)
+                lines += [f"## {issue['title']} (`{iid}`) — 매핑 {len(all_ids)}청크, 표본 {len(picked)}", ""]
             if picked:
                 cur.execute("""
                     SELECT c.chunk_id, co.name, c.meeting_date, c.speaker, c.role,

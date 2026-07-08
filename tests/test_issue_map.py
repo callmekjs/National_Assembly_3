@@ -92,6 +92,15 @@ def test_parse_judge_response():
     check("중복 번호는 dedup", parse_judge_response('{"relevant": [0, 0, 2]}', 5) == [0, 2])
 
 
+def test_parse_tier_response():
+    from issue_tier_pass import parse_tier_response
+    check("정상", parse_tier_response('{"core": [0, 2]}', 5) == [0, 2])
+    check("core 키 없음 → None", parse_tier_response('{"relevant": [0, 2]}', 5) is None)
+    check("JSON 아님 → None", parse_tier_response("0, 2번이 core", 5) is None)
+    check("범위 밖 번호는 버림", parse_tier_response('{"core": [0, 99]}', 5) == [0])
+    check("중복 번호는 dedup", parse_tier_response('{"core": [0, 0, 2]}', 5) == [0, 2])
+
+
 def test_sample_rows_deterministic():
     from issue_spotcheck import sample_rows
     rows = list(range(100))
@@ -111,5 +120,6 @@ if __name__ == "__main__":
     test_cut_candidates()
     test_make_batches()
     test_parse_judge_response()
+    test_parse_tier_response()
     test_sample_rows_deterministic()
     print("ALL PASS")

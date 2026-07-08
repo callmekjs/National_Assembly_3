@@ -134,7 +134,8 @@ def test_issues_list():
     if body["issues"]:
         first = body["issues"][0]
         check("issues: 필드", all(k in first for k in
-              ("issue_id", "title", "type", "description", "chunk_count", "turn_count")), first)
+              ("issue_id", "title", "type", "description", "chunk_count", "turn_count",
+               "core_chunk_count")), first)
 
 
 def main_():
