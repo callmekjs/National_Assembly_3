@@ -26,11 +26,12 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "backend"))
 ROOT = Path(__file__).parent.parent
 SEED_PATH = ROOT / "data" / "issues" / "issues_seed.json"
 
-MAP_VERSION = "v1.0"     # 매핑 방법 버전 — 수집·컷·판정 방식이 바뀌면 올린다
+MAP_VERSION = "v1.2"     # 매핑 방법 버전 — 수집·컷·판정 방식이 바뀌면 올린다
+                         # (v1.2: 키워드 축 분기별 시간 층화 수집 — 최신 편향 방지, 2026-07-08 최종리뷰)
 BATCH_SIZE = 20          # LLM 판정 배치 크기
 DOC_CHARS = 600          # 판정에 보여줄 청크 발췌 길이 (reranker 와 동일)
 PER_QUERY_VEC = 100      # seed_query 당 벡터 후보 수 (hnsw.ef_search=100 이 상한)
-PER_KEYWORD_KW = 300     # seed_keyword 당 키워드 후보 수
+PER_KEYWORD_PER_QUARTER = 40   # 분기별 키워드 후보 상한 — 최신 편향 방지 (2026-07-08 최종리뷰)
 MAX_TRANSIENT_RETRIES = 5   # 일시 오류 재시도 상한 — 소진 시 예외 전파 (이슈 실패로 기록, embeddings_v1 패턴)
 _MODEL = "gpt-4o-mini"
 
@@ -78,7 +79,32 @@ def parse_judge_response(content: str, batch_size: int) -> list[int] | None:
         return None
     if not isinstance(nums, list):
         return None
-    return [n for n in nums if isinstance(n, int) and 0 <= n < batch_size]
+    filtered = [n for n in nums if isinstance(n, int) and 0 <= n < batch_size]
+    return list(dict.fromkeys(filtered))  # 순서 보존 dedup — LLM 이 같은 번호를 중복 응답하는 경우 방지
+
+
+_quarters_cache: list[tuple[str, str]] | None = None
+
+
+def _corpus_quarters() -> list[tuple[str, str]]:
+    """코퍼스 전체 기간을 분기 (date_from, date_to) 목록으로 — 키워드 축 시간 층화용.
+
+    프로세스당 1회만 조회(모듈 전역 캐시) — 이슈·키워드마다 다시 조회하지 않는다.
+    """
+    global _quarters_cache
+    if _quarters_cache is None:
+        from db import get_conn
+        with get_conn() as conn, conn.cursor() as cur:
+            cur.execute("""
+                SELECT to_char(q, 'YYYY-MM-DD'),
+                       to_char((q + interval '3 months' - interval '1 day')::date, 'YYYY-MM-DD')
+                FROM generate_series(
+                    (SELECT date_trunc('quarter', min(meeting_date)) FROM chunks),
+                    (SELECT date_trunc('quarter', max(meeting_date)) FROM chunks),
+                    interval '3 months') AS q
+            """)
+            _quarters_cache = cur.fetchall()
+    return _quarters_cache
 
 
 def collect_candidates(issue: dict) -> dict[str, dict]:
@@ -86,6 +112,11 @@ def collect_candidates(issue: dict) -> dict[str, dict]:
 
     hybrid_search 를 쓰지 않는 이유: limit 컷·turn dedup·reranker 가 걸려 있어
     '넓은 후보 수집'에 부적합 — 두 축을 직접 호출한다 (재현율 담당).
+
+    키워드 축은 분기별로 층화 수집한다 (2026-07-08 최종리뷰): keyword_search 는
+    score DESC, meeting_date DESC 로 정렬하는데 이슈 키워드는 대부분 score 가 동점이라
+    limit 컷이 사실상 '최신 분기 우선'이 되어 과거 발언이 통째로 누락되는 문제가
+    실측(비상계엄 1,110건 중 2024-12 후보 0건)으로 확인됐다.
     """
     from search_keyword import keyword_search
     from search_vector import vector_search
@@ -96,10 +127,12 @@ def collect_candidates(issue: dict) -> dict[str, dict]:
             s = hit.get("score")
             if s is not None and (c["vec_score"] is None or s > c["vec_score"]):
                 c["vec_score"] = round(float(s), 4)
+    quarters = _corpus_quarters()
     for kw in issue["seed_keywords"]:
-        for hit in keyword_search(kw, limit=PER_KEYWORD_KW):
-            c = cands.setdefault(hit["chunk_id"], {"vec_score": None, "kw_hit": False})
-            c["kw_hit"] = True
+        for qf, qt in quarters:
+            for hit in keyword_search(kw, date_from=qf, date_to=qt, limit=PER_KEYWORD_PER_QUARTER):
+                c = cands.setdefault(hit["chunk_id"], {"vec_score": None, "kw_hit": False})
+                c["kw_hit"] = True
     return cands
 
 
@@ -159,6 +192,7 @@ def _judge_batch(client, issue: dict, batch: list[tuple[str, dict]],
             except _transient_errors() as e:
                 if retry == MAX_TRANSIENT_RETRIES - 1:
                     raise
+                print(f"[retry] {type(e).__name__} — {delay}s 대기")
                 time.sleep(delay)
                 delay = min(delay * 2, 60)
         result = parse_judge_response(resp.choices[0].message.content, len(batch))
@@ -191,8 +225,8 @@ def store_mapping(issue: dict, rows: list[tuple], map_version: str = MAP_VERSION
         cur.execute("SELECT count(*) FROM issue_chunks WHERE issue_id = %s",
                     (issue["issue_id"],))
         n = cur.fetchone()[0]
-    if n != len(rows):
-        raise RuntimeError(f"{issue['issue_id']}: 행수 불일치 (기대 {len(rows)}, DB {n})")
+        if n != len(rows):  # with 블록 안에서 검증 — 불일치 시 트랜잭션째 롤백
+            raise RuntimeError(f"{issue['issue_id']}: 행수 불일치 (기대 {len(rows)}, DB {n})")
     return n
 
 
@@ -213,14 +247,20 @@ def process_issue(client, issue: dict, threshold: float, dry_run: bool,
         return {"issue_id": issue["issue_id"], "candidates": len(cands),
                 "after_cut": len(kept), "est_cost": round(_est_cost_usd(len(kept)), 3)}
     meta = fetch_texts(list(kept))
+    missing = [cid for cid in kept if cid not in meta]
+    if missing:
+        print(f"[WARN] {issue['issue_id']}: 메타 조회 누락 {len(missing)}건 — 판정에서 제외")
     items = [(cid, meta[cid]) for cid in kept if cid in meta]
     relevant_ids, dropped = [], 0
+    throttle = judge_model != "gpt-4o-mini"  # 30k TPM 429 실측 대응 — mini 외 모델은 배치 간 대기
     for batch in make_batches(items, size=batch_size):
         result = _judge_batch(client, issue, batch, model=judge_model)
         if result is None:
             dropped += 1
-            continue
-        relevant_ids += [batch[i][0] for i in result]
+        else:
+            relevant_ids += [batch[i][0] for i in result]
+        if throttle:
+            time.sleep(3)
     rows = [(cid, meta[cid]["turn_id"], kept[cid]["vec_score"], kept[cid]["kw_hit"])
             for cid in relevant_ids]
     n = store_mapping(issue, rows, map_version=map_version)
@@ -239,14 +279,13 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--dry-run", action="store_true", help="후보 수·예상 비용만")
     ap.add_argument("--issue", help="단일 이슈만 재실행 (issue_id)")
-    ap.add_argument("--judge-model", default=_MODEL, help="판정 LLM (기본: %(default)s)")
-    ap.add_argument("--batch-size", type=int, default=BATCH_SIZE, help="LLM 판정 배치 크기")
+    ap.add_argument("--judge-model", default=None,
+                     help="판정 LLM (기본: 이슈별 judge_model 필드, 없으면 " + _MODEL + ")")
+    ap.add_argument("--batch-size", type=int, default=None,
+                     help="LLM 판정 배치 크기 (기본: 이슈별 judge_batch 필드, 없으면 "
+                          f"{BATCH_SIZE})")
     ap.add_argument("--map-version", default=MAP_VERSION, help="적재 시 찍을 map_version")
     args = ap.parse_args()
-
-    if args.judge_model != _MODEL:  # 비용 추정은 mini 단가 기준 — 실제와 다를 수 있음
-        print(f"[WARN] --judge-model={args.judge_model} — dry-run 비용 추정은 "
-              f"{_MODEL} 단가 기준이라 실제와 다를 수 있음")
 
     issues = load_seed(SEED_PATH)
     if args.issue:
@@ -262,9 +301,15 @@ def main():
     failures = []
     total_cost = 0.0
     for issue in issues:
+        # 판정 모델·배치: CLI 플래그(명시) > 이슈별 필드 > 기본값 (2026-07-08 최종리뷰)
+        judge_model = args.judge_model or issue.get("judge_model") or _MODEL
+        batch_size = args.batch_size or issue.get("judge_batch") or BATCH_SIZE
+        if judge_model != _MODEL:  # 비용 추정은 mini 단가 기준 — 실제와 다를 수 있음
+            print(f"[WARN] {issue['issue_id']}: judge_model={judge_model} — dry-run 비용 추정은 "
+                  f"{_MODEL} 단가 기준이라 실제와 다를 수 있음")
         try:
             r = process_issue(client, issue, threshold, args.dry_run,
-                               judge_model=args.judge_model, batch_size=args.batch_size,
+                               judge_model=judge_model, batch_size=batch_size,
                                map_version=args.map_version)
         except Exception as e:
             failures.append((issue["issue_id"], f"{type(e).__name__}: {e}"))

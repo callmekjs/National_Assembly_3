@@ -89,6 +89,7 @@ def test_parse_judge_response():
     check("relevant 없음 → None", parse_judge_response('{"order": [1]}', 5) is None)
     check("범위 밖 번호는 버림", parse_judge_response('{"relevant": [0, 99]}', 5) == [0])
     check("정수 아닌 항목은 버림", parse_judge_response('{"relevant": [0, "1"]}', 5) == [0])
+    check("중복 번호는 dedup", parse_judge_response('{"relevant": [0, 0, 2]}', 5) == [0, 2])
 
 
 def test_sample_rows_deterministic():

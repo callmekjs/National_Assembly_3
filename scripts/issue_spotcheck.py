@@ -58,6 +58,7 @@ def main():
                            left(c.text, 400)
                     FROM chunks c JOIN committees co ON co.committee_id = c.committee_id
                     WHERE c.chunk_id = ANY(%s)
+                    ORDER BY c.chunk_id
                 """, (picked,))
                 for cid, com, d, sp, role, text in cur.fetchall():
                     lines += [f"- [ ] `{cid}` ({com} {d}) {sp or ''} {role or ''}:",

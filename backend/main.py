@@ -361,7 +361,7 @@ def list_issues():
                    count(DISTINCT ic.turn_id)  AS turn_count
             FROM issues i LEFT JOIN issue_chunks ic USING (issue_id)
             GROUP BY i.issue_id, i.title, i.type, i.description
-            ORDER BY chunk_count DESC
+            ORDER BY chunk_count DESC, issue_id
         """)
         return {"issues": cur.fetchall()}
 
