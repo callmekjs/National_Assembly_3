@@ -129,3 +129,28 @@ CREATE TABLE IF NOT EXISTS members (
   created_at TIMESTAMPTZ DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS idx_members_name ON members(name);
+
+-- 8. 쟁점 사전 (POL-3). data/issues/issues_seed.json 을 build_issue_map.py 가 적재한다.
+CREATE TABLE IF NOT EXISTS issues (
+  issue_id    TEXT PRIMARY KEY,       -- 슬러그: martial-law, ai-basic-act
+  title       TEXT NOT NULL,          -- 표시명: 12·3 비상계엄
+  type        TEXT NOT NULL,          -- event | policy
+  description TEXT NOT NULL,          -- LLM 관련도 판정의 기준문
+  seed        JSONB NOT NULL,         -- keywords/queries/anchor_meetings 원본
+  created_at  TIMESTAMPTZ DEFAULT now()
+);
+
+-- 9. 이슈↔청크 매핑 (POL-3). 검색 확장 + LLM 판정 통과분만 저장 (누락 > 오염).
+--    turn_id 동시 저장: POL-4 집계는 turn 단위 (청크 분할 중복 방지 — actors.py 교훈)
+CREATE TABLE IF NOT EXISTS issue_chunks (
+  issue_id    TEXT NOT NULL REFERENCES issues(issue_id) ON DELETE CASCADE,
+  chunk_id    TEXT NOT NULL REFERENCES chunks(chunk_id) ON DELETE CASCADE,
+  turn_id     TEXT,
+  vec_score   REAL,                   -- 후보 수집 시 벡터 유사도 (키워드 단독 편입이면 NULL)
+  kw_hit      BOOLEAN,                -- 키워드 매치 여부 (디버깅)
+  judge       TEXT NOT NULL,          -- 편입 근거: 현재 'llm_relevant' 단일
+  map_version TEXT NOT NULL,          -- 매핑 방법 버전 (재매핑 추적)
+  mapped_at   TIMESTAMPTZ DEFAULT now(),
+  PRIMARY KEY (issue_id, chunk_id)
+);
+CREATE INDEX IF NOT EXISTS idx_issue_chunks_chunk ON issue_chunks(chunk_id);
