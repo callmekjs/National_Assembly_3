@@ -18,12 +18,14 @@ def check(name, cond, got=None):
 
 
 def test_parse_stance_response():
-    ok = '{"stances":["support","oppose","concern","neutral","none"]}'
-    check("정상 5개", parse_stance_response(ok, 5) == ["support", "oppose", "concern", "neutral", "none"])
-    check("길이 불일치 → None", parse_stance_response('{"stances":["support"]}', 3) is None)
-    check("허용 밖 토큰 → None", parse_stance_response('{"stances":["yes","no"]}', 2) is None)
+    # index-keyed: {"items":[{"i":n,"stance":...}]} → 길이 batch 리스트(미판정 None)
+    ok = '{"items":[{"i":0,"stance":"support"},{"i":1,"stance":"oppose"}]}'
+    check("정상 2개", parse_stance_response(ok, 2) == ["support", "oppose"])
+    check("누락 인덱스는 None", parse_stance_response('{"items":[{"i":0,"stance":"support"}]}', 2) == ["support", None])
+    check("과다 인덱스 무시", parse_stance_response('{"items":[{"i":0,"stance":"support"},{"i":9,"stance":"oppose"}]}', 2) == ["support", None])
+    check("허용밖 토큰은 그 위치 None", parse_stance_response('{"items":[{"i":0,"stance":"yes"}]}', 1) == [None])
     check("JSON 아님 → None", parse_stance_response("support, oppose", 2) is None)
-    check("stances 키 없음 → None", parse_stance_response('{"x":[]}', 0) is None)
+    check("items 키 없음 → None", parse_stance_response('{"x":[]}', 1) is None)
 
 
 if __name__ == "__main__":
