@@ -5,8 +5,10 @@ import QueryForm from './components/QueryForm'
 import AnswerPanel from './components/AnswerPanel'
 import SourcePanel from './components/SourcePanel'
 import SourceModal from './components/SourceModal'
+import IssueView from './components/IssueView'
 
 function App() {
+  const [tab, setTab] = useState('query')
   const [question, setQuestion] = useState('')
   const [mode, setMode] = useState('qa')
   const [result, setResult] = useState(null)
@@ -46,34 +48,45 @@ function App() {
         </p>
       </header>
 
-      <main>
-        <QueryForm
-          question={question}
-          setQuestion={setQuestion}
-          mode={mode}
-          setMode={setMode}
-          loading={loading}
-          onSubmit={handleSubmit}
-        />
+      <div style={{ marginBottom: 12 }}>
+        <button onClick={() => setTab('query')} disabled={tab === 'query'}>질의</button>
+        <button onClick={() => setTab('issues')} disabled={tab === 'issues'}>쟁점 분석</button>
+      </div>
 
-        {error && <div className="error">{error}</div>}
-
-        {result && (
-          <div className="result-grid">
-            <AnswerPanel key={result.query_id ?? 'no-log'} result={result} onCiteClick={handleCiteClick} />
-            <SourcePanel
-              sources={result.sources}
-              citedNumbers={result.cited_numbers}
-              highlightN={highlightN}
-              onOpenSource={setModalChunkId}
+      {tab === 'query' && (
+        <>
+          <main>
+            <QueryForm
+              question={question}
+              setQuestion={setQuestion}
+              mode={mode}
+              setMode={setMode}
+              loading={loading}
+              onSubmit={handleSubmit}
             />
-          </div>
-        )}
-      </main>
 
-      {modalChunkId && (
-        <SourceModal chunkId={modalChunkId} onClose={() => setModalChunkId(null)} />
+            {error && <div className="error">{error}</div>}
+
+            {result && (
+              <div className="result-grid">
+                <AnswerPanel key={result.query_id ?? 'no-log'} result={result} onCiteClick={handleCiteClick} />
+                <SourcePanel
+                  sources={result.sources}
+                  citedNumbers={result.cited_numbers}
+                  highlightN={highlightN}
+                  onOpenSource={setModalChunkId}
+                />
+              </div>
+            )}
+          </main>
+
+          {modalChunkId && (
+            <SourceModal chunkId={modalChunkId} onClose={() => setModalChunkId(null)} />
+          )}
+        </>
       )}
+
+      {tab === 'issues' && <IssueView />}
 
       <footer>
         <small>

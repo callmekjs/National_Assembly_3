@@ -115,3 +115,71 @@ def list_issues() -> dict:
             ORDER BY chunk_count DESC, issue_id
         """)
         return {"issues": cur.fetchall()}
+
+
+_STANCE_DIRS = ("support", "oppose", "concern")  # 방향(입장) 발언만 카운트
+
+
+def aggregate_stances(rows: list[dict]) -> str:
+    """한 행위자의 발언 stance 목록 → 행위자 레벨 라벨.
+    입장 발언(support/oppose/concern)만 카운트. 0개면 no_stance. 최다가 대표.
+    support·oppose 둘 다 있고 각각 입장발언의 1/3 이상이면 mixed."""
+    counts = {s: 0 for s in _STANCE_DIRS}
+    for r in rows:
+        if r["stance"] in counts:
+            counts[r["stance"]] += 1
+    total = sum(counts.values())
+    if total == 0:
+        return "no_stance"
+    if counts["support"] > 0 and counts["oppose"] > 0 \
+            and counts["support"] >= total / 3 and counts["oppose"] >= total / 3:
+        return "mixed"
+    return max(_STANCE_DIRS, key=lambda s: counts[s])
+
+
+def issue_stances(issue_id: str) -> dict | None:
+    """이슈 행위자 입장 매트릭스. 이슈 없거나 판정 데이터 없으면 None.
+    발언별 stance 를 speaker 로 묶어 집계(aggregate_stances) + 입장별 카운트 + 근거 인용."""
+    from party import member_party
+    with get_conn() as conn, conn.cursor(cursor_factory=RealDictCursor) as cur:
+        cur.execute("SELECT title FROM issues WHERE issue_id = %s", (issue_id,))
+        row = cur.fetchone()
+        if row is None:
+            return None
+        cur.execute("""
+            SELECT s.turn_id, s.speaker, s.role, s.stance, c.meeting_date::text AS date,
+                   min(c.chunk_id) AS chunk_id,
+                   left(string_agg(c.text, ' ' ORDER BY c.chunk_index), 160) AS snippet
+            FROM issue_stances s
+            JOIN chunks c ON c.turn_id = s.turn_id
+            WHERE s.issue_id = %s
+            GROUP BY s.turn_id, s.speaker, s.role, s.stance, c.meeting_date
+            ORDER BY s.speaker, c.meeting_date
+        """, (issue_id,))
+        stance_rows = cur.fetchall()
+    if not stance_rows:
+        return None
+
+    by_speaker: dict[str, list] = {}
+    for r in stance_rows:
+        by_speaker.setdefault(r["speaker"], []).append(r)
+
+    actors = []
+    for speaker, rs in by_speaker.items():
+        counts = {s: 0 for s in ("support", "oppose", "concern", "neutral", "none")}
+        for r in rs:
+            counts[r["stance"]] = counts.get(r["stance"], 0) + 1
+        label = aggregate_stances(rs)
+        # 근거: 대표 라벨을 뒷받침하는 발언(혼재면 support+oppose 양쪽), 없으면 전부
+        support_set = {"support", "oppose"} if label == "mixed" else {label}
+        cites = [r for r in rs if r["stance"] in support_set] or rs
+        actors.append({
+            "speaker": speaker,
+            "party": member_party(speaker),
+            "stance": label,
+            "counts": counts,
+            "citations": [{"turn_id": r["turn_id"], "stance": r["stance"], "date": r["date"],
+                           "chunk_id": r["chunk_id"], "snippet": r["snippet"]} for r in cites],
+        })
+    actors.sort(key=lambda a: sum(a["counts"].values()), reverse=True)
+    return {"issue_id": issue_id, "title": row["title"], "actors": actors}

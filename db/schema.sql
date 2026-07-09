@@ -154,3 +154,16 @@ CREATE TABLE IF NOT EXISTS issue_chunks (
   PRIMARY KEY (issue_id, chunk_id)
 );
 CREATE INDEX IF NOT EXISTS idx_issue_chunks_chunk ON issue_chunks(chunk_id);
+
+-- 10. 이슈↔행위자 입장 (POL-5). core turn 을 LLM 5택 판정 (support|oppose|concern|neutral|none).
+CREATE TABLE IF NOT EXISTS issue_stances (
+  issue_id    TEXT NOT NULL REFERENCES issues(issue_id) ON DELETE CASCADE,
+  turn_id     TEXT NOT NULL,
+  speaker     TEXT,
+  role        TEXT,
+  stance      TEXT NOT NULL,   -- support | oppose | concern | neutral | none
+  judge_model TEXT NOT NULL,
+  map_version TEXT NOT NULL,
+  mapped_at   TIMESTAMPTZ DEFAULT now(),
+  PRIMARY KEY (issue_id, turn_id)
+);

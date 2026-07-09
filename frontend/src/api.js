@@ -32,6 +32,18 @@ async function request(path, options = {}, timeoutMs = DEFAULT_TIMEOUT_MS) {
   return res.json()
 }
 
+export function fetchIssues() {
+  return request('/issues')
+}
+
+export function fetchTimeline(issueId) {
+  return request(`/issues/${encodeURIComponent(issueId)}/timeline`)
+}
+
+export function fetchStances(issueId) {
+  return request(`/issues/${encodeURIComponent(issueId)}/stances`)
+}
+
 export function postQuery(question, mode) {
   return request('/query', {
     method: 'POST',
