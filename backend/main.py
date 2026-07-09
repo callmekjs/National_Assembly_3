@@ -14,6 +14,7 @@ from psycopg2.extras import RealDictCursor
 from pydantic import BaseModel, Field
 
 from actors import actor_profile
+from issues import issue_timeline, list_issues
 from answer import MODE_CONFIG, NO_EVIDENCE, generate_answer
 from db import init_pool, close_pool, get_conn
 from grounding import judge, pre_gate
@@ -352,19 +353,18 @@ def get_actor(name: str):
 
 
 @app.get("/issues")
-def list_issues():
-    """쟁점 사전 목록 (POL-3). 상세·타임라인은 POL-4 에서 확장한다."""
-    with get_conn() as conn, conn.cursor(cursor_factory=RealDictCursor) as cur:
-        cur.execute("""
-            SELECT i.issue_id, i.title, i.type, i.description,
-                   count(ic.chunk_id)          AS chunk_count,
-                   count(DISTINCT ic.turn_id)  AS turn_count,
-                   count(*) FILTER (WHERE ic.judge = 'llm_core') AS core_chunk_count
-            FROM issues i LEFT JOIN issue_chunks ic USING (issue_id)
-            GROUP BY i.issue_id, i.title, i.type, i.description
-            ORDER BY chunk_count DESC, issue_id
-        """)
-        return {"issues": cur.fetchall()}
+def get_issues():
+    """쟁점 사전 목록 (POL-3)."""
+    return list_issues()
+
+
+@app.get("/issues/{issue_id}/timeline")
+def get_issue_timeline(issue_id: str):
+    """쟁점 월별 발언 추이 (POL-4) — 병행 2축(코퍼스 직접 + 매핑 core/전체)."""
+    result = issue_timeline(issue_id)
+    if result is None:
+        raise HTTPException(status_code=404, detail=f"쟁점 없음: {issue_id}")
+    return result
 
 
 @app.get("/citations/{chunk_id}")
