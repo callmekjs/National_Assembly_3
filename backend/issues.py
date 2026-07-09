@@ -21,7 +21,9 @@ def build_keyword_patterns(keywords: list[str]) -> list[str]:
 
 
 def _month_range(months: list[str]) -> list[str]:
-    """'YYYY-MM' 목록의 최소~최대 사이 모든 달을 오름차순으로. 빈 목록이면 []."""
+    """'YYYY-MM' 목록의 최소~최대 사이 모든 달을 오름차순으로. 빈 목록이면 [].
+    None/빈 문자열(nullable meeting_date 유래)은 걸러 min/max TypeError 방지."""
+    months = [m for m in months if m]
     if not months:
         return []
     lo, hi = min(months), max(months)
@@ -73,6 +75,7 @@ def issue_timeline(issue_id: str) -> dict | None:
                        count(DISTINCT turn_id) AS corpus_turns
                 FROM chunks
                 WHERE text ILIKE ANY(%s)
+                  AND meeting_date IS NOT NULL
                 GROUP BY 1
                 """,
                 (patterns,),
@@ -87,6 +90,7 @@ def issue_timeline(issue_id: str) -> dict | None:
                        AS mapped_core_turns
             FROM issue_chunks ic JOIN chunks c ON c.chunk_id = ic.chunk_id
             WHERE ic.issue_id = %s
+              AND c.meeting_date IS NOT NULL
             GROUP BY 1
             """,
             (issue_id,),

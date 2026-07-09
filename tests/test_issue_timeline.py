@@ -54,9 +54,16 @@ def test_merge_months_one_sided_and_empty():
     check("양쪽 빈 입력", merge_months({}, {}) == [])
 
 
+def test_merge_months_ignores_none_month():
+    # nullable meeting_date 로 None 키가 섞여도 크래시 없이 제외 (최종리뷰 Important 방어)
+    out = merge_months({None: 9, "2025-01": 3}, {})
+    check("None 키 제외", [m["month"] for m in out] == ["2025-01"], out)
+
+
 if __name__ == "__main__":
     test_build_keyword_patterns()
     test_merge_months_basic()
     test_merge_months_gap_fill()
     test_merge_months_one_sided_and_empty()
+    test_merge_months_ignores_none_month()
     print("all passed")
