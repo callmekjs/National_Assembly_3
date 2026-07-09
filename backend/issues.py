@@ -62,7 +62,7 @@ def issue_timeline(issue_id: str) -> dict | None:
         row = cur.fetchone()
         if row is None:
             return None
-        keywords = (row["seed"] or {}).get("keywords", [])
+        keywords = (row["seed"] or {}).get("seed_keywords", [])
 
         corpus: dict[str, int] = {}
         patterns = build_keyword_patterns(keywords)
