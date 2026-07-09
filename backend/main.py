@@ -14,7 +14,7 @@ from psycopg2.extras import RealDictCursor
 from pydantic import BaseModel, Field
 
 from actors import actor_profile
-from issues import issue_timeline, list_issues
+from issues import issue_stances, issue_timeline, list_issues
 from answer import MODE_CONFIG, NO_EVIDENCE, generate_answer
 from db import init_pool, close_pool, get_conn
 from grounding import judge, pre_gate
@@ -364,6 +364,15 @@ def get_issue_timeline(issue_id: str):
     result = issue_timeline(issue_id)
     if result is None:
         raise HTTPException(status_code=404, detail=f"쟁점 없음: {issue_id}")
+    return result
+
+
+@app.get("/issues/{issue_id}/stances")
+def get_issue_stances(issue_id: str):
+    """쟁점 행위자 입장 매트릭스 (POL-5) — 발언 5택 판정 → 행위자 집계 + 근거."""
+    result = issue_stances(issue_id)
+    if result is None:
+        raise HTTPException(status_code=404, detail=f"입장 데이터 없음: {issue_id}")
     return result
 
 
