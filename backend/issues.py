@@ -148,7 +148,8 @@ def issue_stances(issue_id: str) -> dict | None:
             return None
         cur.execute("""
             SELECT s.turn_id, s.speaker, s.role, s.stance, c.meeting_date::text AS date,
-                   min(c.chunk_id) AS chunk_id, left(min(c.text), 160) AS snippet
+                   min(c.chunk_id) AS chunk_id,
+                   left(string_agg(c.text, ' ' ORDER BY c.chunk_index), 160) AS snippet
             FROM issue_stances s
             JOIN chunks c ON c.turn_id = s.turn_id
             WHERE s.issue_id = %s
