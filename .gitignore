@@ -28,6 +28,7 @@ data/v1/*
 # 개인 작업 파일
 claude.txt
 스크린샷/
+.claude/settings.local.json
 
 # IDE
 .vscode/
