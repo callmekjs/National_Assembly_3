@@ -1,0 +1,2382 @@
+[
+ {
+  "issue_id": "martial-law",
+  "chunk_id": "과방위_20240821_52194_52194_turn_0265_chunk_001",
+  "verdict": "X",
+  "reason": "이진숙 탄핵·2인체제 논의, 12·3 계엄과 무관",
+  "round": "round1"
+ },
+ {
+  "issue_id": "martial-law",
+  "chunk_id": "과방위_20241209_52363_52363_turn_0399_chunk_001",
+  "verdict": "O",
+  "reason": "계엄·내란 규탄과 탄핵 정국 대응이 중심",
+  "round": "round1"
+ },
+ {
+  "issue_id": "martial-law",
+  "chunk_id": "과방위_20250305_52765_52765_turn_0225_chunk_001",
+  "verdict": "O",
+  "reason": "계엄 선포·국회 군 투입 책임을 직접 추궁",
+  "round": "round1"
+ },
+ {
+  "issue_id": "martial-law",
+  "chunk_id": "과방위_20250905_55324_55324_turn_0058_chunk_001",
+  "verdict": "O",
+  "reason": "계엄선포 사전 인지 진상규명 요구가 중심",
+  "round": "round1"
+ },
+ {
+  "issue_id": "martial-law",
+  "chunk_id": "과방위_20251216_55991_55991_turn_0240_chunk_001",
+  "verdict": "X",
+  "reason": "탄핵소추 권한 일반론, 계엄 실질 논의 없음",
+  "round": "round1"
+ },
+ {
+  "issue_id": "martial-law",
+  "chunk_id": "과방위_20260414_56551_56551_turn_0119_chunk_001",
+  "verdict": "X",
+  "reason": "방송3법·시청권 논의 중 계엄은 배경 언급",
+  "round": "round1"
+ },
+ {
+  "issue_id": "martial-law",
+  "chunk_id": "국방위_20250924_55433_55433_turn_0308_chunk_001",
+  "verdict": "O",
+  "reason": "전군 계엄 관여 조사·내란 척결 촉구",
+  "round": "round1"
+ },
+ {
+  "issue_id": "martial-law",
+  "chunk_id": "국방위_20250929_55445_55445_turn_0509_chunk_001",
+  "verdict": "O",
+  "reason": "12·3 계엄군 저지 상황을 직접 논의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "martial-law",
+  "chunk_id": "국방위_20260317_56393_56393_turn_0264_chunk_001",
+  "verdict": "O",
+  "reason": "내란 사전계획 정황·재판 판단이 주제",
+  "round": "round1"
+ },
+ {
+  "issue_id": "martial-law",
+  "chunk_id": "행안위_20241223_52649_52649_turn_1656_chunk_001",
+  "verdict": "O",
+  "reason": "계엄의 국회 기능 정지 가능성 직접 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "tmon-wemakeprice",
+  "chunk_id": "과방위_20251231_56051_56051_turn_0918_chunk_001",
+  "verdict": "X",
+  "reason": "쿠팡 정산·플랫폼법 논의, 티메프 무관",
+  "round": "round1"
+ },
+ {
+  "issue_id": "tmon-wemakeprice",
+  "chunk_id": "산자중기위_20240730_52142_52142_turn_0588_chunk_001",
+  "verdict": "O",
+  "reason": "티메프 사태 구조·대응을 본격 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "tmon-wemakeprice",
+  "chunk_id": "산자중기위_20240730_52142_52142_turn_0740_chunk_001",
+  "verdict": "O",
+  "reason": "티메프 피해자 대응·정부 책임 추궁",
+  "round": "round1"
+ },
+ {
+  "issue_id": "tmon-wemakeprice",
+  "chunk_id": "산자중기위_20240730_52142_52142_turn_0807_chunk_001",
+  "verdict": "O",
+  "reason": "티메프 사태 원인·정부 관리부실 지적",
+  "round": "round1"
+ },
+ {
+  "issue_id": "tmon-wemakeprice",
+  "chunk_id": "산자중기위_20240909_52472_52472_turn_0643_chunk_001",
+  "verdict": "O",
+  "reason": "티메프 피해자 구제 대책 답변이 중심",
+  "round": "round1"
+ },
+ {
+  "issue_id": "tmon-wemakeprice",
+  "chunk_id": "산자중기위_20250715_55020_55020_turn_0579_chunk_001",
+  "verdict": "X",
+  "reason": "배달·플랫폼 공정거래 논의, 티메프는 스침",
+  "round": "round1"
+ },
+ {
+  "issue_id": "tmon-wemakeprice",
+  "chunk_id": "정무위_20240725_52113_52113_turn_0400_chunk_001",
+  "verdict": "O",
+  "reason": "티메프 파산 피해·선불충전금 규제 논의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "tmon-wemakeprice",
+  "chunk_id": "정무위_20240730_52114_52114_turn_0302_chunk_001",
+  "verdict": "O",
+  "reason": "티몬 정산 지연 경위·공정위 대응 추궁",
+  "round": "round1"
+ },
+ {
+  "issue_id": "tmon-wemakeprice",
+  "chunk_id": "정무위_20250318_54437_54437_turn_1545_chunk_001",
+  "verdict": "O",
+  "reason": "티메프 후속 전금법 정산 보완장치 논의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "tmon-wemakeprice",
+  "chunk_id": "정무위_20250905_55314_55314_turn_0099_chunk_001",
+  "verdict": "X",
+  "reason": "플랫폼법 제정론이 중심, 티메프는 언급",
+  "round": "round1"
+ },
+ {
+  "issue_id": "nk-balloons",
+  "chunk_id": "국방위_20240808_52203_52203_turn_0499_chunk_001",
+  "verdict": "O",
+  "reason": "오물풍선 위해성 평가·군 대비가 중심",
+  "round": "round1"
+ },
+ {
+  "issue_id": "nk-balloons",
+  "chunk_id": "국방위_20240808_52203_52203_turn_1197_chunk_001",
+  "verdict": "O",
+  "reason": "대통령실 낙하·레이저 대공무기 대응 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "nk-balloons",
+  "chunk_id": "국방위_20240808_52203_52203_turn_1573_chunk_001",
+  "verdict": "O",
+  "reason": "오물풍선 대응 중 사단장 문책이 주제",
+  "round": "round1"
+ },
+ {
+  "issue_id": "nk-balloons",
+  "chunk_id": "국방위_20241211_52614_52614_turn_0090_chunk_001",
+  "verdict": "O",
+  "reason": "오물풍선 공세적 대응 시나리오 직접 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "nk-balloons",
+  "chunk_id": "외통위_20240813_52198_52198_turn_0037_chunk_001",
+  "verdict": "O",
+  "reason": "전단·오물풍선 대응 입법 제안설명",
+  "round": "round1"
+ },
+ {
+  "issue_id": "nk-balloons",
+  "chunk_id": "외통위_20240911_52379_52379_turn_0333_chunk_001",
+  "verdict": "O",
+  "reason": "오물풍선 기폭제·민간 피해를 실질 논의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "nk-balloons",
+  "chunk_id": "외통위_20241216_52613_52613_turn_0086_chunk_001",
+  "verdict": "O",
+  "reason": "전단·풍선발 긴장과 정부 대응 비판",
+  "round": "round1"
+ },
+ {
+  "issue_id": "nk-balloons",
+  "chunk_id": "외통위_20241216_52613_52613_turn_0625_chunk_001",
+  "verdict": "O",
+  "reason": "대북전단 살포 관련 대통령 입장 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "nk-balloons",
+  "chunk_id": "외통위_20250714_55019_55019_turn_0610_chunk_001",
+  "verdict": "O",
+  "reason": "전단 살포의 남북 긴장 요인 직접 논의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "nk-balloons",
+  "chunk_id": "행안위_20251126_55879_55879_turn_0675_chunk_001",
+  "verdict": "O",
+  "reason": "전단 살포 제지 법적 근거 법안 심사",
+  "round": "round1"
+ },
+ {
+  "issue_id": "lee-jinsook-kcc",
+  "chunk_id": "과방위_20240621_52077_52077_turn_0596_chunk_001",
+  "verdict": "O",
+  "reason": "2인 체제 적법성 답변 확인 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "lee-jinsook-kcc",
+  "chunk_id": "과방위_20240621_52077_52077_turn_0995_chunk_001",
+  "verdict": "O",
+  "reason": "2인 체제 졸속 의결 문제를 본격 추궁",
+  "round": "round1"
+ },
+ {
+  "issue_id": "lee-jinsook-kcc",
+  "chunk_id": "과방위_20240724_52123_52123_turn_3657_chunk_001",
+  "verdict": "O",
+  "reason": "청문회서 2인체제 위법 의결 책임 추궁",
+  "round": "round1"
+ },
+ {
+  "issue_id": "lee-jinsook-kcc",
+  "chunk_id": "과방위_20240814_52192_52192_turn_0479_chunk_001",
+  "verdict": "O",
+  "reason": "2인 체제 불법성이 발언의 핵심 주제",
+  "round": "round1"
+ },
+ {
+  "issue_id": "lee-jinsook-kcc",
+  "chunk_id": "과방위_20240814_52192_52192_turn_1002_chunk_001",
+  "verdict": "O",
+  "reason": "탄핵 중 5인 체제 복원 방안 논의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "lee-jinsook-kcc",
+  "chunk_id": "과방위_20240826_52195_52195_turn_1134_chunk_001",
+  "verdict": "O",
+  "reason": "이진숙 2인체제 이사선임 직권남용 추궁",
+  "round": "round1"
+ },
+ {
+  "issue_id": "lee-jinsook-kcc",
+  "chunk_id": "과방위_20241227_52644_52644_turn_0880_chunk_001",
+  "verdict": "X",
+  "reason": "윤석열 탄핵심리가 주제, 이진숙은 비교",
+  "round": "round1"
+ },
+ {
+  "issue_id": "lee-jinsook-kcc",
+  "chunk_id": "과방위_20250305_52765_52765_turn_0178_chunk_001",
+  "verdict": "O",
+  "reason": "청문 의혹·2인체제 의결·복귀 문제 추궁",
+  "round": "round1"
+ },
+ {
+  "issue_id": "lee-jinsook-kcc",
+  "chunk_id": "과방위_20250418_54518_54518_turn_0105_chunk_001",
+  "verdict": "O",
+  "reason": "이진숙 위원장 자격·사퇴 요구가 중심",
+  "round": "round1"
+ },
+ {
+  "issue_id": "lee-jinsook-kcc",
+  "chunk_id": "과방위_20251216_55991_55991_turn_0664_chunk_001",
+  "verdict": "X",
+  "reason": "방송장악 청산 총론, 이진숙은 나열 언급",
+  "round": "round1"
+ },
+ {
+  "issue_id": "ytn-privatization",
+  "chunk_id": "과방위_20240621_52077_52077_turn_0117_chunk_001",
+  "verdict": "O",
+  "reason": "2인 체제 YTN 매각 승인 책임 직접 추궁",
+  "round": "round1"
+ },
+ {
+  "issue_id": "ytn-privatization",
+  "chunk_id": "과방위_20240621_52077_52077_turn_0450_chunk_001",
+  "verdict": "O",
+  "reason": "2인 체제 YTN 민영화 강행 처리 책임 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "ytn-privatization",
+  "chunk_id": "과방위_20240621_52077_52077_turn_0735_chunk_001",
+  "verdict": "O",
+  "reason": "기피신청 기각과 매각 의결 무효 논의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "ytn-privatization",
+  "chunk_id": "과방위_20240621_52077_52077_turn_1099_chunk_001",
+  "verdict": "O",
+  "reason": "YTN 매각 승인 절차 졸속 여부 정리 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "ytn-privatization",
+  "chunk_id": "과방위_20240625_52078_52078_turn_2250_chunk_001",
+  "verdict": "X",
+  "reason": "국정조사 촉구 발언, YTN은 여러 의혹 중 예시",
+  "round": "round1"
+ },
+ {
+  "issue_id": "ytn-privatization",
+  "chunk_id": "과방위_20240724_52123_52123_turn_1073_chunk_001",
+  "verdict": "O",
+  "reason": "민영화 비밀 추진 과정의 적절성 지적",
+  "round": "round1"
+ },
+ {
+  "issue_id": "ytn-privatization",
+  "chunk_id": "과방위_20240725_52124_52124_turn_3321_chunk_001",
+  "verdict": "O",
+  "reason": "최다액출자자 변경 절차 정당성 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "ytn-privatization",
+  "chunk_id": "과방위_20250509_54651_54651_turn_0153_chunk_001",
+  "verdict": "O",
+  "reason": "민영화 후 보도 독립성 훼손 실질 진술",
+  "round": "round1"
+ },
+ {
+  "issue_id": "ytn-privatization",
+  "chunk_id": "과방위_20251216_55991_55991_turn_1615_chunk_001",
+  "verdict": "O",
+  "reason": "사영화 반발과 공적 소유구조 복원 논의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "ytn-privatization",
+  "chunk_id": "과방위_20260428_56569_56569_turn_0565_chunk_001",
+  "verdict": "X",
+  "reason": "방송장악 사례 나열, 중심은 통일TV 소송",
+  "round": "round1"
+ },
+ {
+  "issue_id": "coupang-issues",
+  "chunk_id": "과방위_20251202_55931_55931_turn_0308_chunk_001",
+  "verdict": "O",
+  "reason": "쿠팡 해킹·개인정보 유출 대응 직접 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "coupang-issues",
+  "chunk_id": "과방위_20251217_55992_55992_turn_1195_chunk_001",
+  "verdict": "O",
+  "reason": "일용직 민감정보 수집·보관 문제 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "coupang-issues",
+  "chunk_id": "과방위_20251217_55992_55992_turn_1670_chunk_001",
+  "verdict": "O",
+  "reason": "물류노동자 사망 은폐 정황 직접 추궁",
+  "round": "round1"
+ },
+ {
+  "issue_id": "coupang-issues",
+  "chunk_id": "과방위_20251217_55992_55992_turn_1834_chunk_001",
+  "verdict": "O",
+  "reason": "일용직 블랙리스트·개인정보 수집 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "coupang-issues",
+  "chunk_id": "과방위_20251230_56070_56070_turn_0065_chunk_001",
+  "verdict": "O",
+  "reason": "자사우대 독과점 과징금 사건 직접 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "coupang-issues",
+  "chunk_id": "과방위_20251230_56070_56070_turn_1723_chunk_001",
+  "verdict": "O",
+  "reason": "물류센터 산재 은폐·사망사건 추궁",
+  "round": "round1"
+ },
+ {
+  "issue_id": "coupang-issues",
+  "chunk_id": "과방위_20251230_56070_56070_turn_2016_chunk_001",
+  "verdict": "O",
+  "reason": "장덕준 사망사건 관련 직접 신문",
+  "round": "round1"
+ },
+ {
+  "issue_id": "coupang-issues",
+  "chunk_id": "과방위_20251231_56051_56051_turn_0038_chunk_001",
+  "verdict": "O",
+  "reason": "야간노동 건강위험 등 노동환경 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "coupang-issues",
+  "chunk_id": "정무위_20250428_54610_54610_turn_0271_chunk_001",
+  "verdict": "O",
+  "reason": "쿠팡 최혜대우 과징금·동의의결 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "coupang-issues",
+  "chunk_id": "정무위_20251203_55915_55915_turn_0798_chunk_001",
+  "verdict": "O",
+  "reason": "쿠팡 개인정보 유출 경위 사실 확인 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "medical-reform",
+  "chunk_id": "복지위_20240613_52087_52087_turn_0047_chunk_001",
+  "verdict": "O",
+  "reason": "전공의 이탈과 의료 공백 본질 논의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "medical-reform",
+  "chunk_id": "복지위_20240626_52089_52089_turn_0438_chunk_001",
+  "verdict": "O",
+  "reason": "의대 정원 확대 입장 직접 표명",
+  "round": "round1"
+ },
+ {
+  "issue_id": "medical-reform",
+  "chunk_id": "복지위_20240626_52089_52089_turn_0518_chunk_001",
+  "verdict": "O",
+  "reason": "증원 규모·백지화 여부 의료개혁 논의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "medical-reform",
+  "chunk_id": "복지위_20240626_52089_52089_turn_0730_chunk_001",
+  "verdict": "O",
+  "reason": "의료대란 대응과 재정 투입 책임 추궁",
+  "round": "round1"
+ },
+ {
+  "issue_id": "medical-reform",
+  "chunk_id": "복지위_20240716_52143_52143_turn_0393_chunk_001",
+  "verdict": "O",
+  "reason": "의정 갈등 해소 노력 직접 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "medical-reform",
+  "chunk_id": "복지위_20240716_52143_52143_turn_0636_chunk_001",
+  "verdict": "O",
+  "reason": "2000명 증원 근거·전공의 설득 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "medical-reform",
+  "chunk_id": "복지위_20240821_52223_52223_turn_1123_chunk_001",
+  "verdict": "X",
+  "reason": "중심 주제 불명확, 의료대란은 배경 언급",
+  "round": "round1"
+ },
+ {
+  "issue_id": "medical-reform",
+  "chunk_id": "복지위_20250820_55195_55195_turn_1083_chunk_001",
+  "verdict": "O",
+  "reason": "의료대란 후 지역의사제 등 개혁 방안 논의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "medical-reform",
+  "chunk_id": "복지위_20251111_55767_55767_turn_0556_chunk_001",
+  "verdict": "O",
+  "reason": "공공의대 신설·의료개혁 추진 절차 추궁",
+  "round": "round1"
+ },
+ {
+  "issue_id": "medical-reform",
+  "chunk_id": "복지위_20251111_55767_55767_turn_0584_chunk_001",
+  "verdict": "O",
+  "reason": "공공의대와 의정갈등 재발 방지 논의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "marine-cpl-case",
+  "chunk_id": "과방위_20240930_52347_52347_turn_0748_chunk_001",
+  "verdict": "X",
+  "reason": "타 사안 의사진행, 수사외압은 키워드 충돌",
+  "round": "round1"
+ },
+ {
+  "issue_id": "marine-cpl-case",
+  "chunk_id": "국방위_20240808_52203_52203_turn_0035_chunk_001",
+  "verdict": "O",
+  "reason": "채 해병 진실규명 증인 출석 요구 논의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "marine-cpl-case",
+  "chunk_id": "국방위_20240808_52203_52203_turn_1025_chunk_001",
+  "verdict": "O",
+  "reason": "대통령 격노·임성근 보직해임 추궁",
+  "round": "round1"
+ },
+ {
+  "issue_id": "marine-cpl-case",
+  "chunk_id": "국방위_20240808_52203_52203_turn_1061_chunk_001",
+  "verdict": "O",
+  "reason": "채 상병 수사 대통령 지휘권 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "marine-cpl-case",
+  "chunk_id": "국방위_20240808_52203_52203_turn_1065_chunk_001",
+  "verdict": "O",
+  "reason": "박정훈 항명죄 판단 관련 직접 추궁",
+  "round": "round1"
+ },
+ {
+  "issue_id": "marine-cpl-case",
+  "chunk_id": "국방위_20240808_52203_52203_turn_1401_chunk_001",
+  "verdict": "O",
+  "reason": "임성근 구명운동 VIP 개입 의혹 논의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "marine-cpl-case",
+  "chunk_id": "국방위_20241111_52394_52394_turn_0681_chunk_001",
+  "verdict": "O",
+  "reason": "수사관 외압 증언 관련 직접 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "marine-cpl-case",
+  "chunk_id": "국방위_20250625_54939_54939_turn_0102_chunk_001",
+  "verdict": "O",
+  "reason": "800-7070 수사외압 증거·책임자 추궁",
+  "round": "round1"
+ },
+ {
+  "issue_id": "marine-cpl-case",
+  "chunk_id": "국방위_20250924_55433_55433_turn_0047_chunk_001",
+  "verdict": "O",
+  "reason": "임성근 책임·채상병 특검 수사의뢰 촉구",
+  "round": "round1"
+ },
+ {
+  "issue_id": "marine-cpl-case",
+  "chunk_id": "행안위_20240711_52130_52130_turn_1790_chunk_001",
+  "verdict": "O",
+  "reason": "수사기록 이첩·회수 경위 직접 답변",
+  "round": "round1"
+ },
+ {
+  "issue_id": "ai-basic-act",
+  "chunk_id": "과방위_20240903_52364_52364_turn_0111_chunk_001",
+  "verdict": "O",
+  "reason": "AI 기본법 제정 취지·규제 범위를 직접 논의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "ai-basic-act",
+  "chunk_id": "과방위_20240924_52346_52346_turn_0262_chunk_001",
+  "verdict": "O",
+  "reason": "기본법 조속 제정 필요성을 진술인이 주장",
+  "round": "round1"
+ },
+ {
+  "issue_id": "ai-basic-act",
+  "chunk_id": "과방위_20240924_52346_52346_turn_0290_chunk_001",
+  "verdict": "O",
+  "reason": "기본법 제정 지연의 산업계 애로를 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "ai-basic-act",
+  "chunk_id": "과방위_20240924_52346_52346_turn_0356_chunk_001",
+  "verdict": "O",
+  "reason": "기본법 필요성에 대한 정부 측 답변",
+  "round": "round1"
+ },
+ {
+  "issue_id": "ai-basic-act",
+  "chunk_id": "과방위_20241126_52360_52360_turn_0007_chunk_001",
+  "verdict": "O",
+  "reason": "기본법 소위 의결·본회의 처리가 발언 중심",
+  "round": "round1"
+ },
+ {
+  "issue_id": "ai-basic-act",
+  "chunk_id": "과방위_20241126_52360_52360_turn_0015_chunk_001",
+  "verdict": "O",
+  "reason": "기본법 통과 소감과 진흥·규제 쟁점 언급",
+  "round": "round1"
+ },
+ {
+  "issue_id": "ai-basic-act",
+  "chunk_id": "과방위_20241227_52644_52644_turn_0012_chunk_001",
+  "verdict": "O",
+  "reason": "기본법 본회의 통과의 의미가 발언 중심",
+  "round": "round1"
+ },
+ {
+  "issue_id": "ai-basic-act",
+  "chunk_id": "과방위_20251209_55942_55942_turn_0352_chunk_001",
+  "verdict": "O",
+  "reason": "규제·진흥 균형 등 법안 평가 진술",
+  "round": "round1"
+ },
+ {
+  "issue_id": "ai-basic-act",
+  "chunk_id": "과방위_20260428_56569_56569_turn_0528_chunk_001",
+  "verdict": "O",
+  "reason": "기본법 시행과 AI생성물 투명성 이행 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "ai-basic-act",
+  "chunk_id": "산자중기위_20250715_55020_55020_turn_0432_chunk_001",
+  "verdict": "O",
+  "reason": "기본법 34조 고영향AI 의무·중기 대응 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "ai-rnd-policy",
+  "chunk_id": "과방위_20240625_52078_52078_turn_1639_chunk_001",
+  "verdict": "O",
+  "reason": "R&D 예산 삭감 사태를 직접 추궁",
+  "round": "round1"
+ },
+ {
+  "issue_id": "ai-rnd-policy",
+  "chunk_id": "과방위_20241111_52356_52356_turn_0077_chunk_001",
+  "verdict": "O",
+  "reason": "R&D 예산안 증감을 중심으로 한 검토보고",
+  "round": "round1"
+ },
+ {
+  "issue_id": "ai-rnd-policy",
+  "chunk_id": "과방위_20241111_52356_52356_turn_0637_chunk_001",
+  "verdict": "O",
+  "reason": "R&D 삭감·GPU 확보 예산을 실질 논의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "ai-rnd-policy",
+  "chunk_id": "과방위_20241227_52644_52644_turn_0014_chunk_001",
+  "verdict": "X",
+  "reason": "AI 기본법 통과 소감, R&D·인프라 아님",
+  "round": "round1"
+ },
+ {
+  "issue_id": "ai-rnd-policy",
+  "chunk_id": "과방위_20250416_54516_54516_turn_0044_chunk_001",
+  "verdict": "O",
+  "reason": "대형 R&D 예타 제도 운용을 실질 논의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "ai-rnd-policy",
+  "chunk_id": "과방위_20250423_54558_54558_turn_0078_chunk_001",
+  "verdict": "O",
+  "reason": "AI 추경 삭감·인재유치 예산 복원 논의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "ai-rnd-policy",
+  "chunk_id": "과방위_20250424_54562_54562_turn_0019_chunk_001",
+  "verdict": "O",
+  "reason": "R&D 예산 증액·추경 요구가 발언 중심",
+  "round": "round1"
+ },
+ {
+  "issue_id": "ai-rnd-policy",
+  "chunk_id": "과방위_20260428_56569_56569_turn_0507_chunk_001",
+  "verdict": "O",
+  "reason": "AI데이터센터 전력 수급·PPA를 논의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "ai-rnd-policy",
+  "chunk_id": "산자중기위_20250717_55070_55070_turn_0740_chunk_001",
+  "verdict": "O",
+  "reason": "AI 학습 원가·전력 등 산업 경쟁력 논의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "ai-rnd-policy",
+  "chunk_id": "산자중기위_20250717_55070_55070_turn_1104_chunk_001",
+  "verdict": "O",
+  "reason": "AI 인재 유출·R&D 예산 삭감을 논의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "public-broadcasting",
+  "chunk_id": "과방위_20240621_52077_52077_turn_0956_chunk_001",
+  "verdict": "O",
+  "reason": "공영방송 이사 관련 핵심 조항 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "public-broadcasting",
+  "chunk_id": "과방위_20240725_52124_52124_turn_1191_chunk_001",
+  "verdict": "O",
+  "reason": "방송법 개정안 사장 해임 사유를 논의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "public-broadcasting",
+  "chunk_id": "과방위_20240725_52124_52124_turn_2534_chunk_001",
+  "verdict": "O",
+  "reason": "방송3법·지배구조 개선 입법 경위 진술",
+  "round": "round1"
+ },
+ {
+  "issue_id": "public-broadcasting",
+  "chunk_id": "과방위_20240809_52191_52191_turn_0025_chunk_001",
+  "verdict": "O",
+  "reason": "KBS·방문진 이사 선임 절차 적법성 논의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "public-broadcasting",
+  "chunk_id": "과방위_20240909_52344_52344_turn_0154_chunk_001",
+  "verdict": "X",
+  "reason": "표결 처리 방식 항의, 의사진행성 발언",
+  "round": "round1"
+ },
+ {
+  "issue_id": "public-broadcasting",
+  "chunk_id": "과방위_20241113_52376_52376_turn_1140_chunk_001",
+  "verdict": "X",
+  "reason": "위원회 소관 논의 중 지배구조 스침 언급",
+  "round": "round1"
+ },
+ {
+  "issue_id": "public-broadcasting",
+  "chunk_id": "과방위_20241126_52360_52360_turn_0029_chunk_001",
+  "verdict": "O",
+  "reason": "지배구조 문제 해결 경로(5인체제) 주장",
+  "round": "round1"
+ },
+ {
+  "issue_id": "public-broadcasting",
+  "chunk_id": "과방위_20250909_55350_55350_turn_0501_chunk_001",
+  "verdict": "O",
+  "reason": "방송3법 통과·후속 정상화 논의가 중심",
+  "round": "round1"
+ },
+ {
+  "issue_id": "public-broadcasting",
+  "chunk_id": "과방위_20260407_56519_56519_turn_0069_chunk_001",
+  "verdict": "O",
+  "reason": "이사 선임·방송3법 시행령 정비 답변",
+  "round": "round1"
+ },
+ {
+  "issue_id": "public-broadcasting",
+  "chunk_id": "과방위_20260409_56533_56533_turn_0106_chunk_001",
+  "verdict": "O",
+  "reason": "공영방송 이사 선임 방침을 직접 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "media-fairness",
+  "chunk_id": "과방위_20240702_52079_52079_turn_0338_chunk_001",
+  "verdict": "O",
+  "reason": "류희림 취임 후 편파 법정제재 급증 추궁",
+  "round": "round1"
+ },
+ {
+  "issue_id": "media-fairness",
+  "chunk_id": "과방위_20240826_52195_52195_turn_0101_chunk_001",
+  "verdict": "O",
+  "reason": "류희림 청부민원·이해충돌을 직접 논의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "media-fairness",
+  "chunk_id": "과방위_20240913_52345_52345_turn_0036_chunk_001",
+  "verdict": "O",
+  "reason": "민원사주 의혹·심의 독립성 훼손 추궁",
+  "round": "round1"
+ },
+ {
+  "issue_id": "media-fairness",
+  "chunk_id": "과방위_20240913_52345_52345_turn_0353_chunk_001",
+  "verdict": "O",
+  "reason": "민원사주 공익신고·제보자 색출 진술",
+  "round": "round1"
+ },
+ {
+  "issue_id": "media-fairness",
+  "chunk_id": "과방위_20240930_52347_52347_turn_0735_chunk_001",
+  "verdict": "O",
+  "reason": "민원사주 지인 동원 행태 참고인 진술",
+  "round": "round1"
+ },
+ {
+  "issue_id": "media-fairness",
+  "chunk_id": "과방위_20240930_52347_52347_turn_1076_chunk_001",
+  "verdict": "O",
+  "reason": "청부민원 권익위 신고 처리 지연 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "media-fairness",
+  "chunk_id": "과방위_20241118_52357_52357_turn_1089_chunk_001",
+  "verdict": "O",
+  "reason": "KBS 보도 편향성 논란을 직접 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "media-fairness",
+  "chunk_id": "과방위_20251210_55954_55954_turn_0092_chunk_001",
+  "verdict": "O",
+  "reason": "공정성 심의 대상 제외 여부를 논쟁",
+  "round": "round1"
+ },
+ {
+  "issue_id": "media-fairness",
+  "chunk_id": "과방위_20260401_56419_56419_turn_0018_chunk_001",
+  "verdict": "O",
+  "reason": "류희림 체제 자의적 심의 평가·개선 답변",
+  "round": "round1"
+ },
+ {
+  "issue_id": "media-fairness",
+  "chunk_id": "과방위_20260401_56419_56419_turn_0027_chunk_001",
+  "verdict": "O",
+  "reason": "바이든날리면 MBC 과징금 편파심의 추궁",
+  "round": "round1"
+ },
+ {
+  "issue_id": "jeonse-fraud",
+  "chunk_id": "국토위_20240625_52097_52097_turn_0074_chunk_001",
+  "verdict": "O",
+  "reason": "전세사기 특별법 개정안 제안설명",
+  "round": "round1"
+ },
+ {
+  "issue_id": "jeonse-fraud",
+  "chunk_id": "국토위_20240625_52097_52097_turn_0249_chunk_001",
+  "verdict": "O",
+  "reason": "보증금 확보·선구제 개정안 취지 논의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "jeonse-fraud",
+  "chunk_id": "국토위_20240625_52097_52097_turn_0251_chunk_001",
+  "verdict": "O",
+  "reason": "선구제 우선과 리스크 분담 주장",
+  "round": "round1"
+ },
+ {
+  "issue_id": "jeonse-fraud",
+  "chunk_id": "국토위_20240625_52097_52097_turn_0301_chunk_001",
+  "verdict": "O",
+  "reason": "선구제 후회수와 공공매입 비용 비교 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "jeonse-fraud",
+  "chunk_id": "국토위_20240625_52097_52097_turn_0862_chunk_001",
+  "verdict": "O",
+  "reason": "피해자 확정 지연 문제·개정안 반영 요구",
+  "round": "round1"
+ },
+ {
+  "issue_id": "jeonse-fraud",
+  "chunk_id": "국토위_20240625_52097_52097_turn_0958_chunk_001",
+  "verdict": "O",
+  "reason": "선구제 방침 수용 여부 장관 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "jeonse-fraud",
+  "chunk_id": "국토위_20240710_52152_52152_turn_0220_chunk_001",
+  "verdict": "O",
+  "reason": "전세사기 지원제도 악용 문제 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "jeonse-fraud",
+  "chunk_id": "국토위_20250626_54913_54913_turn_0020_chunk_001",
+  "verdict": "O",
+  "reason": "전세사기 실태조사·피해자 지원 현황 보고",
+  "round": "round1"
+ },
+ {
+  "issue_id": "jeonse-fraud",
+  "chunk_id": "국토위_20250729_55090_55090_turn_0863_chunk_001",
+  "verdict": "O",
+  "reason": "피해주택 LH 매입 실적 부진 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "jeonse-fraud",
+  "chunk_id": "국토위_20251217_55969_55969_turn_0014_chunk_001",
+  "verdict": "O",
+  "reason": "특별법 지원 실적·경매차익 무상거주 보고",
+  "round": "round1"
+ },
+ {
+  "issue_id": "housing-policy",
+  "chunk_id": "국토위_20240710_52152_52152_turn_0748_chunk_001",
+  "verdict": "O",
+  "reason": "정부별 주택 인허가·공급 실적 비교 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "housing-policy",
+  "chunk_id": "국토위_20240821_52230_52230_turn_1207_chunk_001",
+  "verdict": "O",
+  "reason": "8·8 공급대책 실효성 비판",
+  "round": "round1"
+ },
+ {
+  "issue_id": "housing-policy",
+  "chunk_id": "국토위_20240903_52523_52523_turn_0502_chunk_001",
+  "verdict": "O",
+  "reason": "대출 수요와 집값 상승, 8·8 대책 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "housing-policy",
+  "chunk_id": "국토위_20240925_52534_52534_turn_0325_chunk_001",
+  "verdict": "O",
+  "reason": "임대주택 공급 예산단가 인상 답변",
+  "round": "round1"
+ },
+ {
+  "issue_id": "housing-policy",
+  "chunk_id": "국토위_20241127_52537_52537_turn_0167_chunk_001",
+  "verdict": "O",
+  "reason": "용적률 규제·주택공급 법안 심사 논의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "housing-policy",
+  "chunk_id": "국토위_20241223_52667_52667_turn_0195_chunk_001",
+  "verdict": "O",
+  "reason": "주택공급 위축과 시장 충격 대응 촉구",
+  "round": "round1"
+ },
+ {
+  "issue_id": "housing-policy",
+  "chunk_id": "국토위_20250313_52773_52773_turn_0367_chunk_001",
+  "verdict": "O",
+  "reason": "집값 상승·토지거래허가제 대응 답변",
+  "round": "round1"
+ },
+ {
+  "issue_id": "housing-policy",
+  "chunk_id": "국토위_20260422_56568_56568_turn_0120_chunk_001",
+  "verdict": "O",
+  "reason": "부동산 이상거래 조사 지원 답변",
+  "round": "round1"
+ },
+ {
+  "issue_id": "housing-policy",
+  "chunk_id": "정무위_20250902_55284_55284_turn_0283_chunk_001",
+  "verdict": "O",
+  "reason": "6·27 부동산 대책 평가 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "housing-policy",
+  "chunk_id": "행안위_20241218_52651_52651_turn_0033_chunk_001",
+  "verdict": "O",
+  "reason": "공공임대 공급과 재건축·정비사업 답변",
+  "round": "round1"
+ },
+ {
+  "issue_id": "semiconductor",
+  "chunk_id": "기재위_20260317_56384_56384_turn_0003_chunk_001",
+  "verdict": "O",
+  "reason": "반도체특별법 특별회계 설치 검토보고",
+  "round": "round1"
+ },
+ {
+  "issue_id": "semiconductor",
+  "chunk_id": "산자중기위_20240820_52216_52216_turn_0069_chunk_001",
+  "verdict": "O",
+  "reason": "반도체 IP 지원 입법·특별법 제정 의견",
+  "round": "round1"
+ },
+ {
+  "issue_id": "semiconductor",
+  "chunk_id": "산자중기위_20240820_52216_52216_turn_0074_chunk_001",
+  "verdict": "O",
+  "reason": "반도체 육성 지원 현황·특별법 진행 답변",
+  "round": "round1"
+ },
+ {
+  "issue_id": "semiconductor",
+  "chunk_id": "산자중기위_20240820_52216_52216_turn_0088_chunk_001",
+  "verdict": "O",
+  "reason": "팹리스 지원 입법 타당성 논의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "semiconductor",
+  "chunk_id": "산자중기위_20241121_52485_52485_turn_0006_chunk_001",
+  "verdict": "X",
+  "reason": "심사 순서·진행 요청의 절차 발언",
+  "round": "round1"
+ },
+ {
+  "issue_id": "semiconductor",
+  "chunk_id": "산자중기위_20241121_52485_52485_turn_0045_chunk_001",
+  "verdict": "O",
+  "reason": "특별법 반도체 주권 문구 취지 논의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "semiconductor",
+  "chunk_id": "산자중기위_20241121_52485_52485_turn_0358_chunk_001",
+  "verdict": "O",
+  "reason": "특별법 클러스터 지원 조항 설명",
+  "round": "round1"
+ },
+ {
+  "issue_id": "semiconductor",
+  "chunk_id": "산자중기위_20250424_54592_54592_turn_0130_chunk_001",
+  "verdict": "O",
+  "reason": "반도체 지원 방식·직접지원 논쟁",
+  "round": "round1"
+ },
+ {
+  "issue_id": "semiconductor",
+  "chunk_id": "산자중기위_20250424_54592_54592_turn_0312_chunk_001",
+  "verdict": "O",
+  "reason": "반도체 소부장 테스트베드 예산 의견",
+  "round": "round1"
+ },
+ {
+  "issue_id": "semiconductor",
+  "chunk_id": "산자중기위_20251204_55920_55920_turn_0006_chunk_001",
+  "verdict": "X",
+  "reason": "법안 일괄 상정 선언, 의사진행 발언",
+  "round": "round1"
+ },
+ {
+  "issue_id": "small-business",
+  "chunk_id": "과방위_20251230_56070_56070_turn_1384_chunk_001",
+  "verdict": "X",
+  "reason": "중심은 쿠팡 수수료 은폐 비판, 별도 이슈",
+  "round": "round1"
+ },
+ {
+  "issue_id": "small-business",
+  "chunk_id": "산자중기위_20240730_52142_52142_turn_0298_chunk_001",
+  "verdict": "O",
+  "reason": "배민 배달 수수료 실태·인상 추궁",
+  "round": "round1"
+ },
+ {
+  "issue_id": "small-business",
+  "chunk_id": "산자중기위_20240730_52142_52142_turn_0463_chunk_001",
+  "verdict": "O",
+  "reason": "자영업자 연체율·종합대책 전기료 지원",
+  "round": "round1"
+ },
+ {
+  "issue_id": "small-business",
+  "chunk_id": "산자중기위_20240730_52142_52142_turn_1391_chunk_001",
+  "verdict": "O",
+  "reason": "소상공인 종합대책 배달료 지원 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "small-business",
+  "chunk_id": "산자중기위_20241108_52488_52488_turn_1546_chunk_001",
+  "verdict": "O",
+  "reason": "결제수수료 절감 등 소상공인 지원 옹호",
+  "round": "round1"
+ },
+ {
+  "issue_id": "small-business",
+  "chunk_id": "산자중기위_20241108_52488_52488_turn_1712_chunk_001",
+  "verdict": "O",
+  "reason": "온누리상품권 사업 한계·보완책 요구",
+  "round": "round1"
+ },
+ {
+  "issue_id": "small-business",
+  "chunk_id": "산자중기위_20241122_52484_52484_turn_0242_chunk_001",
+  "verdict": "O",
+  "reason": "소상공인 고용보험 우대 법안 검토보고",
+  "round": "round1"
+ },
+ {
+  "issue_id": "small-business",
+  "chunk_id": "산자중기위_20260520_56737_56737_turn_0088_chunk_001",
+  "verdict": "O",
+  "reason": "경영위기 소상공인 지원 연계 법안 검토",
+  "round": "round1"
+ },
+ {
+  "issue_id": "small-business",
+  "chunk_id": "정무위_20250318_54437_54437_turn_0808_chunk_001",
+  "verdict": "X",
+  "reason": "한 문장 언급, 실질 논의 아님",
+  "round": "round1"
+ },
+ {
+  "issue_id": "small-business",
+  "chunk_id": "정무위_20250318_54437_54437_turn_1279_chunk_001",
+  "verdict": "X",
+  "reason": "잘린 단문, 논의 내용 판단 불가",
+  "round": "round1"
+ },
+ {
+  "issue_id": "crypto-regulation",
+  "chunk_id": "기재위_20260317_56384_56384_turn_0176_chunk_001",
+  "verdict": "O",
+  "reason": "가상자산 개념 정의·이용자보호법 규율 실질 답변",
+  "round": "round1"
+ },
+ {
+  "issue_id": "crypto-regulation",
+  "chunk_id": "기재위_20260429_56637_56637_turn_0045_chunk_001",
+  "verdict": "X",
+  "reason": "한 문장 스치는 언급, 실질 논의 아님",
+  "round": "round1"
+ },
+ {
+  "issue_id": "crypto-regulation",
+  "chunk_id": "기재위_20260429_56637_56637_turn_0046_chunk_001",
+  "verdict": "O",
+  "reason": "가상자산이용자보호법 이전 개념 조문 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "crypto-regulation",
+  "chunk_id": "기재위_20260429_56637_56637_turn_0069_chunk_001",
+  "verdict": "O",
+  "reason": "가상자산 이전 정의규정·규제 입법 절충 논의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "crypto-regulation",
+  "chunk_id": "정무위_20240722_52111_52111_turn_0271_chunk_001",
+  "verdict": "O",
+  "reason": "가상자산 제도 미비·2단계 입법 위원회 촉구",
+  "round": "round1"
+ },
+ {
+  "issue_id": "crypto-regulation",
+  "chunk_id": "정무위_20240722_52111_52111_turn_0703_chunk_001",
+  "verdict": "O",
+  "reason": "법인 허용·연계 상품 등 가상자산 정책 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "crypto-regulation",
+  "chunk_id": "정무위_20240722_52111_52111_turn_1261_chunk_001",
+  "verdict": "O",
+  "reason": "특금법·이용자보호법 등 규제 체계 논의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "crypto-regulation",
+  "chunk_id": "정무위_20251124_55870_55870_turn_0175_chunk_001",
+  "verdict": "O",
+  "reason": "가상자산사업자 신고 불수리 개정안 검토 보고",
+  "round": "round1"
+ },
+ {
+  "issue_id": "crypto-regulation",
+  "chunk_id": "정무위_20260211_56260_56260_turn_0052_chunk_001",
+  "verdict": "O",
+  "reason": "거래소 보유수량 매칭 전수조사 등 감독 요구",
+  "round": "round1"
+ },
+ {
+  "issue_id": "crypto-regulation",
+  "chunk_id": "정무위_20260211_56260_56260_turn_0085_chunk_001",
+  "verdict": "O",
+  "reason": "위탁 가상자산 실질 보유 의무 이행 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "us-alliance",
+  "chunk_id": "국방위_20240808_52203_52203_turn_1348_chunk_001",
+  "verdict": "O",
+  "reason": "12차 방위비분담금 협상 내용·연동 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "us-alliance",
+  "chunk_id": "국방위_20250211_52720_52720_turn_0438_chunk_001",
+  "verdict": "O",
+  "reason": "주한미군 방위비 재협상 전망 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "us-alliance",
+  "chunk_id": "국방위_20250211_52720_52720_turn_0442_chunk_001",
+  "verdict": "O",
+  "reason": "방위비 재협상·전략자산 비용 협상 전략 제안",
+  "round": "round1"
+ },
+ {
+  "issue_id": "us-alliance",
+  "chunk_id": "국방위_20250211_52720_52720_turn_0836_chunk_001",
+  "verdict": "O",
+  "reason": "전략자산 전개의 방위비 협상 반영 논박",
+  "round": "round1"
+ },
+ {
+  "issue_id": "us-alliance",
+  "chunk_id": "국방위_20250825_55231_55231_turn_0460_chunk_001",
+  "verdict": "O",
+  "reason": "한미방위협정·주한미군 주둔 의의 실질 논의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "us-alliance",
+  "chunk_id": "국방위_20250924_55433_55433_turn_0022_chunk_001",
+  "verdict": "X",
+  "reason": "당부 발언 중 한미동맹 수사적 언급",
+  "round": "round1"
+ },
+ {
+  "issue_id": "us-alliance",
+  "chunk_id": "국방위_20250924_55433_55433_turn_0657_chunk_001",
+  "verdict": "O",
+  "reason": "전작권 전환과 한미동맹 유지 답변",
+  "round": "round1"
+ },
+ {
+  "issue_id": "us-alliance",
+  "chunk_id": "외통위_20250324_54067_54067_turn_0624_chunk_001",
+  "verdict": "X",
+  "reason": "타 사안 질책 중 한미동맹 수사적 언급",
+  "round": "round1"
+ },
+ {
+  "issue_id": "us-alliance",
+  "chunk_id": "외통위_20250423_54556_54556_turn_0191_chunk_001",
+  "verdict": "O",
+  "reason": "방위비 분담금 재협상 대응 실질 논의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "us-alliance",
+  "chunk_id": "외통위_20250627_54940_54940_turn_0150_chunk_001",
+  "verdict": "O",
+  "reason": "방위비 5% 증액 안건 직접 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "inter-korea",
+  "chunk_id": "국방위_20250825_55231_55231_turn_0072_chunk_001",
+  "verdict": "O",
+  "reason": "남북관계 고려 연합훈련 조정 등 대북 기조 비판",
+  "round": "round1"
+ },
+ {
+  "issue_id": "inter-korea",
+  "chunk_id": "외통위_20240717_52128_52128_turn_0131_chunk_001",
+  "verdict": "O",
+  "reason": "대북·통일정책 대상과 방향 실질 논의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "inter-korea",
+  "chunk_id": "외통위_20240717_52128_52128_turn_0304_chunk_001",
+  "verdict": "O",
+  "reason": "압박·고립 대북정책의 영향 직접 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "inter-korea",
+  "chunk_id": "외통위_20240717_52128_52128_turn_0660_chunk_001",
+  "verdict": "O",
+  "reason": "남북 연락채널 복원·대화 재개 논의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "inter-korea",
+  "chunk_id": "외통위_20240828_52201_52201_turn_0832_chunk_001",
+  "verdict": "O",
+  "reason": "남북대화 주무부처 역량·준비 답변",
+  "round": "round1"
+ },
+ {
+  "issue_id": "inter-korea",
+  "chunk_id": "외통위_20241216_52613_52613_turn_0315_chunk_001",
+  "verdict": "X",
+  "reason": "대북전단 살포 사안은 별도 이슈 범위",
+  "round": "round1"
+ },
+ {
+  "issue_id": "inter-korea",
+  "chunk_id": "외통위_20250226_52719_52719_turn_0018_chunk_001",
+  "verdict": "O",
+  "reason": "통일부 업무보고 — 북한 동향·대북정책 보고",
+  "round": "round1"
+ },
+ {
+  "issue_id": "inter-korea",
+  "chunk_id": "외통위_20250311_52768_52768_turn_0482_chunk_001",
+  "verdict": "O",
+  "reason": "남북관계 악영향 사안에 통일부 역할 질책",
+  "round": "round1"
+ },
+ {
+  "issue_id": "inter-korea",
+  "chunk_id": "외통위_20251118_55814_55814_turn_0178_chunk_001",
+  "verdict": "O",
+  "reason": "남북 교류 사업·통일 인식 사업 답변",
+  "round": "round1"
+ },
+ {
+  "issue_id": "inter-korea",
+  "chunk_id": "외통위_20260520_56731_56731_turn_0355_chunk_001",
+  "verdict": "O",
+  "reason": "평화공존·두국가론 등 대북정책 기조 설명",
+  "round": "round1"
+ },
+ {
+  "issue_id": "nk-nuclear",
+  "chunk_id": "국방위_20240808_52203_52203_turn_1612_chunk_001",
+  "verdict": "O",
+  "reason": "북 핵미사일 위협 대응 요격체계 소요 답변",
+  "round": "round1"
+ },
+ {
+  "issue_id": "nk-nuclear",
+  "chunk_id": "국방위_20241111_52394_52394_turn_0148_chunk_001",
+  "verdict": "O",
+  "reason": "러시아의 북 ICBM 기술 이전 우려 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "nk-nuclear",
+  "chunk_id": "국방위_20241114_52404_52404_turn_0599_chunk_001",
+  "verdict": "O",
+  "reason": "ICBM·IRBM 고각발사 대응 방안 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "nk-nuclear",
+  "chunk_id": "국방위_20250211_52720_52720_turn_0031_chunk_001",
+  "verdict": "X",
+  "reason": "업무보고 총론에서 3축체계 나열 언급",
+  "round": "round1"
+ },
+ {
+  "issue_id": "nk-nuclear",
+  "chunk_id": "국방위_20250715_55025_55025_turn_0720_chunk_001",
+  "verdict": "O",
+  "reason": "북핵 비대칭 전력과 미 핵억제 필요 논의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "nk-nuclear",
+  "chunk_id": "국방위_20250924_55433_55433_turn_0256_chunk_001",
+  "verdict": "O",
+  "reason": "북핵 평가 발언·비핵화 구상 직접 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "nk-nuclear",
+  "chunk_id": "국방위_20250924_55433_55433_turn_0274_chunk_001",
+  "verdict": "O",
+  "reason": "미국의 북핵 대응 변화 가능성 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "nk-nuclear",
+  "chunk_id": "외통위_20250714_55019_55019_turn_0428_chunk_001",
+  "verdict": "O",
+  "reason": "북핵 독점 하 힘의 균형 대응 논쟁",
+  "round": "round1"
+ },
+ {
+  "issue_id": "nk-nuclear",
+  "chunk_id": "외통위_20250908_55332_55332_turn_0558_chunk_001",
+  "verdict": "O",
+  "reason": "ICBM 실험 안보리 제재 처리 등 국제 공조",
+  "round": "round1"
+ },
+ {
+  "issue_id": "nk-nuclear",
+  "chunk_id": "외통위_20260520_56731_56731_turn_0357_chunk_001",
+  "verdict": "O",
+  "reason": "비핵화 원칙·북핵 중단 정책 기조 설명",
+  "round": "round1"
+ },
+ {
+  "issue_id": "conscription-welfare",
+  "chunk_id": "과방위_20260409_56533_56533_turn_0024_chunk_001",
+  "verdict": "X",
+  "reason": "출연연 연구자 급식 예산, 군 무관",
+  "round": "round1"
+ },
+ {
+  "issue_id": "conscription-welfare",
+  "chunk_id": "국방위_20240902_52390_52390_turn_0081_chunk_001",
+  "verdict": "O",
+  "reason": "병력 급감 대응 여군 지원병제 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "conscription-welfare",
+  "chunk_id": "국방위_20240902_52390_52390_turn_0082_chunk_001",
+  "verdict": "O",
+  "reason": "인구절벽 병역자원 감소 대책 답변",
+  "round": "round1"
+ },
+ {
+  "issue_id": "conscription-welfare",
+  "chunk_id": "국방위_20240902_52390_52390_turn_1398_chunk_001",
+  "verdict": "O",
+  "reason": "간부 급식비 충분성 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "conscription-welfare",
+  "chunk_id": "국방위_20240923_52405_52405_turn_0550_chunk_001",
+  "verdict": "O",
+  "reason": "간부 급식비 보전 방안 논의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "conscription-welfare",
+  "chunk_id": "국방위_20240924_52406_52406_turn_0103_chunk_001",
+  "verdict": "O",
+  "reason": "병역자원 감소와 병역지정업체 논의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "conscription-welfare",
+  "chunk_id": "국방위_20241113_52403_52403_turn_0138_chunk_001",
+  "verdict": "O",
+  "reason": "기본급식비 단가 인상 예산 심사",
+  "round": "round1"
+ },
+ {
+  "issue_id": "conscription-welfare",
+  "chunk_id": "국방위_20250929_55445_55445_turn_0540_chunk_001",
+  "verdict": "X",
+  "reason": "군 자살사고 분석, 복지정책 아님",
+  "round": "round1"
+ },
+ {
+  "issue_id": "conscription-welfare",
+  "chunk_id": "국방위_20251111_55728_55728_turn_0036_chunk_001",
+  "verdict": "O",
+  "reason": "초급간부 기본급 인상 예산 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "conscription-welfare",
+  "chunk_id": "국방위_20251126_55863_55863_turn_0155_chunk_001",
+  "verdict": "O",
+  "reason": "병역자원 감소와 병역제도 재설계",
+  "round": "round1"
+ },
+ {
+  "issue_id": "pension-reform",
+  "chunk_id": "기재위_20260323_56418_56418_turn_1037_chunk_001",
+  "verdict": "O",
+  "reason": "국민연금 지속가능성·수익률 논의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "pension-reform",
+  "chunk_id": "복지위_20240716_52143_52143_turn_0439_chunk_001",
+  "verdict": "O",
+  "reason": "소득대체율·구조개혁 논의 제안",
+  "round": "round1"
+ },
+ {
+  "issue_id": "pension-reform",
+  "chunk_id": "복지위_20240716_52143_52143_turn_0669_chunk_001",
+  "verdict": "O",
+  "reason": "연금개혁 정부안·확정기여형 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "pension-reform",
+  "chunk_id": "복지위_20240716_52143_52143_turn_1037_chunk_001",
+  "verdict": "O",
+  "reason": "연금 구조개혁 자료 제공 촉구",
+  "round": "round1"
+ },
+ {
+  "issue_id": "pension-reform",
+  "chunk_id": "복지위_20241107_52497_52497_turn_0034_chunk_001",
+  "verdict": "O",
+  "reason": "출산 크레딧 국고 확대 개혁안 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "pension-reform",
+  "chunk_id": "복지위_20241107_52497_52497_turn_0040_chunk_001",
+  "verdict": "O",
+  "reason": "연금개혁 예산 투입 검토 촉구",
+  "round": "round1"
+ },
+ {
+  "issue_id": "pension-reform",
+  "chunk_id": "복지위_20241113_52503_52503_turn_0365_chunk_001",
+  "verdict": "O",
+  "reason": "연금개혁안 크레딧 예산 편성 답변",
+  "round": "round1"
+ },
+ {
+  "issue_id": "pension-reform",
+  "chunk_id": "복지위_20250220_52746_52746_turn_1028_chunk_001",
+  "verdict": "O",
+  "reason": "보험료율 13%·다층체계 논의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "pension-reform",
+  "chunk_id": "복지위_20250220_52746_52746_turn_1120_chunk_001",
+  "verdict": "O",
+  "reason": "연금특위 구조개혁·모수개혁 논의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "pension-reform",
+  "chunk_id": "복지위_20250320_54440_54440_turn_0007_chunk_001",
+  "verdict": "O",
+  "reason": "여야 합의 보험료율·소득대체율 평가",
+  "round": "round1"
+ },
+ {
+  "issue_id": "energy-policy",
+  "chunk_id": "과방위_20241227_52648_52648_turn_0055_chunk_001",
+  "verdict": "X",
+  "reason": "인허가 결격사유 법조항, 정책 아님",
+  "round": "round1"
+ },
+ {
+  "issue_id": "energy-policy",
+  "chunk_id": "과방위_20251209_55942_55942_turn_0236_chunk_001",
+  "verdict": "O",
+  "reason": "수도권 에너지 공급 부족 쟁점 논의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "energy-policy",
+  "chunk_id": "과방위_20260311_56351_56351_turn_0154_chunk_001",
+  "verdict": "O",
+  "reason": "SMR 진흥법·원전 생태계 논의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "energy-policy",
+  "chunk_id": "과방위_20260324_56430_56430_turn_0249_chunk_001",
+  "verdict": "O",
+  "reason": "원전 PPA와 전기요금 영향 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "energy-policy",
+  "chunk_id": "산자중기위_20240729_52141_52141_turn_0162_chunk_001",
+  "verdict": "O",
+  "reason": "원전 공공기관 운영계획 보고",
+  "round": "round1"
+ },
+ {
+  "issue_id": "energy-policy",
+  "chunk_id": "산자중기위_20240909_52472_52472_turn_0038_chunk_001",
+  "verdict": "O",
+  "reason": "체코·바라카 원전 수주 검증 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "energy-policy",
+  "chunk_id": "산자중기위_20240909_52472_52472_turn_0712_chunk_001",
+  "verdict": "O",
+  "reason": "분산형 전력망·재생에너지 확대 촉구",
+  "round": "round1"
+ },
+ {
+  "issue_id": "energy-policy",
+  "chunk_id": "산자중기위_20251119_55841_55841_turn_0587_chunk_001",
+  "verdict": "O",
+  "reason": "에너지자립 산단·재생에너지 전환 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "energy-policy",
+  "chunk_id": "행안위_20250918_55384_55384_turn_0175_chunk_001",
+  "verdict": "O",
+  "reason": "원전·재생에너지 발전단가 비교 논의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "energy-policy",
+  "chunk_id": "행안위_20250918_55384_55384_turn_0179_chunk_001",
+  "verdict": "O",
+  "reason": "원전 폐기물 처리비용·단가 논의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "itaewon-disaster",
+  "chunk_id": "과방위_20240828_52197_52197_turn_0599_chunk_001",
+  "verdict": "X",
+  "reason": "재난방송 역할 논의, 이태원은 예시",
+  "round": "round1"
+ },
+ {
+  "issue_id": "itaewon-disaster",
+  "chunk_id": "정무위_20250219_52703_52703_turn_1024_chunk_001",
+  "verdict": "O",
+  "reason": "진상규명법 시행·조사위 구성 질의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "itaewon-disaster",
+  "chunk_id": "정무위_20250219_52703_52703_turn_1028_chunk_001",
+  "verdict": "O",
+  "reason": "특조위 파견·피해구제위 구성 추궁",
+  "round": "round1"
+ },
+ {
+  "issue_id": "itaewon-disaster",
+  "chunk_id": "정무위_20250219_52703_52703_turn_1032_chunk_001",
+  "verdict": "O",
+  "reason": "추모위원회 미구성·정부 소극성 추궁",
+  "round": "round1"
+ },
+ {
+  "issue_id": "itaewon-disaster",
+  "chunk_id": "행안위_20240711_52130_52130_turn_1121_chunk_001",
+  "verdict": "O",
+  "reason": "참사 관련 장관 지휘감독 책임 추궁",
+  "round": "round1"
+ },
+ {
+  "issue_id": "itaewon-disaster",
+  "chunk_id": "행안위_20241120_52420_52420_turn_0157_chunk_001",
+  "verdict": "X",
+  "reason": "특조위원장 감사 인사말 성격",
+  "round": "round1"
+ },
+ {
+  "issue_id": "itaewon-disaster",
+  "chunk_id": "행안위_20250113_52650_52650_turn_0938_chunk_001",
+  "verdict": "O",
+  "reason": "사회재난 복구지원체계 제도화 논의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "itaewon-disaster",
+  "chunk_id": "행안위_20250218_54447_54447_turn_1252_chunk_001",
+  "verdict": "O",
+  "reason": "특조위 파견 부족·특별법 준수 촉구",
+  "round": "round1"
+ },
+ {
+  "issue_id": "itaewon-disaster",
+  "chunk_id": "행안위_20251114_55831_55831_turn_0864_chunk_001",
+  "verdict": "O",
+  "reason": "이태원 4주기 추모행사 예산 심사",
+  "round": "round1"
+ },
+ {
+  "issue_id": "itaewon-disaster",
+  "chunk_id": "행안위_20251216_55971_55971_turn_0150_chunk_001",
+  "verdict": "O",
+  "reason": "재난조사위 법안 조사범위 논의",
+  "round": "round1"
+ },
+ {
+  "issue_id": "martial-law",
+  "chunk_id": "과방위_20240809_52191_52191_turn_0031_chunk_001",
+  "verdict": "X",
+  "reason": "방송장악·공영방송 이사 선임이 중심, 계엄 무관",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "martial-law",
+  "chunk_id": "과방위_20241227_52644_52644_turn_0591_chunk_001",
+  "verdict": "O",
+  "reason": "탄핵소추 통과·탄핵 신속 진행이 중심 주제",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "martial-law",
+  "chunk_id": "과방위_20241227_52644_52644_turn_0739_chunk_001",
+  "verdict": "O",
+  "reason": "12·3 계엄의 내란죄 성립을 실질 논의",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "martial-law",
+  "chunk_id": "과방위_20250106_52645_52645_turn_0016_chunk_001",
+  "verdict": "X",
+  "reason": "정국 회고 후 타 안건으로 넘어가는 도입부",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "martial-law",
+  "chunk_id": "과방위_20250905_55324_55324_turn_0215_chunk_001",
+  "verdict": "O",
+  "reason": "계엄군 국회 진입 옹호 성명 책임 추궁",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "martial-law",
+  "chunk_id": "과방위_20251216_55991_55991_turn_0240_chunk_001",
+  "verdict": "X",
+  "reason": "탄핵소추 권한 일반론 답변, 계엄 논의 아님",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "martial-law",
+  "chunk_id": "과방위_20251216_55991_55991_turn_1035_chunk_001",
+  "verdict": "X",
+  "reason": "법안 모호성 논의 중 내란을 예시로 참조",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "martial-law",
+  "chunk_id": "기재위_20260123_56197_56197_turn_0995_chunk_001",
+  "verdict": "O",
+  "reason": "후보자의 계엄 후 내란 옹호 행적 추궁",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "martial-law",
+  "chunk_id": "정무위_20241218_52636_52636_turn_0469_chunk_001",
+  "verdict": "O",
+  "reason": "계엄 선포·군경 난입, 총리 개입 여부 추궁",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "martial-law",
+  "chunk_id": "정무위_20241218_52636_52636_turn_0576_chunk_001",
+  "verdict": "O",
+  "reason": "내란 규정과 탄핵 심판 진행이 중심 주장",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "tmon-wemakeprice",
+  "chunk_id": "산자중기위_20240730_52142_52142_turn_0061_chunk_001",
+  "verdict": "O",
+  "reason": "티메프 사태·기업회생 신청 직접 질의",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "tmon-wemakeprice",
+  "chunk_id": "산자중기위_20240730_52142_52142_turn_0129_chunk_001",
+  "verdict": "O",
+  "reason": "티몬·위메프 회생 신청 피해 우려 질의",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "tmon-wemakeprice",
+  "chunk_id": "산자중기위_20240730_52142_52142_turn_0740_chunk_001",
+  "verdict": "O",
+  "reason": "티메프 피해자 대응·예방 실기 책임 추궁",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "tmon-wemakeprice",
+  "chunk_id": "산자중기위_20240730_52142_52142_turn_1344_chunk_001",
+  "verdict": "O",
+  "reason": "티메프 사태 원인 정리 질의가 중심",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "tmon-wemakeprice",
+  "chunk_id": "산자중기위_20240821_52214_52214_turn_0093_chunk_001",
+  "verdict": "O",
+  "reason": "티메프 정부 책임·피해 판매자 금융지원 논의",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "tmon-wemakeprice",
+  "chunk_id": "산자중기위_20241219_52662_52662_turn_1138_chunk_001",
+  "verdict": "O",
+  "reason": "티메프 구제 긴급 법률 대응 직접 질의",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "tmon-wemakeprice",
+  "chunk_id": "정무위_20240730_52114_52114_turn_0302_chunk_001",
+  "verdict": "O",
+  "reason": "티몬 정산 지연 경위와 공정위 대응 추궁",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "tmon-wemakeprice",
+  "chunk_id": "정무위_20240730_52114_52114_turn_0538_chunk_001",
+  "verdict": "O",
+  "reason": "티메프 사태 책임을 금융당국에 직접 추궁",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "tmon-wemakeprice",
+  "chunk_id": "정무위_20240730_52114_52114_turn_0742_chunk_001",
+  "verdict": "O",
+  "reason": "티메프 미정산·환불 피해 규모 파악 질의",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "tmon-wemakeprice",
+  "chunk_id": "정무위_20241203_52300_52300_turn_0263_chunk_001",
+  "verdict": "O",
+  "reason": "티메프 정산 시기 규제 입법 처리 논의",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "small-business",
+  "chunk_id": "과방위_20251230_56070_56070_turn_1947_chunk_001",
+  "verdict": "X",
+  "reason": "쿠팡 끼워팔기·독과점이 중심(별도 이슈)",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "small-business",
+  "chunk_id": "산자중기위_20240730_52142_52142_turn_0463_chunk_001",
+  "verdict": "O",
+  "reason": "자영업자 연체율·25조 대책·전기료 지원 질의",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "small-business",
+  "chunk_id": "산자중기위_20240730_52142_52142_turn_0818_chunk_001",
+  "verdict": "O",
+  "reason": "자영업자 부채·코로나 만기연장 프로그램 논의",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "small-business",
+  "chunk_id": "산자중기위_20240909_52472_52472_turn_0093_chunk_001",
+  "verdict": "O",
+  "reason": "자영업자 구조 대응·재도전특별자금 집행 질의",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "small-business",
+  "chunk_id": "산자중기위_20241108_52488_52488_turn_1746_chunk_001",
+  "verdict": "O",
+  "reason": "온누리상품권 지류 개편·시장 상인 의견 논의",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "small-business",
+  "chunk_id": "산자중기위_20241128_52481_52481_turn_0005_chunk_001",
+  "verdict": "X",
+  "reason": "법안 심사결과 낭독 절차 발언, 상생협력법 중심",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "small-business",
+  "chunk_id": "산자중기위_20241219_52662_52662_turn_0846_chunk_001",
+  "verdict": "O",
+  "reason": "소상공인·외식업 피해 인정 답변이 발언 전부",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "small-business",
+  "chunk_id": "정무위_20250220_52705_52705_turn_0492_chunk_001",
+  "verdict": "O",
+  "reason": "자영업자 채무조정·상환유예·이자감면 논의",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "small-business",
+  "chunk_id": "행안위_20250630_54950_54950_turn_0165_chunk_001",
+  "verdict": "O",
+  "reason": "소상공인 지원·소비진작 정책 정합성 질의",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "small-business",
+  "chunk_id": "행안위_20250630_54950_54950_turn_0349_chunk_001",
+  "verdict": "O",
+  "reason": "소상공인 지원 필요성 직접 질의",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "lee-jinsook-kcc",
+  "chunk_id": "과방위_20240621_52077_52077_turn_0369_chunk_001",
+  "verdict": "O",
+  "reason": "2인 체제 의결 위법성·법원판결이 질의 중심",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "lee-jinsook-kcc",
+  "chunk_id": "과방위_20240625_52078_52078_turn_0575_chunk_001",
+  "verdict": "O",
+  "reason": "2인 체제 합법성·방통위원장 탄핵 논쟁 중심",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "lee-jinsook-kcc",
+  "chunk_id": "과방위_20240625_52078_52078_turn_1440_chunk_001",
+  "verdict": "X",
+  "reason": "방심위 표적심사·MBC 재허가 중심, 별도 이슈",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "lee-jinsook-kcc",
+  "chunk_id": "과방위_20240724_52123_52123_turn_1604_chunk_001",
+  "verdict": "O",
+  "reason": "2인 체제 위법성·이사선임 강행 중단 주장",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "lee-jinsook-kcc",
+  "chunk_id": "과방위_20240826_52195_52195_turn_1122_chunk_001",
+  "verdict": "O",
+  "reason": "이진숙 2인 체제 이사선임 효력정지가 중심",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "lee-jinsook-kcc",
+  "chunk_id": "과방위_20240827_52196_52196_turn_0547_chunk_001",
+  "verdict": "X",
+  "reason": "2인 체제는 서두 언급, 중심은 예산·지역방송",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "lee-jinsook-kcc",
+  "chunk_id": "과방위_20241118_52357_52357_turn_1716_chunk_001",
+  "verdict": "O",
+  "reason": "이진숙 2인 체제 KBS 이사임명 불법성 중심",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "lee-jinsook-kcc",
+  "chunk_id": "과방위_20250902_55279_55279_turn_0038_chunk_001",
+  "verdict": "X",
+  "reason": "전한길·거취 논란, 청문·탄핵 국면 범위 밖",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "lee-jinsook-kcc",
+  "chunk_id": "과방위_20250902_55279_55279_turn_0138_chunk_001",
+  "verdict": "X",
+  "reason": "한 문장 단편, 법안 관련 스치는 발언",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "lee-jinsook-kcc",
+  "chunk_id": "과방위_20250905_55324_55324_turn_0115_chunk_001",
+  "verdict": "X",
+  "reason": "방통위법 위헌 논의 중 탄핵판결문 참조",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "ytn-privatization",
+  "chunk_id": "과방위_20240621_52077_52077_turn_0117_chunk_001",
+  "verdict": "O",
+  "reason": "YTN 매각(2인 의결) 책임 추궁이 발언 전부",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "ytn-privatization",
+  "chunk_id": "과방위_20240621_52077_52077_turn_0450_chunk_001",
+  "verdict": "O",
+  "reason": "YTN 민영화 강행 절차의 위법성 추궁",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "ytn-privatization",
+  "chunk_id": "과방위_20240621_52077_52077_turn_0735_chunk_001",
+  "verdict": "O",
+  "reason": "YTN 매각 의결 기피신청 기각·무효 책임 추궁",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "ytn-privatization",
+  "chunk_id": "과방위_20240621_52077_52077_turn_1099_chunk_001",
+  "verdict": "O",
+  "reason": "YTN 매각 졸속 승인 경위 정리 질의",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "ytn-privatization",
+  "chunk_id": "과방위_20240625_52078_52078_turn_2250_chunk_001",
+  "verdict": "X",
+  "reason": "중심은 방통위 국정조사 요구, YTN은 예시",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "ytn-privatization",
+  "chunk_id": "과방위_20240724_52123_52123_turn_1073_chunk_001",
+  "verdict": "X",
+  "reason": "어느 민영화인지 불명확, MBC 증인 질의",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "ytn-privatization",
+  "chunk_id": "과방위_20240725_52124_52124_turn_3321_chunk_001",
+  "verdict": "O",
+  "reason": "YTN 최다액출자자 변경 승인 후보자 질의",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "ytn-privatization",
+  "chunk_id": "과방위_20250509_54651_54651_turn_0153_chunk_001",
+  "verdict": "O",
+  "reason": "민영화 후 사추위 폐기 등 영향 진술 중심",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "ytn-privatization",
+  "chunk_id": "과방위_20251216_55991_55991_turn_1902_chunk_001",
+  "verdict": "O",
+  "reason": "YTN 지분 인수·승인취소 쟁점 중심 질의",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "ytn-privatization",
+  "chunk_id": "과방위_20260507_56671_56671_turn_0234_chunk_001",
+  "verdict": "X",
+  "reason": "위원장 마무리 인사말, 절차성 발언",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "public-broadcasting",
+  "chunk_id": "과방위_20240621_52077_52077_turn_0628_chunk_001",
+  "verdict": "O",
+  "reason": "이사수 확대·사장 국민추천위 개정안 설명",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "public-broadcasting",
+  "chunk_id": "과방위_20240725_52124_52124_turn_1187_chunk_001",
+  "verdict": "O",
+  "reason": "방송4법 이사회 구성·사장 추천 절차 질의",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "public-broadcasting",
+  "chunk_id": "과방위_20240725_52124_52124_turn_1196_chunk_001",
+  "verdict": "O",
+  "reason": "방송4법 사장선임·지배구조 견해 답변",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "public-broadcasting",
+  "chunk_id": "과방위_20240726_52125_52125_turn_1869_chunk_001",
+  "verdict": "O",
+  "reason": "방송법 개정안 이사진 구성 논의 중심",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "public-broadcasting",
+  "chunk_id": "과방위_20240909_52344_52344_turn_0154_chunk_001",
+  "verdict": "X",
+  "reason": "표결처리 항의성 의사진행, 법안 내용 없음",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "public-broadcasting",
+  "chunk_id": "과방위_20241119_52358_52358_turn_0275_chunk_001",
+  "verdict": "X",
+  "reason": "2인 체제 이사선임 위법이 중심(이진숙 이슈)",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "public-broadcasting",
+  "chunk_id": "과방위_20250305_52765_52765_turn_0075_chunk_001",
+  "verdict": "X",
+  "reason": "특정 임명 추궁 단편, 지배구조 개정 논의 아님",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "public-broadcasting",
+  "chunk_id": "과방위_20250905_55324_55324_turn_0040_chunk_001",
+  "verdict": "X",
+  "reason": "방송장악 규탄 서두 발언, 법 개정 논의 아님",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "public-broadcasting",
+  "chunk_id": "과방위_20260324_56431_56431_turn_0109_chunk_001",
+  "verdict": "X",
+  "reason": "TBS 예산·이사지명 관행, 공영방송 범위 밖",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "public-broadcasting",
+  "chunk_id": "과방위_20260407_56519_56519_turn_0024_chunk_001",
+  "verdict": "X",
+  "reason": "TBS 지원 답변, KBS·MBC·EBS 지배구조 아님",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "semiconductor",
+  "chunk_id": "기재위_20260317_56384_56384_turn_0003_chunk_001",
+  "verdict": "O",
+  "reason": "반도체특별법 특별회계 설치 타당성 검토 보고",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "semiconductor",
+  "chunk_id": "산자중기위_20240820_52216_52216_turn_0069_chunk_001",
+  "verdict": "O",
+  "reason": "반도체설계재산 지원 입법에 대한 정부 의견",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "semiconductor",
+  "chunk_id": "산자중기위_20240820_52216_52216_turn_0074_chunk_001",
+  "verdict": "O",
+  "reason": "반도체 육성 지원 체계·특별법 추진 현황 답변",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "semiconductor",
+  "chunk_id": "산자중기위_20240820_52216_52216_turn_0088_chunk_001",
+  "verdict": "O",
+  "reason": "팹리스 지원 입법의 타당성 실질 토론",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "semiconductor",
+  "chunk_id": "산자중기위_20241107_52478_52478_turn_0170_chunk_001",
+  "verdict": "O",
+  "reason": "반도체 패키징 지원사업 부처 중복 질의",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "semiconductor",
+  "chunk_id": "산자중기위_20241121_52485_52485_turn_0011_chunk_001",
+  "verdict": "O",
+  "reason": "반도체특별법 7건 발의 배경·내용 검토 보고",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "semiconductor",
+  "chunk_id": "산자중기위_20241121_52485_52485_turn_0139_chunk_001",
+  "verdict": "O",
+  "reason": "반도체특별법 지지와 반도체위 통제 방안 주장",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "semiconductor",
+  "chunk_id": "산자중기위_20250424_54592_54592_turn_0131_chunk_001",
+  "verdict": "O",
+  "reason": "반도체 직접보조금 지원 논의 경위 답변",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "semiconductor",
+  "chunk_id": "산자중기위_20250424_54592_54592_turn_0316_chunk_001",
+  "verdict": "O",
+  "reason": "반도체 소부장 기술규제 대응 지원 예산 보고",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "semiconductor",
+  "chunk_id": "산자중기위_20251204_55920_55920_turn_0007_chunk_001",
+  "verdict": "O",
+  "reason": "반도체특별법 심사경과·쟁점 항목 실질 보고",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "us-alliance",
+  "chunk_id": "국방위_20240808_52203_52203_turn_1348_chunk_001",
+  "verdict": "O",
+  "reason": "12차 방위비분담금 협상 내용 공유 문제 질의",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "us-alliance",
+  "chunk_id": "국방위_20250211_52720_52720_turn_0438_chunk_001",
+  "verdict": "O",
+  "reason": "트럼프발 방위비 분담금 재협상 전망 질의",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "us-alliance",
+  "chunk_id": "국방위_20250211_52720_52720_turn_0442_chunk_001",
+  "verdict": "O",
+  "reason": "방위비 재협상 이력과 협상 전략 제안",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "us-alliance",
+  "chunk_id": "국방위_20250211_52720_52720_turn_0836_chunk_001",
+  "verdict": "O",
+  "reason": "전략자산 전개비용 방위비 반영 반대 논의",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "us-alliance",
+  "chunk_id": "국방위_20250924_55433_55433_turn_0261_chunk_001",
+  "verdict": "X",
+  "reason": "북핵 대응 답변 중 동맹 작동 원론 언급",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "us-alliance",
+  "chunk_id": "국방위_20250924_55433_55433_turn_0657_chunk_001",
+  "verdict": "O",
+  "reason": "전작권 전환과 한미동맹 유지 관계 답변",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "us-alliance",
+  "chunk_id": "국방위_20251105_55718_55718_turn_0419_chunk_001",
+  "verdict": "O",
+  "reason": "방위비 인상·대미 요청 접근방식 비판",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "us-alliance",
+  "chunk_id": "외통위_20250423_54556_54556_turn_0191_chunk_001",
+  "verdict": "O",
+  "reason": "방위비 분담금 재협상 대응 실질 질의",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "us-alliance",
+  "chunk_id": "외통위_20250423_54556_54556_turn_0561_chunk_001",
+  "verdict": "O",
+  "reason": "방위비 협정 재논의 정부 입장 확인 질의",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "us-alliance",
+  "chunk_id": "외통위_20250717_55053_55053_turn_0144_chunk_001",
+  "verdict": "O",
+  "reason": "한미 연합훈련 역할과 조정 가능성 답변",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "conscription-welfare",
+  "chunk_id": "과방위_20260409_56533_56533_turn_0024_chunk_001",
+  "verdict": "X",
+  "reason": "출연연 연구자 급식 문제, 군과 무관",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "conscription-welfare",
+  "chunk_id": "국방위_20240902_52390_52390_turn_0915_chunk_001",
+  "verdict": "O",
+  "reason": "병 봉급 200만원과 초급간부 처우 보완 답변",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "conscription-welfare",
+  "chunk_id": "국방위_20240902_52390_52390_turn_0924_chunk_001",
+  "verdict": "O",
+  "reason": "초급간부 처우·후보생 내일준비금 질타",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "conscription-welfare",
+  "chunk_id": "국방위_20240904_52401_52401_turn_0015_chunk_001",
+  "verdict": "O",
+  "reason": "병사 월급 인상과 간부 보수체계 형평 논의",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "conscription-welfare",
+  "chunk_id": "국방위_20241111_52394_52394_turn_0023_chunk_001",
+  "verdict": "O",
+  "reason": "초급·중견간부 처우개선 예산 반영 당부",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "conscription-welfare",
+  "chunk_id": "국방위_20241126_52407_52407_turn_0188_chunk_001",
+  "verdict": "O",
+  "reason": "군인급식기본법안 주요 내용 검토 보고",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "conscription-welfare",
+  "chunk_id": "국방위_20241126_52407_52407_turn_0257_chunk_001",
+  "verdict": "O",
+  "reason": "단기복무장려금 초급간부 처우 개정안 보고",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "conscription-welfare",
+  "chunk_id": "국방위_20251111_55728_55728_turn_0101_chunk_001",
+  "verdict": "O",
+  "reason": "군 급식 민간위탁 양극화·단가 문제 지적",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "conscription-welfare",
+  "chunk_id": "국방위_20251126_55863_55863_turn_0152_chunk_001",
+  "verdict": "O",
+  "reason": "병역자원 감소와 인력구조 검토 답변",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "conscription-welfare",
+  "chunk_id": "복지위_20250220_52746_52746_turn_0670_chunk_001",
+  "verdict": "X",
+  "reason": "중심은 연금 군복무크레딧, 월급은 참조",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "itaewon-disaster",
+  "chunk_id": "과방위_20240724_52123_52123_turn_0732_chunk_001",
+  "verdict": "X",
+  "reason": "방송보도 논란 검증 중 참사 참조 언급",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "itaewon-disaster",
+  "chunk_id": "정무위_20240827_52181_52181_turn_0788_chunk_001",
+  "verdict": "O",
+  "reason": "참사 총리 책임 지적 시정요구 내용 보고",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "itaewon-disaster",
+  "chunk_id": "정무위_20250219_52703_52703_turn_1024_chunk_001",
+  "verdict": "O",
+  "reason": "진상규명법 시행·조사위 구성 직접 질의",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "itaewon-disaster",
+  "chunk_id": "정무위_20250219_52703_52703_turn_1026_chunk_001",
+  "verdict": "O",
+  "reason": "특조위 파견 부족·진상조사 방해 추궁",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "itaewon-disaster",
+  "chunk_id": "행안위_20240702_52083_52083_turn_0061_chunk_001",
+  "verdict": "O",
+  "reason": "특별법 특위 구성과 대통령 조작설 질의",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "itaewon-disaster",
+  "chunk_id": "행안위_20240729_52134_52134_turn_1959_chunk_001",
+  "verdict": "O",
+  "reason": "참사 당시 책임자에게 사과 요구",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "itaewon-disaster",
+  "chunk_id": "행안위_20241111_52418_52418_turn_0002_chunk_001",
+  "verdict": "O",
+  "reason": "특조위 예산 미반영 문제와 지원 요청",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "itaewon-disaster",
+  "chunk_id": "행안위_20241120_52420_52420_turn_0157_chunk_001",
+  "verdict": "X",
+  "reason": "예산 의결 감사 인사말, 실질 논의 아님",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "itaewon-disaster",
+  "chunk_id": "행안위_20250113_52650_52650_turn_1327_chunk_001",
+  "verdict": "X",
+  "reason": "내란 기록물 논의 중 특조위 비교 언급",
+  "round": "round2-t1.1"
+ },
+ {
+  "issue_id": "itaewon-disaster",
+  "chunk_id": "행안위_20250218_54447_54447_turn_1252_chunk_001",
+  "verdict": "O",
+  "reason": "특조위 파견 부족 지적·특별법 준수 촉구",
+  "round": "round2-t1.1"
+ }
+]
