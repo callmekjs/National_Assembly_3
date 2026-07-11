@@ -68,6 +68,7 @@ def fetch_stance_turns(issue_id: str) -> list:
             FROM issue_stances s JOIN chunks c ON c.turn_id = s.turn_id
             WHERE s.issue_id = %s
             GROUP BY s.turn_id, s.speaker, s.role, c.meeting_date
+            ORDER BY s.turn_id
         """, (issue_id,))
         return cur.fetchall()
 
@@ -78,7 +79,11 @@ def main():
     from db import init_pool, close_pool
     ap = argparse.ArgumentParser()
     ap.add_argument("--issue", required=True)
+    ap.add_argument("--force", action="store_true", help="기존 시트 덮어쓰기 허용 (라벨 손실 위험)")
     args = ap.parse_args()
+    out = ROOT / "data" / "issues" / f"stance_labels_{args.issue}.md"
+    if out.exists() and not args.force:
+        print(f"[FAIL] 이미 존재: {out} — 라벨 보호를 위해 중단. 재생성하려면 --force"); sys.exit(1)
     init_pool()
     rows = fetch_stance_turns(args.issue)
     close_pool()
@@ -86,7 +91,6 @@ def main():
         print(f"[FAIL] issue_stances 비어 있음: {args.issue} — POL-5 먼저 실행"); sys.exit(1)
     picked = sample_turns(rows)
     md = render_sheet(args.issue, picked, total=len(rows))
-    out = ROOT / "data" / "issues" / f"stance_labels_{args.issue}.md"
     out.write_text(md, encoding="utf-8")
     print(f"저장: {out} — 표본 {len(picked)}/{len(rows)}. 사용자가 `입장:` 40건 기입 후 stance_eval.py 실행")
 
