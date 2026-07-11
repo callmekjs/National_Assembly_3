@@ -74,3 +74,44 @@ def build_issue_block(party_data: dict, timeline: dict | None, actors: list[dict
     if named:
         lines.append("- 주요 행위자: " + ", ".join(named))
     return "\n".join(lines)
+
+
+def load_issue_index() -> list[dict]:
+    """issues 테이블 1회 조회 후 모듈 캐시 (party._load_map 패턴). 24행 수준."""
+    global _issue_index
+    if _issue_index is None:
+        from db import get_conn
+        with get_conn() as conn, conn.cursor() as cur:
+            cur.execute("SELECT issue_id, title, seed FROM issues")
+            _issue_index = [
+                {"issue_id": i, "title": t,
+                 "seed_keywords": (s or {}).get("seed_keywords", [])}
+                for i, t, s in cur.fetchall()
+            ]
+    return _issue_index
+
+
+def top_actors(issue_id: str, limit: int = 8) -> list[dict]:
+    """이슈 내 발언 수 상위 행위자. 구도 제외자(증인 등) 탈락 대비 5명보다 여유 조회."""
+    from db import get_conn
+    with get_conn() as conn, conn.cursor() as cur:
+        cur.execute("""
+            SELECT speaker, count(*) AS n_turns FROM issue_stances
+            WHERE issue_id = %s GROUP BY speaker
+            ORDER BY n_turns DESC, speaker LIMIT %s
+        """, (issue_id, limit))
+        return [{"speaker": s, "n_turns": n} for s, n in cur.fetchall()]
+
+
+def issue_context_for(question: str) -> tuple[str, dict] | None:
+    """질문 → (분석 블록, issue_context dict) 또는 None (감지 실패·판정 없는 이슈)."""
+    hit = detect_issue(question, load_issue_index())
+    if hit is None:
+        return None
+    from issues import issue_party_stances, issue_timeline
+    party_data = issue_party_stances(hit["issue_id"])
+    if party_data is None:
+        return None
+    block = build_issue_block(party_data, issue_timeline(hit["issue_id"]),
+                              top_actors(hit["issue_id"]))
+    return block, {"issue_id": hit["issue_id"], "title": hit["title"]}
