@@ -9,6 +9,7 @@
   집계는 turn 단위(actors.py 교훈). 매핑은 chunks.turn_id(NOT NULL 권위) 사용.
 """
 
+from collections import Counter
 from psycopg2.extras import RealDictCursor
 
 from db import get_conn
@@ -135,6 +136,63 @@ def aggregate_stances(rows: list[dict]) -> str:
             and counts["support"] >= total / 3 and counts["oppose"] >= total / 3:
         return "mixed"
     return max(_STANCE_DIRS, key=lambda s: counts[s])
+
+
+# POL-3 core 게이트(≥90%) 미달 7개 — 매핑 정밀도 경고 대상 (progress.md POL-3 후속 기록,
+# core 86.2% 마감 2026-07-08). 게이트 재실행 시 이 목록도 갱신할 것.
+LOW_QUALITY_ISSUES = frozenset({
+    "martial-law", "lee-jinsook-kcc", "ytn-privatization", "public-broadcasting",
+    "small-business", "conscription-welfare", "itaewon-disaster",
+})
+
+_COMP_STANCES = ("support", "oppose", "concern", "mixed", "no_stance")  # 행위자 대표 라벨
+_GROUP_PRIORITY = ("assembly", "government", "witness", "staff", "unknown")  # 동률 우선순위
+_SPECIAL_ROWS = ("정부측", "무소속/미상")  # 항상 맨 뒤, 이 순서
+
+
+def actor_group(roles: list) -> str:
+    """행위자의 이슈 내 role 목록 → 최빈 그룹. 동률이면 _GROUP_PRIORITY 순 (겸직 의원 우선)."""
+    from party import speaker_group
+    counts = Counter(speaker_group(r) for r in roles)
+    return max(_GROUP_PRIORITY, key=lambda g: (counts.get(g, 0), -_GROUP_PRIORITY.index(g)))
+
+
+def party_composition(actors: list[dict]) -> list[dict]:
+    """행위자 목록 → 정당별 구도 행 (POL-6). actors 원소: speaker/party/stance/roles.
+
+    assembly → 정당 행(무소속·미상은 "무소속/미상"), government → "정부측",
+    witness·staff → 제외. 정렬: 수 내림차순 → 정당명, 특수행 맨 뒤."""
+    rows: dict[str, dict] = {}
+    for a in actors:
+        g = actor_group(a["roles"])
+        if g in ("witness", "staff"):
+            continue
+        if g == "government":
+            key = "정부측"
+        elif g == "assembly" and a["party"] and a["party"] != "무소속":
+            key = a["party"]
+        else:
+            key = "무소속/미상"
+        row = rows.setdefault(key, {"party": key, "actor_count": 0,
+                                    "stance_dist": {s: 0 for s in _COMP_STANCES},
+                                    "actors": []})
+        row["actor_count"] += 1
+        row["stance_dist"][a["stance"]] += 1
+        row["actors"].append({"speaker": a["speaker"], "stance": a["stance"]})
+    ordered = sorted((r for r in rows.values() if r["party"] not in _SPECIAL_ROWS),
+                     key=lambda r: (-r["actor_count"], r["party"]))
+    ordered += [rows[k] for k in _SPECIAL_ROWS if k in rows]
+    return ordered
+
+
+def party_sides(parties: list[str]) -> dict:
+    """정권교체 구간 목록 + 정당별 여야 (POL-6 보조 필드). 위성정당은 모정당 기준."""
+    from party import RULING_PERIODS, SATELLITE_PARENT
+    periods = [{"from": s.isoformat(), "to": None if e.year == 9999 else e.isoformat(),
+                "ruling": p} for s, e, p in RULING_PERIODS]
+    sides = {party: ["여당" if SATELLITE_PARENT.get(party, party) == pr["ruling"] else "야당"
+                     for pr in periods] for party in parties}
+    return {"periods": periods, "sides": sides}
 
 
 def issue_stances(issue_id: str) -> dict | None:
