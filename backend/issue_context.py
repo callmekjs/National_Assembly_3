@@ -78,7 +78,10 @@ def build_issue_block(party_data: dict, timeline: dict | None, actors: list[dict
 
 
 def load_issue_index() -> list[dict]:
-    """issues 테이블 1회 조회 후 모듈 캐시 (party._load_map 패턴). 24행 수준."""
+    """issues 테이블 1회 조회 후 모듈 캐시 (party._load_map 패턴). 24행 수준.
+
+    주의: 프로세스 수명 캐시 — 이슈를 새로 추가하면 백엔드 재시작 전까지 감지 안 됨.
+    """
     global _issue_index
     if _issue_index is None:
         from db import get_conn
