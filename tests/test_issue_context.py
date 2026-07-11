@@ -75,8 +75,9 @@ def test_build_issue_block_low_and_fallback():
     assert "⚠ 이 이슈의 자동 매핑 정밀도는 기준 미달" in block
     assert "- 발언 피크: 2024-06(42턴)" in block               # corpus 대체
     assert "주요 행위자" not in block                            # actors 없으면 줄 생략
-    # 타임라인 None·빈 달이면 피크 줄 자체 생략
-    assert "발언 피크" not in build_issue_block(PARTY_DATA, None, [])
+    # 타임라인 None·빈 달이면 피크 줄 자체 생략 (안내문의 '발언 피크 시기' 언급과
+    # 구분하기 위해 줄 프리픽스로 검사)
+    assert "- 발언 피크:" not in build_issue_block(PARTY_DATA, None, [])
 
 
 if __name__ == "__main__":
