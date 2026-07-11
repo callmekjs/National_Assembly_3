@@ -62,6 +62,12 @@ function AnswerPanel({ result, onCiteClick }) {
         Grounding: {result.grounding}
       </span>
 
+      {result.issue_context && (
+        <div style={{ fontSize: 12, color: '#2563eb', margin: '4px 0' }}>
+          📊 이슈 분석 반영: {result.issue_context.title}
+        </div>
+      )}
+
       {result.ungrounded && (
         <div className="ungrounded-banner">⚠ 이 답변에는 출처가 연결되지 않은 내용이 있습니다</div>
       )}
