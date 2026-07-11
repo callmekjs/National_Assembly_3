@@ -241,3 +241,35 @@ def issue_stances(issue_id: str) -> dict | None:
         })
     actors.sort(key=lambda a: sum(a["counts"].values()), reverse=True)
     return {"issue_id": issue_id, "title": row["title"], "actors": actors}
+
+
+def issue_party_stances(issue_id: str) -> dict | None:
+    """이슈 정당 구도 (POL-6). 이슈 없거나 판정 데이터 없으면 None.
+
+    발언 rows → 행위자(speaker)별 대표 라벨(aggregate_stances) + role 목록
+    → party_composition 으로 정당 행 → side_by_period 보조 필드 부착."""
+    from party import member_party
+    with get_conn() as conn, conn.cursor(cursor_factory=RealDictCursor) as cur:
+        cur.execute("SELECT title FROM issues WHERE issue_id = %s", (issue_id,))
+        row = cur.fetchone()
+        if row is None:
+            return None
+        cur.execute("SELECT speaker, role, stance FROM issue_stances WHERE issue_id = %s",
+                    (issue_id,))
+        srows = cur.fetchall()
+    if not srows:
+        return None
+
+    by_speaker: dict[str, list] = {}
+    for r in srows:
+        by_speaker.setdefault(r["speaker"], []).append(r)
+    actors = [{"speaker": sp, "party": member_party(sp), "stance": aggregate_stances(rs),
+               "roles": [r["role"] for r in rs]} for sp, rs in by_speaker.items()]
+
+    parties = party_composition(actors)
+    ps = party_sides([r["party"] for r in parties if r["party"] not in _SPECIAL_ROWS])
+    for r in parties:
+        r["side_by_period"] = ps["sides"].get(r["party"])  # 특수행은 None
+    return {"issue_id": issue_id, "title": row["title"],
+            "mapping_quality": "low" if issue_id in LOW_QUALITY_ISSUES else "ok",
+            "periods": ps["periods"], "parties": parties}

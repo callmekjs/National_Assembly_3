@@ -44,6 +44,10 @@ export function fetchStances(issueId) {
   return request(`/issues/${encodeURIComponent(issueId)}/stances`)
 }
 
+export function fetchPartyStances(issueId) {
+  return request(`/issues/${encodeURIComponent(issueId)}/party-stances`)
+}
+
 export function postQuery(question, mode) {
   return request('/query', {
     method: 'POST',
