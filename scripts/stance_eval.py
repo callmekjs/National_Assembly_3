@@ -33,12 +33,13 @@ def parse_label_sheet(text: str) -> dict[str, str]:
         if m:
             cur = m.group(1)
             continue
-        lm = _LABEL_RE.search(line)
-        if lm and cur is not None:
-            tok = lm.group(1).lower()
-            if tok in STANCES and cur not in labels:
-                labels[cur] = tok
-            cur = None  # `입장:` 줄을 소비 — 다음 turn_id 까지 대기
+        if "입장:" in line and cur is not None:
+            lm = _LABEL_RE.search(line)
+            if lm:
+                tok = lm.group(1).lower()
+                if tok in STANCES and cur not in labels:
+                    labels[cur] = tok
+            cur = None  # 입장: 줄을 소비 — 빈칸이어도 다음 turn_id 까지 대기
     return labels
 
 
@@ -49,13 +50,13 @@ def agreement(human: dict[str, str], llm: dict[str, str]) -> dict:
     disagreements = []
     agree = 0
     for t in common:
-        h, l = human[t], llm[t]
-        if h in matrix and l in matrix[h]:
-            matrix[h][l] += 1
-        if h == l:
+        h, m = human[t], llm[t]
+        if h in matrix and m in matrix[h]:
+            matrix[h][m] += 1
+        if h == m:
             agree += 1
         else:
-            disagreements.append({"turn_id": t, "human": h, "llm": l})
+            disagreements.append({"turn_id": t, "human": h, "llm": m})
     n = len(common)
     return {
         "n": n,
@@ -74,6 +75,8 @@ def fetch_llm_stances(issue_id: str) -> dict[str, str]:
 
 def write_outputs(issue_id, human, result, out_json, out_md) -> None:
     """eval 자산 JSON(재실행용) + 사람 판독 리포트 md 저장."""
+    out_json.parent.mkdir(parents=True, exist_ok=True)
+    out_md.parent.mkdir(parents=True, exist_ok=True)
     out_json.write_text(json.dumps(
         {"issue_id": issue_id, "rng_seed": 42, "labels": human},
         ensure_ascii=False, indent=1), encoding="utf-8")
@@ -117,10 +120,12 @@ def main():
     out_md = root / "data" / "issues" / "stance_eval_report.md"
     write_outputs(args.issue, human, result, out_json, out_md)
 
-    n_sheet = len(_ITEM_RE.findall(sheet_text))
-    skipped = n_sheet - len(human)
-    if skipped > 0:
-        print(f"[WARN] 시트 {n_sheet}건 중 {skipped}건 미기입/무효 제외")
+    items = _ITEM_RE.findall(sheet_text)
+    missing = [t for t in items if t not in human]
+    if missing:
+        print(f"[WARN] 시트 {len(items)}건 중 {len(missing)}건 미기입/무효 제외:")
+        for t in missing:
+            print(f"  - {t}")
     print(f"[OK] 공통 {result['n']}건 일치율 {result['agreement']} — {out_json.name}, {out_md.name} 저장")
 
 

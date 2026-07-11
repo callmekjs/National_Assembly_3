@@ -46,6 +46,12 @@ def test_parse_label_sheet():
     check("빈칸 제외", "복지위_A_turn_0003" not in r, r)
     check("허용밖 토큰 제외", "복지위_A_turn_0004" not in r, r)
     check("총 2건만", len(r) == 2, r)
+    # 빈 라벨 뒤 본문의 스트레이 '입장: support' 줄이 오귀속되지 않아야 함
+    stray = "- `t9` (2024-01-01) 아무개\n      입장: \n      본문에 입장: support 같은 문구가 있어도\n"
+    check("빈칸 후 스트레이 미귀속", "t9" not in parse_label_sheet(stray))
+    # 같은 turn_id 두 번 기입 시 최초 유효 라벨 유지
+    dup = "- `t8` (2024-01-01) 아무개\n      입장: support\n- `t8` (2024-01-01) 아무개\n      입장: oppose\n"
+    check("중복 turn_id 최초 라벨 유지", parse_label_sheet(dup) == {"t8": "support"})
 
 
 def test_agreement():
@@ -85,6 +91,8 @@ def test_write_outputs_roundtrip(tmp_path=None):
     md = out_md.read_text(encoding="utf-8")
     check("리포트 일치율 표기", "일치율" in md)
     check("리포트 혼동행렬 표기", "혼동행렬" in md)
+    check("리포트 행렬 셀값", "| support | 1 | 0 | 0 | 0 | 0 |" in md, md)
+    check("리포트 concern→oppose 셀", "| concern | 0 | 1 | 0 | 0 | 0 |" in md, md)
     os.remove(out_json); os.remove(out_md)
 
 
