@@ -9,7 +9,7 @@ if __name__ == "__main__":
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 
-from stance_eval import parse_label_sheet, agreement  # noqa: E402
+from stance_eval import parse_label_sheet, agreement, write_outputs  # noqa: E402
 
 
 def check(name, cond, got=None):
@@ -70,7 +70,26 @@ def test_agreement():
     check("공통 0건 agreement None", r3["n"] == 0 and r3["agreement"] is None, r3)
 
 
+def test_write_outputs_roundtrip(tmp_path=None):
+    import json, tempfile, os
+    d = tempfile.mkdtemp()
+    out_json = Path(d) / "stance_eval_x.json"
+    out_md = Path(d) / "report.md"
+    human = {"t1": "support", "t2": "concern"}
+    result = agreement(human, {"t1": "support", "t2": "oppose"})
+    write_outputs("medical-reform", human, result, out_json, out_md)
+    saved = json.loads(out_json.read_text(encoding="utf-8"))
+    check("JSON issue_id", saved["issue_id"] == "medical-reform", saved)
+    check("JSON seed 42", saved["rng_seed"] == 42, saved)
+    check("JSON labels 보존", saved["labels"] == human, saved)
+    md = out_md.read_text(encoding="utf-8")
+    check("리포트 일치율 표기", "일치율" in md)
+    check("리포트 혼동행렬 표기", "혼동행렬" in md)
+    os.remove(out_json); os.remove(out_md)
+
+
 if __name__ == "__main__":
     test_parse_label_sheet()
     test_agreement()
+    test_write_outputs_roundtrip()
     print("all passed")
