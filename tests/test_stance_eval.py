@@ -9,7 +9,7 @@ if __name__ == "__main__":
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 
-from stance_eval import parse_label_sheet  # noqa: E402
+from stance_eval import parse_label_sheet, agreement  # noqa: E402
 
 
 def check(name, cond, got=None):
@@ -48,6 +48,29 @@ def test_parse_label_sheet():
     check("총 2건만", len(r) == 2, r)
 
 
+def test_agreement():
+    # 완전 일치
+    h = {"t1": "support", "t2": "oppose"}
+    r = agreement(h, dict(h))
+    check("완전 일치 1.0", r["agreement"] == 1.0 and r["n"] == 2, r)
+    check("혼동행렬 대각 카운트", r["matrix"]["support"]["support"] == 1 and r["matrix"]["oppose"]["oppose"] == 1, r)
+    check("불일치 없음", r["disagreements"] == [], r)
+
+    # 부분 일치 — 공통 t1(일치)·t2(불일치), t3 는 사람만 → 제외
+    human = {"t1": "support", "t2": "concern", "t3": "none"}
+    llm = {"t1": "support", "t2": "oppose"}
+    r2 = agreement(human, llm)
+    check("공통 2건", r2["n"] == 2, r2)
+    check("일치율 0.5", r2["agreement"] == 0.5, r2)
+    check("혼동 concern→oppose", r2["matrix"]["concern"]["oppose"] == 1, r2)
+    check("불일치 1건 t2", [d["turn_id"] for d in r2["disagreements"]] == ["t2"], r2)
+
+    # 공통 0건 방어
+    r3 = agreement({"a": "support"}, {"b": "oppose"})
+    check("공통 0건 agreement None", r3["n"] == 0 and r3["agreement"] is None, r3)
+
+
 if __name__ == "__main__":
     test_parse_label_sheet()
+    test_agreement()
     print("all passed")

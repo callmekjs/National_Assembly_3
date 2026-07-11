@@ -37,3 +37,26 @@ def parse_label_sheet(text: str) -> dict[str, str]:
                 labels[cur] = tok
             cur = None  # `입장:` 줄을 소비 — 다음 turn_id 까지 대기
     return labels
+
+
+def agreement(human: dict[str, str], llm: dict[str, str]) -> dict:
+    """공통 turn_id 에서 일치율 + 혼동행렬(사람→LLM) + 불일치 목록. 공통 0건이면 방어."""
+    common = sorted(set(human) & set(llm))
+    matrix = {h: {c: 0 for c in STANCES} for h in STANCES}
+    disagreements = []
+    agree = 0
+    for t in common:
+        h, l = human[t], llm[t]
+        if h in matrix and l in matrix[h]:
+            matrix[h][l] += 1
+        if h == l:
+            agree += 1
+        else:
+            disagreements.append({"turn_id": t, "human": h, "llm": l})
+    n = len(common)
+    return {
+        "n": n,
+        "agreement": round(agree / n, 3) if n else None,
+        "matrix": matrix,
+        "disagreements": disagreements,
+    }
