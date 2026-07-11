@@ -1,8 +1,52 @@
 import { useEffect, useState } from 'react'
-import { fetchIssues, fetchTimeline, fetchStances } from '../api'
+import { fetchIssues, fetchTimeline, fetchStances, fetchPartyStances } from '../api'
 
 const STANCE_KO = { support: '찬성', oppose: '반대', concern: '우려', mixed: '혼재', no_stance: '무입장' }
 const STANCE_COLOR = { support: '#2563eb', oppose: '#dc2626', concern: '#d97706', mixed: '#7c3aed', no_stance: '#6b7280' }
+
+function PartyBar({ row }) {
+  const total = Math.max(row.actor_count, 1)
+  const badge = row.side_by_period
+    ? (row.side_by_period[0] === row.side_by_period[1]
+        ? row.side_by_period[0] : `${row.side_by_period[0]}→${row.side_by_period[1]}`)
+    : null
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8, margin: '4px 0' }}>
+      <div style={{ width: 170, fontSize: 13, flexShrink: 0 }}>
+        {row.party}{' '}
+        {badge && <span style={{ fontSize: 11, color: '#555', border: '1px solid #ccc', borderRadius: 4, padding: '0 4px' }}>{badge}</span>}
+      </div>
+      <div style={{ flex: 1, display: 'flex', height: 18, borderRadius: 3, overflow: 'hidden', background: '#f3f4f6' }}>
+        {Object.entries(row.stance_dist).filter(([, v]) => v > 0).map(([s, v]) => (
+          <div key={s} title={`${STANCE_KO[s]} ${v}명`}
+               style={{ width: `${(v / total) * 100}%`, background: STANCE_COLOR[s] }} />
+        ))}
+      </div>
+      <div style={{ width: 44, fontSize: 12, textAlign: 'right', flexShrink: 0 }}>{row.actor_count}명</div>
+    </div>
+  )
+}
+
+function PartyPanel({ data }) {
+  if (!data) return <p>불러오는 중…</p>
+  return (
+    <div>
+      {data.mapping_quality === 'low' && (
+        <p style={{ color: '#d97706', fontSize: 12 }}>
+          ⚠ 이 이슈의 청크 매핑 정밀도는 게이트 기준(90%) 미달 — 구도 수치 해석 주의
+        </p>
+      )}
+      {data.parties.map(r => <PartyBar key={r.party} row={r} />)}
+      <p style={{ fontSize: 11, color: '#666' }}>
+        {Object.entries(STANCE_KO).map(([s, ko]) => (
+          <span key={s} style={{ marginRight: 10 }}>
+            <span style={{ color: STANCE_COLOR[s] }}>■</span> {ko}
+          </span>
+        ))}
+      </p>
+    </div>
+  )
+}
 
 function TimelineChart({ months }) {
   if (!months || months.length === 0) return <p>타임라인 데이터 없음</p>
@@ -51,14 +95,16 @@ export default function IssueView() {
   const [sel, setSel] = useState('medical-reform')
   const [timeline, setTimeline] = useState(null)
   const [stances, setStances] = useState(null)
+  const [partyStances, setPartyStances] = useState(null)
   const [error, setError] = useState(null)
 
   useEffect(() => { fetchIssues().then(d => setIssues(d.issues)).catch(e => setError(e.message)) }, [])
   useEffect(() => {
     if (!sel) return
-    setError(null); setTimeline(null); setStances(null)
+    setError(null); setTimeline(null); setStances(null); setPartyStances(null)
     fetchTimeline(sel).then(setTimeline).catch(e => setError(e.message))
     fetchStances(sel).then(setStances).catch(e => setError(e.message))
+    fetchPartyStances(sel).then(setPartyStances).catch(() => setPartyStances(null))
   }, [sel])
 
   return (
@@ -69,6 +115,8 @@ export default function IssueView() {
       {error && <p style={{ color: '#dc2626' }}>{error}</p>}
       <h3>월별 발언 추이</h3>
       {timeline ? <TimelineChart months={timeline.months} /> : <p>불러오는 중…</p>}
+      <h3>여야 구도</h3>
+      {partyStances ? <PartyPanel data={partyStances} /> : <p>구도 데이터 없음(판정된 이슈만 표시)</p>}
       <h3>행위자 입장 {stances ? `(${stances.actors.length}명)` : ''}</h3>
       {stances ? (
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
