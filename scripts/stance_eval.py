@@ -20,6 +20,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "backend"))
 STANCES = ("support", "oppose", "concern", "neutral", "none")
 _TURN_RE = re.compile(r"`([^`]+)`")
 _LABEL_RE = re.compile(r"입장:\s*([A-Za-z]+)")
+_ITEM_RE = re.compile(r"^- `([^`]+)`", re.MULTILINE)   # 항목 불릿만 — 안내문 백틱 제외
 
 
 def parse_label_sheet(text: str) -> dict[str, str]:
@@ -102,7 +103,8 @@ def main():
     labels_path = root / "data" / "issues" / f"stance_labels_{args.issue}.md"
     if not labels_path.exists():
         print(f"[FAIL] 라벨 파일 없음: {labels_path} — stance_label_sheet.py 먼저 실행"); sys.exit(1)
-    human = parse_label_sheet(labels_path.read_text(encoding="utf-8"))
+    sheet_text = labels_path.read_text(encoding="utf-8")
+    human = parse_label_sheet(sheet_text)
     if not human:
         print(f"[FAIL] 기입된 라벨 0건 — `입장:` 뒤에 5택을 기입하세요"); sys.exit(1)
 
@@ -115,7 +117,7 @@ def main():
     out_md = root / "data" / "issues" / "stance_eval_report.md"
     write_outputs(args.issue, human, result, out_json, out_md)
 
-    n_sheet = len(_TURN_RE.findall(labels_path.read_text(encoding="utf-8")))
+    n_sheet = len(_ITEM_RE.findall(sheet_text))
     skipped = n_sheet - len(human)
     if skipped > 0:
         print(f"[WARN] 시트 {n_sheet}건 중 {skipped}건 미기입/무효 제외")

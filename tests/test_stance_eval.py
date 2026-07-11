@@ -88,8 +88,22 @@ def test_write_outputs_roundtrip(tmp_path=None):
     os.remove(out_json); os.remove(out_md)
 
 
+def test_sheet_item_count():
+    from stance_eval import _ITEM_RE
+    sheet = "\n".join([
+        "# 입장 블라인드 라벨 — x",
+        "> 각 발언을 읽고 `입장:` 뒤에 support|oppose 중 하나를 적으세요.",
+        "- `t1` (2024-01-01) 아무개",
+        "      입장: support",
+        "- `t2` (2024-01-02) 아무개",
+        "      입장: ",
+    ])
+    check("안내문 백틱 제외 항목 2건", len(_ITEM_RE.findall(sheet)) == 2)
+
+
 if __name__ == "__main__":
     test_parse_label_sheet()
     test_agreement()
     test_write_outputs_roundtrip()
+    test_sheet_item_count()
     print("all passed")
