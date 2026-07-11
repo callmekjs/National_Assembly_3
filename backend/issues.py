@@ -9,6 +9,7 @@
   집계는 turn 단위(actors.py 교훈). 매핑은 chunks.turn_id(NOT NULL 권위) 사용.
 """
 
+from collections import Counter
 from psycopg2.extras import RealDictCursor
 
 from db import get_conn
@@ -137,6 +138,63 @@ def aggregate_stances(rows: list[dict]) -> str:
     return max(_STANCE_DIRS, key=lambda s: counts[s])
 
 
+# POL-3 core 게이트(≥90%) 미달 7개 — 매핑 정밀도 경고 대상 (progress.md POL-3 후속 기록,
+# core 86.2% 마감 2026-07-08). 게이트 재실행 시 이 목록도 갱신할 것.
+LOW_QUALITY_ISSUES = frozenset({
+    "martial-law", "lee-jinsook-kcc", "ytn-privatization", "public-broadcasting",
+    "small-business", "conscription-welfare", "itaewon-disaster",
+})
+
+_COMP_STANCES = ("support", "oppose", "concern", "mixed", "no_stance")  # 행위자 대표 라벨
+_GROUP_PRIORITY = ("assembly", "government", "witness", "staff", "unknown")  # 동률 우선순위
+_SPECIAL_ROWS = ("정부측", "무소속/미상")  # 항상 맨 뒤, 이 순서
+
+
+def actor_group(roles: list) -> str:
+    """행위자의 이슈 내 role 목록 → 최빈 그룹. 동률이면 _GROUP_PRIORITY 순 (겸직 의원 우선)."""
+    from party import speaker_group
+    counts = Counter(speaker_group(r) for r in roles)
+    return max(_GROUP_PRIORITY, key=lambda g: (counts.get(g, 0), -_GROUP_PRIORITY.index(g)))
+
+
+def party_composition(actors: list[dict]) -> list[dict]:
+    """행위자 목록 → 정당별 구도 행 (POL-6). actors 원소: speaker/party/stance/roles.
+
+    assembly → 정당 행(무소속·미상은 "무소속/미상"), government → "정부측",
+    witness·staff → 제외. 정렬: 수 내림차순 → 정당명, 특수행 맨 뒤."""
+    rows: dict[str, dict] = {}
+    for a in actors:
+        g = actor_group(a["roles"])
+        if g in ("witness", "staff"):
+            continue
+        if g == "government":
+            key = "정부측"
+        elif g == "assembly" and a["party"] and a["party"] != "무소속":
+            key = a["party"]
+        else:
+            key = "무소속/미상"
+        row = rows.setdefault(key, {"party": key, "actor_count": 0,
+                                    "stance_dist": {s: 0 for s in _COMP_STANCES},
+                                    "actors": []})
+        row["actor_count"] += 1
+        row["stance_dist"][a["stance"]] += 1
+        row["actors"].append({"speaker": a["speaker"], "stance": a["stance"]})
+    ordered = sorted((r for r in rows.values() if r["party"] not in _SPECIAL_ROWS),
+                     key=lambda r: (-r["actor_count"], r["party"]))
+    ordered += [rows[k] for k in _SPECIAL_ROWS if k in rows]
+    return ordered
+
+
+def party_sides(parties: list[str]) -> dict:
+    """정권교체 구간 목록 + 정당별 여야 (POL-6 보조 필드). 위성정당은 모정당 기준."""
+    from party import RULING_PERIODS, SATELLITE_PARENT
+    periods = [{"from": s.isoformat(), "to": None if e.year == 9999 else e.isoformat(),
+                "ruling": p} for s, e, p in RULING_PERIODS]
+    sides = {party: ["여당" if SATELLITE_PARENT.get(party, party) == pr["ruling"] else "야당"
+                     for pr in periods] for party in parties}
+    return {"periods": periods, "sides": sides}
+
+
 def issue_stances(issue_id: str) -> dict | None:
     """이슈 행위자 입장 매트릭스. 이슈 없거나 판정 데이터 없으면 None.
     발언별 stance 를 speaker 로 묶어 집계(aggregate_stances) + 입장별 카운트 + 근거 인용."""
@@ -183,3 +241,37 @@ def issue_stances(issue_id: str) -> dict | None:
         })
     actors.sort(key=lambda a: sum(a["counts"].values()), reverse=True)
     return {"issue_id": issue_id, "title": row["title"], "actors": actors}
+
+
+def issue_party_stances(issue_id: str) -> dict | None:
+    """이슈 정당 구도 (POL-6). 이슈 없거나 판정 데이터 없으면 None.
+
+    발언 rows → 행위자(speaker)별 대표 라벨(aggregate_stances) + role 목록
+    → party_composition 으로 정당 행 → side_by_period 보조 필드 부착."""
+    from party import member_party
+    with get_conn() as conn, conn.cursor(cursor_factory=RealDictCursor) as cur:
+        cur.execute("SELECT title FROM issues WHERE issue_id = %s", (issue_id,))
+        row = cur.fetchone()
+        if row is None:
+            return None
+        cur.execute("""
+            SELECT speaker, role, stance FROM issue_stances
+            WHERE issue_id = %s ORDER BY speaker, turn_id
+        """, (issue_id,))
+        srows = cur.fetchall()
+    if not srows:
+        return None
+
+    by_speaker: dict[str, list] = {}
+    for r in srows:
+        by_speaker.setdefault(r["speaker"], []).append(r)
+    actors = [{"speaker": sp, "party": member_party(sp), "stance": aggregate_stances(rs),
+               "roles": [r["role"] for r in rs]} for sp, rs in by_speaker.items()]
+
+    parties = party_composition(actors)
+    ps = party_sides([r["party"] for r in parties if r["party"] not in _SPECIAL_ROWS])
+    for r in parties:
+        r["side_by_period"] = ps["sides"].get(r["party"])  # 특수행은 None
+    return {"issue_id": issue_id, "title": row["title"],
+            "mapping_quality": "low" if issue_id in LOW_QUALITY_ISSUES else "ok",
+            "periods": ps["periods"], "parties": parties}

@@ -158,6 +158,22 @@ def test_aliases_merge():
           YU_COMPAT in group and YU_STD in group, sorted(group))
 
 
+def test_speaker_group():
+    """role → 그룹 분류 (POL-6). party_label 게이트와 동일 판정의 재사용 함수."""
+    from party import speaker_group
+    assert speaker_group("위원") == "assembly"
+    assert speaker_group("위원장") == "assembly"          # 국회 위원장 — exact 매치가 우선
+    assert speaker_group("소위원장") == "assembly"
+    assert speaker_group("보건복지부장관") == "government"
+    assert speaker_group("금융위원장") == "government"     # 행정기관장 (위원장$ 패턴)
+    assert speaker_group("증인") == "witness"
+    assert speaker_group("참고인") == "witness"
+    assert speaker_group("수석전문위원") == "staff"
+    assert speaker_group("장관후보자") == "unknown"        # 후보자는 아직 행정부 아님
+    assert speaker_group(None) == "unknown"
+    assert speaker_group("기타직함") == "unknown"
+
+
 def main():
     test_ruling_periods()
     test_nfkc_matching()
@@ -167,6 +183,7 @@ def main():
     test_satellite_side()
     test_role_gate()
     test_aliases_merge()
+    test_speaker_group()
     print("\nALL PASS")
 
 
