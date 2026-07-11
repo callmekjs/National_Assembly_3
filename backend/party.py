@@ -118,6 +118,29 @@ def member_party(speaker: str | None) -> str | None:
     return None if party in (None, _AMBIGUOUS) else party
 
 
+def speaker_group(role: str | None) -> str:
+    """발언 자격(role) → 그룹. party_label 게이트와 동일 판정의 재사용 함수 (POL-6).
+
+    "assembly"(국회의원) | "government"(행정부) | "witness"(증인·참고인·진술인) |
+    "staff"(국회 스태프) | "unknown"(미상·후보자·자격불명).
+    판정 순서는 기존 party_label 과 동일 — 후보자 검사가 행정부 패턴보다 먼저
+    ("위원장후보자" 가 위원장$ 에 오폭하지 않도록).
+    """
+    if role in ASSEMBLY_ROLES:
+        return "assembly"
+    if role is None:
+        return "unknown"
+    if role in STAFF_ROLES:
+        return "staff"
+    if role in WITNESS_ROLES:
+        return "witness"
+    if _NOMINEE_ROLE.search(role):
+        return "unknown"
+    if _EXECUTIVE_ROLE.search(role):
+        return "government"
+    return "unknown"
+
+
 def party_label(
     speaker: str | None, meeting_date: str | None, role: str | None = None
 ) -> str | None:
@@ -134,13 +157,10 @@ def party_label(
     # 증인에게 정당이 붙을 수 있던 구멍 (2026-07-07 수정). 실측: role=NULL 은
     # 전체 0.12%(494청크), 의원 이름 일치 114청크 — 라벨 손실은 미미하고
     # "자격이 확인된 발언에만 라벨" 원칙이 구조적으로 보장된다.
-    if role not in ASSEMBLY_ROLES:
-        if role is None:
-            return None
-        if role in STAFF_ROLES or role in WITNESS_ROLES or _NOMINEE_ROLE.search(role):
-            return None
-        if _EXECUTIVE_ROLE.search(role):
-            return "정부측"
+    group = speaker_group(role)
+    if group == "government":
+        return "정부측"
+    if group != "assembly":
         return None
 
     party = _load_map().get(_norm(speaker))
