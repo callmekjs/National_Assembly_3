@@ -254,8 +254,10 @@ def issue_party_stances(issue_id: str) -> dict | None:
         row = cur.fetchone()
         if row is None:
             return None
-        cur.execute("SELECT speaker, role, stance FROM issue_stances WHERE issue_id = %s",
-                    (issue_id,))
+        cur.execute("""
+            SELECT speaker, role, stance FROM issue_stances
+            WHERE issue_id = %s ORDER BY speaker, turn_id
+        """, (issue_id,))
         srows = cur.fetchall()
     if not srows:
         return None
