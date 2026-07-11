@@ -179,7 +179,7 @@ def query(req: QueryRequest):
         result = {
             "answer": NO_EVIDENCE, "mode": req.mode,
             "sources": [], "citations": [], "cited_numbers": [], "invalid_citations": [],
-            "usage": None,
+            "usage": None, "issue_context": None,
         }
         grounding, ungrounded = gate, False
     else:
