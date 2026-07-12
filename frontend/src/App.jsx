@@ -6,6 +6,7 @@ import AnswerPanel from './components/AnswerPanel'
 import SourcePanel from './components/SourcePanel'
 import SourceModal from './components/SourceModal'
 import IssueView from './components/IssueView'
+import ActorView from './components/ActorView'
 
 function App() {
   const [tab, setTab] = useState('query')
@@ -16,6 +17,11 @@ function App() {
   const [error, setError] = useState(null)
   const [highlightN, setHighlightN] = useState(null) // [n] 클릭 시 하이라이트할 출처 번호
   const [modalChunkId, setModalChunkId] = useState(null)
+  const [selectedActor, setSelectedActor] = useState(null)
+  const [selectedIssue, setSelectedIssue] = useState(null)
+
+  function openActor(name) { setSelectedActor(name); setTab('actor') }
+  function openIssue(issueId) { setSelectedIssue(issueId); setTab('issues') }
 
   async function handleSubmit() {
     if (!question.trim() || loading) return
@@ -51,6 +57,7 @@ function App() {
       <div style={{ marginBottom: 12 }}>
         <button onClick={() => setTab('query')} disabled={tab === 'query'}>질의</button>
         <button onClick={() => setTab('issues')} disabled={tab === 'issues'}>쟁점 분석</button>
+        <button onClick={() => setTab('actor')} disabled={tab === 'actor'}>의원 프로필</button>
       </div>
 
       {tab === 'query' && (
@@ -86,7 +93,8 @@ function App() {
         </>
       )}
 
-      {tab === 'issues' && <IssueView />}
+      {tab === 'issues' && <IssueView selectedIssue={selectedIssue} onActorClick={openActor} />}
+      {tab === 'actor' && <ActorView actor={selectedActor} onIssueClick={openIssue} />}
 
       <footer>
         <small>

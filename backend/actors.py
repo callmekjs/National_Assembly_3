@@ -18,6 +18,7 @@ from psycopg2.extras import RealDictCursor
 from aliases import expand_aliases
 from answer import display_speaker
 from db import get_conn
+from issues import aggregate_stances
 from party import RULING_PERIODS, member_party, party_label
 
 
@@ -36,6 +37,44 @@ def build_party_history(name: str) -> tuple[str | None, list[dict]]:
         period = f"{start.isoformat()} ~ " + ("" if end.year == 9999 else end.isoformat())
         history.append({"period": period.strip(), "label": party_label(name, start.isoformat(), "의원")})
     return party, history
+
+
+_STANCE_KEYS = ("support", "oppose", "concern", "neutral", "none")
+
+
+def fold_issue_stances(rows: list[dict]) -> list[dict]:
+    """(issue_id, title, stance, n) 집계 행 → 이슈별 대표 라벨 + 카운트. 순수 함수.
+
+    대표 라벨은 issues.aggregate_stances 재사용 — 쟁점 매트릭스(POL-5)와 동일 규칙이라
+    두 화면의 라벨이 어긋나지 않는다. 정렬은 발언 수 내림차순."""
+    by_issue: dict[str, dict] = {}
+    for r in rows:
+        it = by_issue.setdefault(r["issue_id"], {
+            "issue_id": r["issue_id"], "title": r["title"],
+            "counts": {s: 0 for s in _STANCE_KEYS},
+        })
+        if r["stance"] in it["counts"]:  # 도메인 밖 값 방어 — 스키마에 CHECK 없음
+            it["counts"][r["stance"]] += r["n"]
+    out = []
+    for it in by_issue.values():
+        flat = [{"stance": s} for s, n in it["counts"].items() for _ in range(n)]
+        out.append({**it, "stance": aggregate_stances(flat),
+                    "total_turns": sum(it["counts"].values())})
+    out.sort(key=lambda x: -x["total_turns"])
+    return out
+
+
+def actor_issue_stances(variants: list[str]) -> list[dict]:
+    """의원의 이슈별 입장 (POL-9) — issue_stances 역조회, 별칭 목록으로 매칭."""
+    with get_conn() as conn, conn.cursor(cursor_factory=RealDictCursor) as cur:
+        cur.execute("""
+            SELECT s.issue_id, i.title, s.stance, count(*) AS n
+            FROM issue_stances s JOIN issues i USING (issue_id)
+            WHERE s.speaker = ANY(%s)
+            GROUP BY s.issue_id, i.title, s.stance
+            ORDER BY s.issue_id
+        """, (variants,))
+        return fold_issue_stances(cur.fetchall())
 
 
 def actor_profile(name: str) -> dict | None:
@@ -139,4 +178,5 @@ def actor_profile(name: str) -> dict | None:
         "utterance_types": utterance_types,
         "top_mentions": top_mentions,
         "recent_utterances": recent,
+        "issue_stances": actor_issue_stances(variants),
     }

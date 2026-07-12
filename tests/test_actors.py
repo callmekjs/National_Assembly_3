@@ -54,9 +54,29 @@ def test_party_history():
     check("이력: 무소속은 여야 없이 표기", p == "무소속" and all(h["label"] == "무소속" for h in hist), hist)
 
 
+def test_fold_issue_stances():
+    from actors import fold_issue_stances
+    rows = [
+        {"issue_id": "a", "title": "이슈A", "stance": "support", "n": 3},
+        {"issue_id": "a", "title": "이슈A", "stance": "concern", "n": 1},
+        {"issue_id": "b", "title": "이슈B", "stance": "neutral", "n": 5},
+    ]
+    r = fold_issue_stances(rows)
+    check("발언수 내림차순 (b 5 > a 4)", [x["issue_id"] for x in r] == ["b", "a"], r)
+    a = next(x for x in r if x["issue_id"] == "a")
+    check("대표 라벨 support (3>1)", a["stance"] == "support", a)
+    check("counts 5키 0 포함",
+          a["counts"] == {"support": 3, "oppose": 0, "concern": 1, "neutral": 0, "none": 0}, a)
+    check("total_turns 4", a["total_turns"] == 4, a)
+    b = next(x for x in r if x["issue_id"] == "b")
+    check("입장발언 0 → no_stance", b["stance"] == "no_stance", b)
+    check("빈 입력 []", fold_issue_stances([]) == [])
+
+
 def main():
     test_canonical_org()
     test_party_history()
+    test_fold_issue_stances()
     print("\nALL PASS")
 
 
