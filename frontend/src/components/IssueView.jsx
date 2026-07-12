@@ -94,7 +94,7 @@ function StanceRow({ actor, onActorClick }) {
 
 export default function IssueView({ selectedIssue, onActorClick }) {
   const [issues, setIssues] = useState([])
-  const [sel, setSel] = useState('medical-reform')
+  const [sel, setSel] = useState(selectedIssue || 'medical-reform')
   useEffect(() => { if (selectedIssue) setSel(selectedIssue) }, [selectedIssue])
   const [timeline, setTimeline] = useState(null)
   const [stances, setStances] = useState(null)
