@@ -69,13 +69,15 @@ function TimelineChart({ months }) {
   )
 }
 
-function StanceRow({ actor }) {
+function StanceRow({ actor, onActorClick }) {
   const [open, setOpen] = useState(false)
   const c = actor.counts
   return (
     <>
       <tr onClick={() => setOpen(!open)} style={{ cursor: 'pointer' }}>
-        <td>{actor.speaker}</td>
+        <td onClick={e => { e.stopPropagation(); onActorClick && onActorClick(actor.speaker) }}
+            style={{ color: '#2563eb', textDecoration: 'underline', cursor: 'pointer' }}
+            title="의원 프로필 보기">{actor.speaker}</td>
         <td>{actor.party || '—'}</td>
         <td><span style={{ color: STANCE_COLOR[actor.stance], fontWeight: 600 }}>{STANCE_KO[actor.stance]}</span></td>
         <td style={{ fontSize: 12 }}>찬{c.support}·반{c.oppose}·우{c.concern}·중{c.neutral}·무{c.none}</td>
@@ -90,9 +92,10 @@ function StanceRow({ actor }) {
   )
 }
 
-export default function IssueView() {
+export default function IssueView({ selectedIssue, onActorClick }) {
   const [issues, setIssues] = useState([])
   const [sel, setSel] = useState('medical-reform')
+  useEffect(() => { if (selectedIssue) setSel(selectedIssue) }, [selectedIssue])
   const [timeline, setTimeline] = useState(null)
   const [stances, setStances] = useState(null)
   const [partyStances, setPartyStances] = useState(null)
@@ -121,7 +124,7 @@ export default function IssueView() {
       {stances ? (
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead><tr><th>발언자</th><th>정당</th><th>입장</th><th>발언 수</th><th></th></tr></thead>
-          <tbody>{stances.actors.map(a => <StanceRow key={a.speaker} actor={a} />)}</tbody>
+          <tbody>{stances.actors.map(a => <StanceRow key={a.speaker} actor={a} onActorClick={onActorClick} />)}</tbody>
         </table>
       ) : <p>입장 데이터 없음(판정된 이슈만 표시)</p>}
     </div>
