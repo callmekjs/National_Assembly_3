@@ -53,7 +53,8 @@ def fold_issue_stances(rows: list[dict]) -> list[dict]:
             "issue_id": r["issue_id"], "title": r["title"],
             "counts": {s: 0 for s in _STANCE_KEYS},
         })
-        it["counts"][r["stance"]] += r["n"]
+        if r["stance"] in it["counts"]:  # 도메인 밖 값 방어 — 스키마에 CHECK 없음
+            it["counts"][r["stance"]] += r["n"]
     out = []
     for it in by_issue.values():
         flat = [{"stance": s} for s, n in it["counts"].items() for _ in range(n)]
