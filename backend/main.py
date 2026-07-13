@@ -54,14 +54,6 @@ CORS_ORIGINS = (
     or ["http://localhost:5173", "http://127.0.0.1:5173"]
 )
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=CORS_ORIGINS,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
 # 배포 방어선 (4단계-A) — 0 이면 해당 방어 끔 (테스트는 conftest 가 끔)
 RATE_LIMIT_LLM_PER_MIN = int(os.environ.get("RATE_LIMIT_LLM_PER_MIN", "5"))
 RATE_LIMIT_PER_MIN = int(os.environ.get("RATE_LIMIT_PER_MIN", "60"))
@@ -98,11 +90,28 @@ async def guard_middleware(request: Request, call_next):
         if limiter.per_min > 0 and not limiter.allow(ip, time.time()):
             return JSONResponse(status_code=429, content={
                 "detail": "요청이 너무 잦습니다. 1분 뒤 다시 시도해주세요."})
-        if path in _LLM_PATHS and DAILY_COST_LIMIT_USD > 0 \
-                and daily_cost_exceeded(DAILY_COST_LIMIT_USD):
-            return JSONResponse(status_code=429, content={
-                "detail": "오늘의 무료 사용량이 모두 소진되었습니다. 내일 다시 이용해주세요."})
+        if path in _LLM_PATHS and DAILY_COST_LIMIT_USD > 0:
+            try:
+                over = daily_cost_exceeded(DAILY_COST_LIMIT_USD)
+            except Exception:
+                logger.warning("비용 상한 조회 실패 — fail-open (방어선이 서비스를 막지 않게)", exc_info=True)
+                over = False
+            if over:
+                return JSONResponse(status_code=429, content={
+                    "detail": "오늘의 무료 사용량이 모두 소진되었습니다. 내일 다시 이용해주세요."})
     return await call_next(request)
+
+
+# CORS 를 마지막에 등록 — 나중 등록이 바깥이라 guard 의 429 응답도 CORS 헤더를 받는다
+# (안 그러면 교차 출처 브라우저가 429 detail 을 못 읽음). preflight(OPTIONS)는 CORS 가
+# guard 앞에서 처리하므로 한도에 카운트되지 않는 부수 효과도 의도된 것.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=CORS_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 # 날짜는 date 타입으로 받아 잘못된 값("2025-13-01" 등)을 422 로 거른다 — str 로 두면
