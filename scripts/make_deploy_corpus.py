@@ -33,7 +33,7 @@ FULL_TABLES = ("committees", "meetings", "speakers", "members", "issues", "issue
 
 def expand_neighbor_turn_ids(turn_ids: set) -> set:
     """turn 집합 + 같은 회의 인접 ±1 (answer.neighbor_turn_ids 와 동일 규칙, 자릿수 보존).
-    패턴 밖 id 는 그대로 둔다. turn_0000 의 이전(-1)은 만들지 않는다."""
+    패턴 밖 id 는 그대로 둔다. 첫 turn(0001)의 이전(-1)은 만들지 않는다."""
     out = set(turn_ids)
     for tid in turn_ids:
         m = _TURN_ID.match(tid)
@@ -41,7 +41,7 @@ def expand_neighbor_turn_ids(turn_ids: set) -> set:
             continue
         src, no = m.group("src"), m.group("no")
         n, width = int(no), len(no)
-        if n > 0:
+        if n > 1:  # answer.py 와 동일 — turn 번호는 0001 시작, 0001 의 이전은 없음
             out.add(f"{src}{n - 1:0{width}d}")
         out.add(f"{src}{n + 1:0{width}d}")
     return out

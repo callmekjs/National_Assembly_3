@@ -23,12 +23,12 @@ def test_expand_neighbor_turn_ids():
     check("이전 turn (자릿수 보존)", "복지위_20240613_52087_52087_turn_0046" in r, r)
     check("다음 turn", "복지위_20240613_52087_52087_turn_0048" in r, r)
     check("3개 정확히", len(r) == 3, r)
-    r0 = expand_neighbor_turn_ids({"A_turn_0000"})
-    check("turn_0000 은 이전 없음 (음수 미생성)", r0 == {"A_turn_0000", "A_turn_0001"}, r0)
+    r0 = expand_neighbor_turn_ids({"A_turn_0001"})
+    check("첫 turn(0001)은 이전 없음 — answer.py 동일", r0 == {"A_turn_0001", "A_turn_0002"}, r0)
     check("패턴 밖 id 는 그대로", expand_neighbor_turn_ids({"weird"}) == {"weird"})
     # 인접끼리 겹치면 합집합
     r2 = expand_neighbor_turn_ids({"A_turn_0001", "A_turn_0002"})
-    check("겹침 합집합", r2 == {"A_turn_0000", "A_turn_0001", "A_turn_0002", "A_turn_0003"}, r2)
+    check("겹침 합집합 (0000 미생성)", r2 == {"A_turn_0001", "A_turn_0002", "A_turn_0003"}, r2)
 
 
 def test_estimate_mb():
