@@ -9,6 +9,8 @@ from typing import Literal
 
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from starlette.concurrency import run_in_threadpool
 from openai import OpenAIError
 from psycopg2.extras import RealDictCursor
 from pydantic import BaseModel, Field
@@ -18,6 +20,7 @@ from issues import issue_party_stances, issue_stances, issue_timeline, list_issu
 from answer import MODE_CONFIG, NO_EVIDENCE, generate_answer
 from db import init_pool, close_pool, get_conn
 from grounding import judge, pre_gate
+from guard import RateLimiter, client_ip, daily_cost_exceeded
 from search_keyword import keyword_search
 from search_vector import vector_search
 from search_hybrid import hybrid_search
@@ -52,13 +55,13 @@ CORS_ORIGINS = (
     or ["http://localhost:5173", "http://127.0.0.1:5173"]
 )
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=CORS_ORIGINS,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# 배포 방어선 (4단계-A) — 0 이면 해당 방어 끔 (테스트는 conftest 가 끔)
+RATE_LIMIT_LLM_PER_MIN = int(os.environ.get("RATE_LIMIT_LLM_PER_MIN", "5"))
+RATE_LIMIT_PER_MIN = int(os.environ.get("RATE_LIMIT_PER_MIN", "60"))
+DAILY_COST_LIMIT_USD = float(os.environ.get("DAILY_COST_LIMIT_USD", "1.0"))
+_llm_limiter = RateLimiter(RATE_LIMIT_LLM_PER_MIN)
+_general_limiter = RateLimiter(RATE_LIMIT_PER_MIN)
+_LLM_PATHS = ("/query", "/answer")   # LLM 호출 경로 — 강한 한도 + 비용 상한
 
 
 @app.middleware("http")
@@ -75,6 +78,45 @@ async def request_log_middleware(request: Request, call_next):
         (time.time() - t0) * 1000,
     )
     return response
+
+
+@app.middleware("http")
+async def guard_middleware(request: Request, call_next):
+    """배포 방어선 (4단계-A) — IP rate limit + 일별 비용 상한. /health 는 통과."""
+    path = request.url.path
+    if path != "/health":
+        ip = client_ip(request.headers.get("x-forwarded-for"),
+                       request.client.host if request.client else "unknown")
+        limiter = _llm_limiter if path in _LLM_PATHS else _general_limiter
+        if limiter.per_min > 0 and not limiter.allow(ip, time.time()):
+            logger.info("guard 429 rate-limit ip=%s path=%s", ip, path)
+            return JSONResponse(status_code=429, content={
+                "detail": "요청이 너무 잦습니다. 1분 뒤 다시 시도해주세요."})
+        if path in _LLM_PATHS and DAILY_COST_LIMIT_USD > 0:
+            try:
+                # 동기 DB 조회를 스레드풀로 — async 미들웨어에서 직접 부르면 이벤트 루프가
+                # 멎어 DB 장애 시 /health 까지 같이 죽는다 (최종리뷰 지적)
+                over = await run_in_threadpool(daily_cost_exceeded, DAILY_COST_LIMIT_USD)
+            except Exception:
+                logger.warning("비용 상한 조회 실패 — fail-open (방어선이 서비스를 막지 않게)", exc_info=True)
+                over = False
+            if over:
+                logger.info("guard 429 cost-limit ip=%s path=%s", ip, path)
+                return JSONResponse(status_code=429, content={
+                    "detail": "오늘의 무료 사용량이 모두 소진되었습니다. 내일 다시 이용해주세요."})
+    return await call_next(request)
+
+
+# CORS 를 마지막에 등록 — 나중 등록이 바깥이라 guard 의 429 응답도 CORS 헤더를 받는다
+# (안 그러면 교차 출처 브라우저가 429 detail 을 못 읽음). preflight(OPTIONS)는 CORS 가
+# guard 앞에서 처리하므로 한도에 카운트되지 않는 부수 효과도 의도된 것.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=CORS_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 # 날짜는 date 타입으로 받아 잘못된 값("2025-13-01" 등)을 422 로 거른다 — str 로 두면
