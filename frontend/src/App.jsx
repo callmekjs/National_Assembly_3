@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
-import { postQuery } from './api'
+import { postQuery, pingHealth } from './api'
 import QueryForm from './components/QueryForm'
 import AnswerPanel from './components/AnswerPanel'
 import SourcePanel from './components/SourcePanel'
@@ -19,6 +19,11 @@ function App() {
   const [modalChunkId, setModalChunkId] = useState(null)
   const [selectedActor, setSelectedActor] = useState(null)
   const [selectedIssue, setSelectedIssue] = useState(null)
+  const [serverStatus, setServerStatus] = useState('checking') // checking | ok | down
+
+  useEffect(() => {
+    pingHealth().then(() => setServerStatus('ok')).catch(() => setServerStatus('down'))
+  }, [])
 
   function openActor(name) { setSelectedActor(name); setTab('actor') }
   function openIssue(issueId) { setSelectedIssue(issueId); setTab('issues') }
@@ -53,6 +58,17 @@ function App() {
           국회 회의록을 근거로 정책 의제, 행위자, 쟁점, 입장 차이, 시계열 흐름을 분석하는 GovTech RAG 서비스
         </p>
       </header>
+
+      {serverStatus === 'checking' && (
+        <div style={{ background: '#fef3c7', color: '#92400e', padding: '8px 12px', borderRadius: 6, marginBottom: 12, fontSize: 14 }}>
+          무료 서버를 깨우는 중입니다 (최대 1분)…
+        </div>
+      )}
+      {serverStatus === 'down' && (
+        <div style={{ background: '#fee2e2', color: '#991b1b', padding: '8px 12px', borderRadius: 6, marginBottom: 12, fontSize: 14 }}>
+          서버 연결 실패 — 잠시 후 새로고침해주세요.
+        </div>
+      )}
 
       <div style={{ marginBottom: 12 }}>
         <button onClick={() => setTab('query')} disabled={tab === 'query'}>질의</button>
@@ -100,6 +116,9 @@ function App() {
         <small>
           22대 국회 상임위 회의록 767건 (2024-05 ~ 2026-06) &nbsp;|&nbsp;
           근거가 부족한 내용은 확인 불가로 안내합니다.
+          <br />
+          데모 코퍼스: 24개 쟁점 관련 발언 부분집합 (전체 42만 청크는 로컬 데모) — 의원
+          프로필 통계도 이 부분집합 기준입니다.
         </small>
       </footer>
     </div>
