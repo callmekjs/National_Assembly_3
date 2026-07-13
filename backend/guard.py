@@ -17,7 +17,8 @@ _cost_cache: tuple[float, float] | None = None  # (계산 시각, 오늘 합계 
 class RateLimiter:
     """키(IP)별 슬라이딩 윈도우 카운터. now 주입으로 시계 없이 테스트 가능.
 
-    메모리: 키 딕셔너리는 고유 IP 수만큼만 자람(유계) — 빈 키 GC 는 생략(단순성).
+    메모리: 키는 고유 클라이언트 키 수만큼 자람. XFF 위조로 임의 키를 무한 생성하는
+    메모리 공격은 client_ip 의 키 절단(64자)이 항목 크기를 상한 — 빈 키 GC 는 생략(단순성).
     """
 
     def __init__(self, per_min: int):
@@ -35,11 +36,13 @@ class RateLimiter:
 
 
 def client_ip(xff: str | None, fallback: str) -> str:
-    """X-Forwarded-For 첫 값(플랫폼 프록시 전제) → 없으면 직접 연결 주소."""
+    """X-Forwarded-For 첫 값(플랫폼 프록시 전제) → 없으면 직접 연결 주소.
+
+    64자 절단 — 위조 XFF 로 거대 키를 만들어 리미터 메모리를 불리는 것을 상한."""
     if xff:
         first = xff.split(",")[0].strip()
         if first:
-            return first
+            return first[:64]
     return fallback
 
 

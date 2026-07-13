@@ -10,6 +10,7 @@ from typing import Literal
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from starlette.concurrency import run_in_threadpool
 from openai import OpenAIError
 from psycopg2.extras import RealDictCursor
 from pydantic import BaseModel, Field
@@ -88,15 +89,19 @@ async def guard_middleware(request: Request, call_next):
                        request.client.host if request.client else "unknown")
         limiter = _llm_limiter if path in _LLM_PATHS else _general_limiter
         if limiter.per_min > 0 and not limiter.allow(ip, time.time()):
+            logger.info("guard 429 rate-limit ip=%s path=%s", ip, path)
             return JSONResponse(status_code=429, content={
                 "detail": "요청이 너무 잦습니다. 1분 뒤 다시 시도해주세요."})
         if path in _LLM_PATHS and DAILY_COST_LIMIT_USD > 0:
             try:
-                over = daily_cost_exceeded(DAILY_COST_LIMIT_USD)
+                # 동기 DB 조회를 스레드풀로 — async 미들웨어에서 직접 부르면 이벤트 루프가
+                # 멎어 DB 장애 시 /health 까지 같이 죽는다 (최종리뷰 지적)
+                over = await run_in_threadpool(daily_cost_exceeded, DAILY_COST_LIMIT_USD)
             except Exception:
                 logger.warning("비용 상한 조회 실패 — fail-open (방어선이 서비스를 막지 않게)", exc_info=True)
                 over = False
             if over:
+                logger.info("guard 429 cost-limit ip=%s path=%s", ip, path)
                 return JSONResponse(status_code=429, content={
                     "detail": "오늘의 무료 사용량이 모두 소진되었습니다. 내일 다시 이용해주세요."})
     return await call_next(request)
