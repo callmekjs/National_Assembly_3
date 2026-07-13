@@ -72,6 +72,37 @@ python scripts/extractor_v1.py 과방위 외통위
 
 ---
 
+## 공개 배포 (4단계-B 런북)
+
+무료 3-스택: **Vercel**(프론트) + **Render free**(백엔드) + **Supabase free**(DB).
+배포 코퍼스는 이슈 중심 축소본 — `scripts/make_deploy_corpus.py` 가 생성 (전체 9.6GB
+중 이슈 관련 turn만 ≤350MB, 검색 eval 수치 R@5 0.983 은 전체 코퍼스 로컬 측정 기준).
+
+### 순서 (사용자 체크리스트)
+
+1. **Supabase**: 프로젝트 생성 (리전 Northeast Asia) → Settings > Database 의
+   Connection string(URI) 복사 → 로컬 `.env` 에 `DEPLOY_DATABASE_URL=...` 추가
+2. **코퍼스 이전** (로컬에서): `python scripts/make_deploy_corpus.py` — 행수 검증
+   리포트 `[OK]` 확인 (dry-run 먼저: `--dry-run`)
+3. **Render**: New Web Service → GitHub 저장소 연결 → Root Directory `backend`,
+   Build `pip install -r requirements.txt`, Start
+   `uvicorn main:app --host 0.0.0.0 --port $PORT`, Health Check Path `/health`
+   - 환경변수: `DATABASE_URL`(Supabase URI), `OPENAI_API_KEY`,
+     `BACKEND_CORS_ORIGINS`(Vercel 도메인, 배포 후 갱신), `RERANKER_ENABLED=1`,
+     `PYTHON_VERSION=3.12.10`
+4. **Vercel**: Add New Project → 같은 저장소 → Root Directory `frontend` →
+   환경변수 `VITE_API_URL`(Render URL) → Deploy → 도메인을 Render 의
+   `BACKEND_CORS_ORIGINS` 에 반영(재배포)
+5. **스모크 6항목**: `/health` 200(행수=축소본) / report 질의 1건(issue_context 포함)
+   / 쟁점 탭 24개 이슈 / 프로필 김윤 / 연속 6회 질의 → 429 / 15분 방치 후 콜드스타트 배너
+
+### 운영 방어선 (기본값)
+
+IP당 LLM 분당 5회·일반 60회, 일별 OpenAI 비용 상한 $1 (초과 시 한국어 안내).
+상세: `docs/superpowers/specs/2026-07-11-dep-a-guardrails-design.md`
+
+---
+
 ## 서비스 실행 방법
 
 ### 백엔드
