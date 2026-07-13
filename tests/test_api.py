@@ -138,6 +138,42 @@ def test_issues_list():
                "core_chunk_count")), first)
 
 
+def test_guard_rate_limit_and_cost():
+    if not HAS_DB:
+        print(_SKIP_MSG); return
+    import guard
+    # LLM 리미터를 2회/분으로 교체 — /query 는 사전차단 경로(검색 0건 질문)라 LLM 미호출
+    saved_limiter, saved_cost = main._llm_limiter, main.DAILY_COST_LIMIT_USD
+    main._llm_limiter = guard.RateLimiter(2)
+    main.DAILY_COST_LIMIT_USD = 0  # 비용 상한은 이 케이스에서 끔
+    try:
+        body = {"question": "zzqqxx 존재하지않는 검색어 9999", "mode": "qa"}
+        r1 = client.post("/query", json=body)
+        r2 = client.post("/query", json=body)
+        r3 = client.post("/query", json=body)
+        check("2회까지 정상", r1.status_code == 200 and r2.status_code == 200,
+              (r1.status_code, r2.status_code))
+        check("3번째 429", r3.status_code == 429, r3.status_code)
+        check("429 한국어 detail", "요청이 너무 잦습니다" in r3.json()["detail"], r3.json())
+        check("일반 경로는 LLM 한도와 독립", client.get("/issues").status_code == 200)
+        check("/health 무제한", client.get("/health").status_code == 200)
+    finally:
+        main._llm_limiter = saved_limiter
+        main.DAILY_COST_LIMIT_USD = saved_cost
+
+    # 비용 상한 — fetch 주입 대신 캐시를 직접 심어 검증 (DB 값 무관 결정적)
+    saved_cost = main.DAILY_COST_LIMIT_USD
+    main.DAILY_COST_LIMIT_USD = 0.5
+    guard._cost_cache = (float("inf"), 9.99)   # 만료되지 않는 캐시에 초과값
+    try:
+        r = client.post("/query", json={"question": "비용 상한 테스트", "mode": "qa"})
+        check("비용 초과 429", r.status_code == 429, r.status_code)
+        check("소진 안내 문구", "무료 사용량" in r.json()["detail"], r.json())
+    finally:
+        main.DAILY_COST_LIMIT_USD = saved_cost
+        guard.reset_cost_cache()
+
+
 def main_():
     test_health()
     test_validation_422()
@@ -145,6 +181,7 @@ def main_():
     test_openai_error_502()
     test_feedback_and_citation_errors()
     test_issues_list()
+    test_guard_rate_limit_and_cost()
     print("\nALL PASS" if HAS_DB else "\nDB 없음 — 전체 건너뜀")
 
 
