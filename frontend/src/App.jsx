@@ -28,19 +28,32 @@ function App() {
   function openActor(name) { setSelectedActor(name); setTab('actor') }
   function openIssue(issueId) { setSelectedIssue(issueId); setTab('issues') }
 
-  async function handleSubmit() {
-    if (!question.trim() || loading) return
+  async function handleSubmit(q = question) {
+    if (!q.trim() || loading) return
     setLoading(true)
     setResult(null)
     setError(null)
     setHighlightN(null)
     try {
-      setResult(await postQuery(question, mode))
+      setResult(await postQuery(q, mode))
     } catch (e) {
       setError(e.message)
     } finally {
       setLoading(false)
     }
+  }
+
+  // 첫 방문자용 예시 질문 — 클릭 즉시 실행 (질의·입장·쟁점 유형을 하나씩)
+  const EXAMPLES = [
+    '의대 정원 확대에 대한 여야 입장은?',
+    '12·3 비상계엄 이후 국회 논의는?',
+    '전세사기 피해자 지원 대책은?',
+    'AI 기본법의 핵심 쟁점은?',
+  ]
+
+  function askExample(q) {
+    setQuestion(q)
+    handleSubmit(q)
   }
 
   function handleCiteClick(n) {
@@ -98,6 +111,17 @@ function App() {
               loading={loading}
               onSubmit={handleSubmit}
             />
+
+            {!result && !loading && (
+              <div className="example-chips">
+                <span className="chips-label">이런 질문을 해보세요</span>
+                {EXAMPLES.map((q) => (
+                  <button key={q} type="button" onClick={() => askExample(q)}>
+                    {q}
+                  </button>
+                ))}
+              </div>
+            )}
 
             {error && <div className="error">{error}</div>}
 

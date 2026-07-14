@@ -20,6 +20,10 @@ body {
   gap: 2rem;
 }
 
+header {
+  text-align: center;
+}
+
 header h1 {
   font-size: 1.75rem;
   font-weight: 700;
@@ -98,6 +102,36 @@ header h1 {
 .query-form button:disabled {
   background: #adb5bd;
   cursor: not-allowed;
+}
+
+/* ── 예시 질문 칩 (첫 방문 빈 상태) ────────────────────────── */
+.example-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.example-chips .chips-label {
+  font-size: 0.8rem;
+  color: #868e96;
+}
+
+.example-chips button {
+  padding: 0.4rem 0.9rem;
+  font-size: 0.85rem;
+  font-family: inherit;
+  background: #fff;
+  color: #495057;
+  border: 1px solid #dee2e6;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.example-chips button:hover {
+  border-color: #adb5bd;
+  background: #f8f9fa;
 }
 
 .error {
