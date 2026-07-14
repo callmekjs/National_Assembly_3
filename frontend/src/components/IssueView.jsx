@@ -9,26 +9,33 @@ const COUNT_ORDER = ['support', 'oppose', 'concern', 'neutral', 'none']
 const COUNT_KO = { support: '찬성', oppose: '반대', concern: '우려', neutral: '중립', none: '판정외' }
 const COUNT_COLOR = { support: '#2563eb', oppose: '#dc2626', concern: '#d97706', neutral: '#9ca3af', none: '#e5e7eb' }
 
-function StanceMiniBar({ counts }) {
+function StanceMiniBar({ counts, maxTotal }) {
   const total = COUNT_ORDER.reduce((s, k) => s + (counts[k] || 0), 0)
   if (!total) return <span style={{ fontSize: 12, color: '#868e96' }}>—</span>
   const tooltip = COUNT_ORDER.filter(k => counts[k] > 0)
     .map(k => `${COUNT_KO[k]} ${counts[k]}`).join(' · ')
+  // 폭 = 발언 수 비례 (표 내 최대 기준, 하한 10%) — 4건과 35건이 같은 폭으로
+  // 그려지던 시각 왜곡 제거. 정확한 수치는 우측 숫자·툴팁
+  const widthPct = Math.max((total / Math.max(maxTotal, 1)) * 100, 10)
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }} title={tooltip}>
-      <div style={{ flex: 1, display: 'flex', height: 14, borderRadius: 3, overflow: 'hidden',
-                    background: '#f3f4f6', minWidth: 90 }}>
-        {COUNT_ORDER.filter(k => counts[k] > 0).map(k => (
-          <div key={k} style={{ width: `${(counts[k] / total) * 100}%`, background: COUNT_COLOR[k] }} />
-        ))}
+      <div style={{ flex: 1, minWidth: 90 }}>
+        <div style={{ width: `${widthPct}%`, display: 'flex', height: 14, borderRadius: 3, overflow: 'hidden' }}>
+          {COUNT_ORDER.filter(k => counts[k] > 0).map(k => (
+            <div key={k} style={{ width: `${(counts[k] / total) * 100}%`, background: COUNT_COLOR[k] }} />
+          ))}
+        </div>
       </div>
       <span style={{ width: 34, fontSize: 12, color: '#495057', textAlign: 'right', flexShrink: 0 }}>{total}</span>
     </div>
   )
 }
 
-function PartyBar({ row }) {
+function PartyBar({ row, maxCount }) {
   const total = Math.max(row.actor_count, 1)
+  // 막대 폭 = 인원수 비례 — 1명 정당이 18명 정당과 같은 폭으로 그려져
+  // "강한 입장 블록"으로 오독되던 왜곡 제거 (최소 4%는 클릭·툴팁용 시각 하한)
+  const widthPct = Math.max((row.actor_count / Math.max(maxCount, 1)) * 100, 4)
   const badge = row.side_by_period
     ? (row.side_by_period[0] === row.side_by_period[1]
         ? row.side_by_period[0] : `${row.side_by_period[0]}→${row.side_by_period[1]}`)
@@ -39,19 +46,37 @@ function PartyBar({ row }) {
         {row.party}{' '}
         {badge && <span style={{ fontSize: 11, color: '#555', border: '1px solid #ccc', borderRadius: 4, padding: '0 4px' }}>{badge}</span>}
       </div>
-      <div style={{ flex: 1, display: 'flex', height: 18, borderRadius: 3, overflow: 'hidden', background: '#f3f4f6' }}>
-        {Object.entries(row.stance_dist).filter(([, v]) => v > 0).map(([s, v]) => (
-          <div key={s} title={`${STANCE_KO[s]} ${v}명`}
-               style={{ width: `${(v / total) * 100}%`, background: STANCE_COLOR[s] }} />
-        ))}
+      <div style={{ flex: 1 }}>
+        <div style={{ width: `${widthPct}%`, display: 'flex', height: 18, borderRadius: 3, overflow: 'hidden' }}>
+          {Object.entries(row.stance_dist).filter(([, v]) => v > 0).map(([s, v]) => (
+            <div key={s} title={`${STANCE_KO[s]} ${v}명`}
+                 style={{ width: `${(v / total) * 100}%`, background: STANCE_COLOR[s] }} />
+          ))}
+        </div>
       </div>
       <div style={{ width: 44, fontSize: 12, textAlign: 'right', flexShrink: 0 }}>{row.actor_count}명</div>
     </div>
   )
 }
 
+const _SUMMARY_ORDER = ['support', 'oppose', 'concern', 'mixed', 'no_stance']
+
+function partySummary(parties) {
+  // 인원 3명 이상 상위 3개 그룹의 최다 입장을 한 문장으로 — "그래서 구도가 어떤가"
+  const top = [...parties].sort((a, b) => b.actor_count - a.actor_count)
+    .filter(p => p.actor_count >= 3).slice(0, 3)
+  if (!top.length) return null
+  return top.map(p => {
+    const dom = _SUMMARY_ORDER.reduce(
+      (best, s) => (p.stance_dist[s] || 0) > (p.stance_dist[best] || 0) ? s : best, _SUMMARY_ORDER[0])
+    return `${p.party} ${p.actor_count}명은 ${STANCE_KO[dom]} 중심`
+  }).join(' · ')
+}
+
 function PartyPanel({ data }) {
   if (!data) return <p>불러오는 중…</p>
+  const maxCount = Math.max(...data.parties.map(p => p.actor_count), 1)
+  const summary = partySummary(data.parties)
   return (
     <div>
       {data.mapping_quality === 'low' && (
@@ -59,40 +84,65 @@ function PartyPanel({ data }) {
           ⚠ 이 이슈의 청크 매핑 정밀도는 게이트 기준(90%) 미달 — 구도 수치 해석 주의
         </p>
       )}
-      {data.parties.map(r => <PartyBar key={r.party} row={r} />)}
+      {summary && (
+        <p style={{ fontSize: 13.5, fontWeight: 500, color: '#212529', margin: '2px 0 8px' }}>{summary}</p>
+      )}
+      {data.parties.map(r => <PartyBar key={r.party} row={r} maxCount={maxCount} />)}
       <p style={{ fontSize: 11, color: '#666' }}>
         {Object.entries(STANCE_KO).map(([s, ko]) => (
           <span key={s} style={{ marginRight: 10 }}>
             <span style={{ color: STANCE_COLOR[s] }}>■</span> {ko}
           </span>
         ))}
+        <span style={{ color: '#868e96' }}>— 막대 길이는 인원수 비례</span>
       </p>
     </div>
   )
 }
 
 function TimelineChart({ months }) {
+  // 이 쟁점 발언 수(절대값)의 월별 막대 하나만 — 전체 코퍼스 선(회의 일정 계절성)은
+  // 배경 소음이라 제거. 독자의 질문은 "언제 뜨거웠나" 하나다.
   if (!months || months.length === 0) return <p>타임라인 데이터 없음</p>
-  const W = 640, H = 200, pad = 30
-  const maxC = Math.max(...months.map(m => m.corpus_turns), 1)
-  const maxM = Math.max(...months.map(m => m.mapped_core_turns), 1)
-  const x = i => pad + i * (W - 2 * pad) / Math.max(months.length - 1, 1)
-  const yC = v => H - pad - v / maxC * (H - 2 * pad)
-  const yM = v => H - pad - v / maxM * (H - 2 * pad)
-  const line = (fy, key) => months.map((m, i) => `${x(i).toFixed(1)},${fy(m[key]).toFixed(1)}`).join(' ')
+  const W = 640, H = 190, padX = 30, padTop = 30, padBottom = 26
+  const n = months.length
+  const vals = months.map(m => m.mapped_core_turns || 0)
+  const max = Math.max(...vals, 1)
+  const peakIdx = vals.indexOf(Math.max(...vals))
+  const slot = (W - 2 * padX) / n
+  const barW = Math.max(slot * 0.65, 2)
+  const x = i => padX + i * slot + (slot - barW) / 2
+  const y = v => padTop + (1 - v / max) * (H - padTop - padBottom)
+  const step = Math.max(Math.ceil(n / 4), 1)
+  const ticks = [...new Set([0, ...Array.from({ length: n }, (_, i) => i).filter(i => i % step === 0), n - 1])]
   return (
-    <svg width="100%" viewBox={`0 0 ${W} ${H}`} role="img" aria-label="이슈 월별 발언 추이">
-      <polyline fill="none" stroke="#2563eb" strokeWidth="2" points={line(yC, 'corpus_turns')} />
-      <polyline fill="none" stroke="#d97706" strokeWidth="1.5" strokeDasharray="5 3" points={line(yM, 'mapped_core_turns')} />
-      <text x={pad} y={H - 8} fontSize="11" fill="#666">{months[0].month}</text>
-      <text x={W - pad} y={H - 8} fontSize="11" fill="#666" textAnchor="end">{months[months.length - 1].month}</text>
-      <text x={pad} y={16} fontSize="11" fill="#2563eb">— 전체 발언 추이</text>
-      <text x={pad} y={30} fontSize="11" fill="#d97706">-- 이 쟁점 발언 추이 (상대 비율)</text>
+    <svg width="100%" viewBox={`0 0 ${W} ${H}`} role="img" aria-label="이 쟁점의 월별 발언 수 막대 차트">
+      <line x1={padX} y1={H - padBottom} x2={W - padX} y2={H - padBottom} stroke="#e5e7eb" />
+      {months.map((m, i) => (
+        <rect key={m.month} x={x(i)} y={y(vals[i])} width={barW}
+              height={Math.max(H - padBottom - y(vals[i]), vals[i] > 0 ? 1.5 : 0)}
+              fill={i === peakIdx ? '#1d4ed8' : '#93c5fd'} rx="1">
+          <title>{`${m.month} · ${vals[i]}건`}</title>
+        </rect>
+      ))}
+      {vals[peakIdx] > 0 && (
+        <text x={Math.min(Math.max(x(peakIdx) + barW / 2, 70), W - 70)} y={y(vals[peakIdx]) - 8}
+              fontSize="12" fontWeight="600" fill="#1d4ed8" textAnchor="middle">
+          {months[peakIdx].month} · {vals[peakIdx]}건
+        </text>
+      )}
+      {ticks.map(i => (
+        <text key={i} y={H - 8} fontSize="11" fill="#666"
+              x={i === 0 ? padX : i === n - 1 ? W - padX : x(i) + barW / 2}
+              textAnchor={i === 0 ? 'start' : i === n - 1 ? 'end' : 'middle'}>
+          {months[i].month}
+        </text>
+      ))}
     </svg>
   )
 }
 
-function StanceRow({ actor, onActorClick }) {
+function StanceRow({ actor, onActorClick, maxTotal }) {
   const [open, setOpen] = useState(false)
   return (
     <>
@@ -102,7 +152,7 @@ function StanceRow({ actor, onActorClick }) {
             title="의원 프로필 보기">{actor.speaker}</td>
         <td>{actor.party || '—'}</td>
         <td><span style={{ color: STANCE_COLOR[actor.stance], fontWeight: 600 }}>{STANCE_KO[actor.stance]}</span></td>
-        <td style={{ padding: '2px 8px' }}><StanceMiniBar counts={actor.counts} /></td>
+        <td style={{ padding: '2px 8px' }}><StanceMiniBar counts={actor.counts} maxTotal={maxTotal} /></td>
         <td>{open ? '▲' : '▼'}</td>
       </tr>
       {open && actor.citations.map(cit => (
@@ -183,7 +233,15 @@ export default function IssueView({ selectedIssue, onActorClick, onSelChange }) 
         <>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead><tr><th>발언자</th><th>정당</th><th>입장</th><th style={{ minWidth: 140 }}>입장 분포</th><th></th></tr></thead>
-            <tbody>{stances.actors.map(a => <StanceRow key={a.speaker} actor={a} onActorClick={onActorClick} />)}</tbody>
+            <tbody>
+              {(() => {
+                const maxTotal = Math.max(...stances.actors.map(
+                  a => COUNT_ORDER.reduce((s, k) => s + (a.counts[k] || 0), 0)), 1)
+                return stances.actors.map(a => (
+                  <StanceRow key={a.speaker} actor={a} onActorClick={onActorClick} maxTotal={maxTotal} />
+                ))
+              })()}
+            </tbody>
           </table>
           <p style={{ fontSize: 11, color: '#666' }}>
             {COUNT_ORDER.map(s => (
