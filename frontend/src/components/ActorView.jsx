@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { fetchActor } from '../api'
+import { useEffect, useRef, useState } from 'react'
+import { fetchActor, searchActors } from '../api'
 
 const STANCE_KO = { support: '찬성', oppose: '반대', concern: '우려', mixed: '혼재', no_stance: '무입장' }
 const STANCE_COLOR = { support: '#2563eb', oppose: '#dc2626', concern: '#d97706', mixed: '#7c3aed', no_stance: '#6b7280' }
@@ -20,28 +20,66 @@ function MonthLine({ months }) {
   )
 }
 
-export default function ActorView({ actor, onIssueClick }) {
+export default function ActorView({ actor, onIssueClick, onShown }) {
   const [input, setInput] = useState(actor || '')
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(false)
   const [err, setErr] = useState(null)
+  const [suggestions, setSuggestions] = useState([])
+  const lastLoadedRef = useRef('') // 방금 조회한 이름 — 자동완성 재팝업·이중 fetch 방지
 
   async function load(name) {
     const q = (name || '').trim()
     if (!q) return
+    lastLoadedRef.current = q
+    setSuggestions([])
     setErr(null); setProfile(null); setLoading(true)
-    try { setProfile(await fetchActor(q)) } catch (e) { setErr(e.message) } finally { setLoading(false) }
+    try {
+      setProfile(await fetchActor(q))
+      onShown?.(q)
+    } catch (e) { setErr(e.message) } finally { setLoading(false) }
   }
-  useEffect(() => { if (actor) { setInput(actor); load(actor) } }, [actor])
+  useEffect(() => {
+    if (actor && actor !== lastLoadedRef.current) { setInput(actor); load(actor) }
+  }, [actor])
+
+  // 자동완성 — 250ms 디바운스, 방금 조회한 이름 그대로면 띄우지 않는다
+  useEffect(() => {
+    const q = input.trim()
+    if (!q || q === lastLoadedRef.current) { setSuggestions([]); return undefined }
+    const t = setTimeout(() => {
+      searchActors(q).then(d => setSuggestions(d.matches)).catch(() => setSuggestions([]))
+    }, 250)
+    return () => clearTimeout(t)
+  }, [input])
 
   const maxCommittee = profile ? Math.max(...profile.by_committee.map(c => c.turns), 1) : 1
 
   return (
     <div>
       <div style={{ marginBottom: 12 }}>
-        <input value={input} onChange={e => setInput(e.target.value)}
-               onKeyDown={e => e.key === 'Enter' && load(input)}
-               placeholder="의원 이름 (예: 김윤)" style={{ padding: '6px 8px', marginRight: 8 }} />
+        <span style={{ position: 'relative', display: 'inline-block', marginRight: 8 }}>
+          <input value={input} onChange={e => setInput(e.target.value)}
+                 onKeyDown={e => { if (e.key === 'Enter') load(input); if (e.key === 'Escape') setSuggestions([]) }}
+                 onBlur={() => setTimeout(() => setSuggestions([]), 150)}
+                 placeholder="의원 이름 (예: 김윤)" style={{ padding: '6px 8px' }} />
+          {suggestions.length > 0 && (
+            <ul style={{ position: 'absolute', top: '100%', left: 0, zIndex: 10, minWidth: 220,
+                         margin: '4px 0 0', padding: 4, listStyle: 'none', background: '#fff',
+                         border: '1px solid #dee2e6', borderRadius: 6,
+                         boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
+              {suggestions.map(m => (
+                <li key={m.name}>
+                  <button type="button" onMouseDown={() => { setInput(m.name); load(m.name) }}
+                          style={{ width: '100%', textAlign: 'left', padding: '6px 8px', background: 'none',
+                                   border: 'none', cursor: 'pointer', fontSize: 14, fontFamily: 'inherit' }}>
+                    {m.name} <span style={{ color: '#868e96', fontSize: 12 }}>{m.party}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </span>
         <button onClick={() => load(input)} disabled={loading}>{loading ? '조회 중…' : '조회'}</button>
       </div>
       {err && <p style={{ color: '#6b7280' }}>{err}</p>}

@@ -92,7 +92,7 @@ function StanceRow({ actor, onActorClick }) {
   )
 }
 
-export default function IssueView({ selectedIssue, onActorClick }) {
+export default function IssueView({ selectedIssue, onActorClick, onSelChange }) {
   const [issues, setIssues] = useState([])
   const [sel, setSel] = useState(selectedIssue || 'medical-reform')
   useEffect(() => { if (selectedIssue) setSel(selectedIssue) }, [selectedIssue])
@@ -112,7 +112,7 @@ export default function IssueView({ selectedIssue, onActorClick }) {
 
   return (
     <div>
-      <label>이슈: <select value={sel} onChange={e => setSel(e.target.value)}>
+      <label>이슈: <select value={sel} onChange={e => { setSel(e.target.value); onSelChange?.(e.target.value) }}>
         {issues.map(i => <option key={i.issue_id} value={i.issue_id}>{i.title}</option>)}
       </select></label>
       {error && <p style={{ color: '#dc2626' }}>{error}</p>}
