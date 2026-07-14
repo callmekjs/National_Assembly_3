@@ -8,8 +8,30 @@ import SourceModal from './components/SourceModal'
 import IssueView from './components/IssueView'
 import ActorView from './components/ActorView'
 
+// URL 쿼리 파라미터 ↔ 화면 상태 (공유 가능 링크: ?tab=issues&issue=medical-reform)
+const TABS = ['query', 'issues', 'actor']
+
+function readUrlState() {
+  const p = new URLSearchParams(window.location.search)
+  return {
+    tab: TABS.includes(p.get('tab')) ? p.get('tab') : 'query',
+    issue: p.get('issue'),
+    actor: p.get('actor'),
+  }
+}
+
+function urlFromState(tab, issue, actor) {
+  const p = new URLSearchParams()
+  if (tab !== 'query') p.set('tab', tab)
+  if (tab === 'issues' && issue) p.set('issue', issue)
+  if (tab === 'actor' && actor) p.set('actor', actor)
+  const s = p.toString()
+  return s ? `?${s}` : window.location.pathname
+}
+
 function App() {
-  const [tab, setTab] = useState('query')
+  const initialUrl = readUrlState()
+  const [tab, setTab] = useState(initialUrl.tab)
   const [question, setQuestion] = useState('')
   const [mode, setMode] = useState('qa')
   const [result, setResult] = useState(null)
@@ -17,9 +39,17 @@ function App() {
   const [error, setError] = useState(null)
   const [highlightN, setHighlightN] = useState(null) // [n] 클릭 시 하이라이트할 출처 번호
   const [modalChunkId, setModalChunkId] = useState(null)
-  const [selectedActor, setSelectedActor] = useState(null)
-  const [selectedIssue, setSelectedIssue] = useState(null)
+  const [selectedActor, setSelectedActor] = useState(initialUrl.actor)
+  const [selectedIssue, setSelectedIssue] = useState(initialUrl.issue)
   const [serverStatus, setServerStatus] = useState('checking') // checking | ok | down
+
+  // 상태 → URL 반영 (replaceState — 히스토리 오염 없이 현재 화면을 공유 가능하게)
+  useEffect(() => {
+    const url = urlFromState(tab, selectedIssue, selectedActor)
+    if (url !== window.location.pathname + window.location.search) {
+      window.history.replaceState(null, '', url)
+    }
+  }, [tab, selectedIssue, selectedActor])
 
   useEffect(() => {
     pingHealth().then(() => setServerStatus('ok')).catch(() => setServerStatus('down'))
@@ -144,8 +174,12 @@ function App() {
         </>
       )}
 
-      {tab === 'issues' && <IssueView selectedIssue={selectedIssue} onActorClick={openActor} />}
-      {tab === 'actor' && <ActorView actor={selectedActor} onIssueClick={openIssue} />}
+      {tab === 'issues' && (
+        <IssueView selectedIssue={selectedIssue} onActorClick={openActor} onSelChange={setSelectedIssue} />
+      )}
+      {tab === 'actor' && (
+        <ActorView actor={selectedActor} onIssueClick={openIssue} onShown={setSelectedActor} />
+      )}
 
       <footer>
         <small>

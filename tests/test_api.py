@@ -146,6 +146,28 @@ def test_issues_list():
                "core_chunk_count")), first)
 
 
+def test_actor_search():
+    """의원 자동완성 — 부분일치 목록·빈 q 422·무일치 빈 목록·LIKE 와일드카드 무해."""
+    if not HAS_DB:
+        print(_SKIP_MSG)
+        return
+    r = client.get("/actors", params={"q": "김"})
+    check("actors 검색: 200", r.status_code == 200, r.status_code)
+    body = r.json()
+    check("actors 검색: matches 목록", isinstance(body.get("matches"), list), body)
+    check("actors 검색: 최대 10건", len(body["matches"]) <= 10, len(body["matches"]))
+    if body["matches"]:
+        first = body["matches"][0]
+        check("actors 검색: 필드 name·party", "name" in first and "party" in first, first)
+        check("actors 검색: 부분일치", all("김" in m["name"] for m in body["matches"]), body["matches"])
+    r = client.get("/actors", params={"q": ""})
+    check("actors 검색: 빈 q → 422", r.status_code == 422, r.status_code)
+    r = client.get("/actors", params={"q": "존재하지않는이름"})
+    check("actors 검색: 무일치 빈 목록", r.status_code == 200 and r.json()["matches"] == [], r.json())
+    r = client.get("/actors", params={"q": "%"})
+    check("actors 검색: %% 이스케이프 (전건 매칭 방지)", r.status_code == 200 and r.json()["matches"] == [], r.json())
+
+
 def test_guard_rate_limit_and_cost():
     if not HAS_DB:
         print(_SKIP_MSG); return
@@ -206,6 +228,7 @@ def main_():
     test_openai_error_502()
     test_feedback_and_citation_errors()
     test_issues_list()
+    test_actor_search()
     test_guard_rate_limit_and_cost()
     print("\nALL PASS" if HAS_DB else "\nDB 없음 — 전체 건너뜀")
 

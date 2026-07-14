@@ -52,6 +52,10 @@ export function fetchActor(name) {
   return request(`/actors/${encodeURIComponent(name)}`)
 }
 
+export function searchActors(q) {
+  return request(`/actors?q=${encodeURIComponent(q)}`)
+}
+
 export function pingHealth() {
   // 콜드스타트(Render free 슬립) 대비 — 최대 90초 대기
   return request('/health', {}, 90000)

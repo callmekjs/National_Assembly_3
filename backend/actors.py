@@ -64,6 +64,20 @@ def fold_issue_stances(rows: list[dict]) -> list[dict]:
     return out
 
 
+def search_members(q: str, limit: int = 10) -> list[dict]:
+    """의원 이름 부분일치 검색 — 프로필 자동완성용. members(320명) 대상, 이름 오름차순.
+
+    LIKE 이스케이프는 검색 모듈 규칙 재사용 — 이름에 %·_ 가 올 일은 없지만
+    사용자 입력이므로 방어."""
+    from search_keyword import _like_escape
+    with get_conn() as conn, conn.cursor(cursor_factory=RealDictCursor) as cur:
+        cur.execute(
+            "SELECT name, party FROM members WHERE name LIKE %s ORDER BY name LIMIT %s",
+            (f"%{_like_escape(q.strip())}%", limit),
+        )
+        return [dict(r) for r in cur.fetchall()]
+
+
 def actor_issue_stances(variants: list[str]) -> list[dict]:
     """의원의 이슈별 입장 (POL-9) — issue_stances 역조회, 별칭 목록으로 매칭."""
     with get_conn() as conn, conn.cursor(cursor_factory=RealDictCursor) as cur:

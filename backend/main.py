@@ -15,7 +15,7 @@ from openai import OpenAIError
 from psycopg2.extras import RealDictCursor
 from pydantic import BaseModel, Field
 
-from actors import actor_profile
+from actors import actor_profile, search_members
 from issues import issue_party_stances, issue_stances, issue_timeline, list_issues
 from answer import MODE_CONFIG, NO_EVIDENCE, generate_answer
 from db import init_pool, close_pool, get_conn
@@ -383,6 +383,12 @@ def answer_endpoint(req: AnswerRequest):
         return generate_answer(req.question, req.mode, req.committee, req.date_from, req.date_to)
     except OpenAIError as e:
         raise HTTPException(status_code=502, detail=f"LLM 호출 실패: {type(e).__name__}")
+
+
+@app.get("/actors")
+def get_actors(q: str = Query(min_length=1, max_length=30)):
+    """의원 이름 부분일치 검색 — 프로필 자동완성용 (members 320명, 최대 10건)."""
+    return {"matches": search_members(q)}
 
 
 @app.get("/actors/{name}")
