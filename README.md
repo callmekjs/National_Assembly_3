@@ -82,13 +82,18 @@ python scripts/extractor_v1.py 과방위 외통위
 
 1. **Supabase**: 프로젝트 생성 (리전 Northeast Asia) → Settings > Database 의
    Connection string(URI) 복사 → 로컬 `.env` 에 `DEPLOY_DATABASE_URL=...` 추가
+   - **Session Pooler**(포트 5432) URI 를 쓸 것 — Direct connection 은 IPv6 전용이라
+     로컬·Render 에서 접속 실패할 수 있음. Transaction Pooler(6543)는 스키마 작업에 부적합.
 2. **코퍼스 이전** (로컬에서): `python scripts/make_deploy_corpus.py` — 행수 검증
    리포트 `[OK]` 확인 (dry-run 먼저: `--dry-run`)
+   - `db/indexes.sql` 은 원격에 실행하지 말 것 — trgm 인덱스는 축소본에 의도적으로
+     미생성(용량 절약), HNSW 는 스크립트가 한도 내일 때 직접 생성한다.
 3. **Render**: New Web Service → GitHub 저장소 연결 → Root Directory `backend`,
    Build `pip install -r requirements.txt`, Start
    `uvicorn main:app --host 0.0.0.0 --port $PORT`, Health Check Path `/health`
    - 환경변수: `DATABASE_URL`(Supabase URI), `OPENAI_API_KEY`,
-     `BACKEND_CORS_ORIGINS`(Vercel 도메인, 배포 후 갱신), `RERANKER_ENABLED=1`,
+     `BACKEND_CORS_ORIGINS`(Vercel 도메인, 배포 후 갱신 — 형식은
+     `https://<app>.vercel.app`, 끝 슬래시 없음), `RERANKER_ENABLED=1`,
      `PYTHON_VERSION=3.12.10`
 4. **Vercel**: Add New Project → 같은 저장소 → Root Directory `frontend` →
    환경변수 `VITE_API_URL`(Render URL) → Deploy → 도메인을 Render 의

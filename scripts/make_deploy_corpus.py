@@ -83,12 +83,14 @@ def copy_table(lcur, rcur, table: str, where: str = "", params: tuple = ()) -> i
     """로컬 → 원격 한 테이블 복사 (컬럼 자동, 배치 1000). 반환 = 복사 행수."""
     from psycopg2.extras import execute_values
     lcur.execute(
-        "SELECT column_name FROM information_schema.columns "
-        "WHERE table_name = %s ORDER BY ordinal_position", (table,))
-    cols = [r[0] for r in lcur.fetchall()]
+        "SELECT column_name, data_type FROM information_schema.columns "
+        "WHERE table_name = %s AND table_schema = 'public' ORDER BY ordinal_position", (table,))
+    meta = lcur.fetchall()
+    cols = [c for c, _ in meta]
     collist = ", ".join(cols)
-    # embedding(vector) 은 텍스트 직렬화로 이식 — 원격에서 ::vector 캐스팅
-    sel = ", ".join(f"{c}::text" if c == "embedding" else c for c in cols)
+    # vector·jsonb 는 텍스트 직렬화로 이식 — 문자열 리터럴은 원격 컬럼 타입으로 암시 캐스팅됨
+    sel = ", ".join(f"{c}::text" if c == "embedding" or dt == "jsonb" else c
+                    for c, dt in meta)
     lcur.execute(f"SELECT {sel} FROM {table} {where}", params)
     n = 0
     while True:
@@ -155,7 +157,7 @@ def main():
                     if scope["index"]:
                         print("HNSW 생성 중 (수만 행 — 수 분)…")
                         rcur.execute("""
-                            CREATE INDEX IF NOT EXISTS embeddings_openai_hnsw
+                            CREATE INDEX IF NOT EXISTS idx_embeddings_openai_hnsw
                             ON embeddings_openai USING hnsw (embedding vector_cosine_ops)
                         """)
                     # 행수 검증 — 원격 count 와 대조
