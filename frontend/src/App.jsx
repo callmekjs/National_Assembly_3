@@ -70,11 +70,22 @@ function App() {
         </div>
       )}
 
-      <div style={{ marginBottom: 12 }}>
-        <button onClick={() => setTab('query')} disabled={tab === 'query'}>질의</button>
-        <button onClick={() => setTab('issues')} disabled={tab === 'issues'}>쟁점 분석</button>
-        <button onClick={() => setTab('actor')} disabled={tab === 'actor'}>의원 프로필</button>
-      </div>
+      <nav className="tab-nav" aria-label="주요 화면">
+        {[
+          ['query', '질의'],
+          ['issues', '쟁점 분석'],
+          ['actor', '의원 프로필'],
+        ].map(([id, label]) => (
+          <button
+            key={id}
+            className={tab === id ? 'active' : ''}
+            aria-current={tab === id ? 'page' : undefined}
+            onClick={() => setTab(id)}
+          >
+            {label}
+          </button>
+        ))}
+      </nav>
 
       {tab === 'query' && (
         <>

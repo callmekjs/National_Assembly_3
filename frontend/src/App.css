@@ -32,6 +32,35 @@ header h1 {
   line-height: 1.5;
 }
 
+/* ── 탭 내비게이션: 활성 = 진하게 (mode-toggle 과 같은 대비 문법) ── */
+.tab-nav {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.tab-nav button {
+  padding: 0.5rem 1.25rem;
+  font-size: 0.9rem;
+  font-family: inherit;
+  background: #fff;
+  color: #495057;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.tab-nav button:not(.active):hover {
+  border-color: #adb5bd;
+}
+
+.tab-nav button.active {
+  background: #212529;
+  color: #fff;
+  border-color: #212529;
+  font-weight: 600;
+}
+
 .query-form {
   display: flex;
   flex-direction: column;
