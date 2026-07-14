@@ -271,6 +271,33 @@ def test_build_user_message_issue_block():
     check("이슈블록: 미지정 시 경계 없음", "이슈 분석 데이터" not in build_user_message("q", "b"))
 
 
+# ── 10. 질문 유형 라우터 (2026-07-14) ─────────────────────────────────────────
+
+def test_classify_question():
+    from query_parser import classify_question
+    check("라우터: 여야 비교", "compare" in classify_question("전세사기 특별법에 대한 여야 입장 차이는?"))
+    check("라우터: 찬반", "compare" in classify_question("의대 증원 찬반 의견 정리해줘"))
+    check("라우터: 경과", "timeline" in classify_question("AI 기본법 논의 경과를 브리핑해줘"))
+    check("라우터: 변해왔", "timeline" in classify_question("반도체 지원 논의가 어떻게 변해왔어?"))
+    check("라우터: 정부 주체", "actor" in classify_question("의대 정원 확대에 대해 정부는 어떤 입장이야?"))
+    check("라우터: 장관 주체", "actor" in classify_question("조규홍 장관의 입장은 뭐야?"))
+    check("라우터: 일반 질문 무유형", classify_question("티메프 사태 피해자 구제 대책") == set())
+    check("라우터: 복합(비교+경과)", classify_question("여야 입장이 어떻게 변해왔는지 경과 알려줘") >= {"compare", "timeline"})
+
+
+def test_type_guides():
+    block = "[1]\nspeaker: 김현 위원\ncontent:\n발언"
+    msg = build_user_message("의대 정원에 대해 정부는 어떤 입장이야?", block)
+    check("유형지시: 주체 질문 → 주체 중심", "주체의 발언을 중심" in msg)
+    msg = build_user_message("전세사기법 여야 입장 차이는?", block)
+    check("유형지시: 비교 질문 → 일반화 금지", "일반화하지" in msg)
+    check("유형지시: 비교 질문 → 정당 가드 병행", "[정당(당시 여야)]" in msg)
+    msg = build_user_message("AI 기본법 논의 경과 알려줘", block)
+    check("유형지시: 경과 질문 → 시간순", "시간순" in msg)
+    msg = build_user_message("티메프 사태 피해자 구제 대책", block)
+    check("유형지시: 무관 질문 없음", "시간순" not in msg and "일반화하지" not in msg)
+
+
 def main():
     test_parse_citations()
     test_build_source_block()
@@ -283,6 +310,8 @@ def main():
     test_strip_boilerplate()
     test_build_user_message()
     test_build_user_message_issue_block()
+    test_classify_question()
+    test_type_guides()
     print("\nALL PASS")
 
 
