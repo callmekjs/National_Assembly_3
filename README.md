@@ -72,6 +72,42 @@ python scripts/extractor_v1.py 과방위 외통위
 
 ---
 
+## 공개 배포 (4단계-B 런북)
+
+무료 3-스택: **Vercel**(프론트) + **Render free**(백엔드) + **Supabase free**(DB).
+배포 코퍼스는 이슈 중심 축소본 — `scripts/make_deploy_corpus.py` 가 생성 (전체 9.6GB
+중 이슈 관련 turn만 ≤350MB, 검색 eval 수치 R@5 0.983 은 전체 코퍼스 로컬 측정 기준).
+
+### 순서 (사용자 체크리스트)
+
+1. **Supabase**: 프로젝트 생성 (리전 Northeast Asia) → Settings > Database 의
+   Connection string(URI) 복사 → 로컬 `.env` 에 `DEPLOY_DATABASE_URL=...` 추가
+   - **Session Pooler**(포트 5432) URI 를 쓸 것 — Direct connection 은 IPv6 전용이라
+     로컬·Render 에서 접속 실패할 수 있음. Transaction Pooler(6543)는 스키마 작업에 부적합.
+2. **코퍼스 이전** (로컬에서): `python scripts/make_deploy_corpus.py` — 행수 검증
+   리포트 `[OK]` 확인 (dry-run 먼저: `--dry-run`)
+   - `db/indexes.sql` 은 원격에 실행하지 말 것 — trgm 인덱스는 축소본에 의도적으로
+     미생성(용량 절약), HNSW 는 스크립트가 한도 내일 때 직접 생성한다.
+3. **Render**: New Web Service → GitHub 저장소 연결 → Root Directory `backend`,
+   Build `pip install -r requirements.txt`, Start
+   `uvicorn main:app --host 0.0.0.0 --port $PORT`, Health Check Path `/health`
+   - 환경변수: `DATABASE_URL`(Supabase URI), `OPENAI_API_KEY`,
+     `BACKEND_CORS_ORIGINS`(Vercel 도메인, 배포 후 갱신 — 형식은
+     `https://<app>.vercel.app`, 끝 슬래시 없음), `RERANKER_ENABLED=1`,
+     `PYTHON_VERSION=3.12.10`
+4. **Vercel**: Add New Project → 같은 저장소 → Root Directory `frontend` →
+   환경변수 `VITE_API_URL`(Render URL) → Deploy → 도메인을 Render 의
+   `BACKEND_CORS_ORIGINS` 에 반영(재배포)
+5. **스모크 6항목**: `/health` 200(행수=축소본) / report 질의 1건(issue_context 포함)
+   / 쟁점 탭 24개 이슈 / 프로필 김윤 / 연속 6회 질의 → 429 / 15분 방치 후 콜드스타트 배너
+
+### 운영 방어선 (기본값)
+
+IP당 LLM 분당 5회·일반 60회, 일별 OpenAI 비용 상한 $1 (초과 시 한국어 안내).
+상세: `docs/superpowers/specs/2026-07-11-dep-a-guardrails-design.md`
+
+---
+
 ## 서비스 실행 방법
 
 ### 백엔드
@@ -136,17 +172,15 @@ npm run dev    # → http://localhost:5173
   - [x] RAG-0 기반 정비 → [x] RAG-1 조회 API → [x] RAG-2 키워드 검색 → [x] RAG-3 벡터 검색
   - → [x] RAG-4 하이브리드 → [x] RAG-5 검색 평가 → [x] RAG-6 답변 생성(qa/report 모드)
   - → [x] RAG-7 /query 통합(Grounding 판정 + query_logs) → [x] RAG-8 프론트(출처 패널·원문 모달)
-- [ ] 3단계: 정책 도메인 분석 기능 (쟁점/시계열/행위자) — 진행 중, 세부 로드맵 POL-0~9 (`docs/progress.md`)
-  - [x] POL-0 정당 모듈: 22대 의원-정당 매핑 + **발언 시점 기준 여야 판정** + 발언 자격(role) 게이트
-    (국회의원만 정당 라벨, 행정부는 "정부측", 후보자·증인은 무표기 — `docs/party_module_spec.md`)
-  - [x] POL-1 enrichment 실태 조사: ETL-5 필드 감사 — stance_signals·bill_refs·policy_domain
-    사용 불가 판정, **입장 분석은 LLM 판정으로 확정** (분석을 불량 재료 위에 쌓기 전에 차단)
-  - [x] POL-2 행위자 프로필 API: `/actors/{name}` — 발언 통계·여야 이력·주요 언급 기관·최근 발언
-  - [ ] POL-3~9: 쟁점 사전 → 타임라인 → 입장 분석 → 여야 구도 → eval → 통합 → 프론트
+- [x] **3단계: 정책 도메인 분석 기능 — 완료 (2026-07-11, POL-0~9 전 항목)**
+  - [x] POL-0 정당 모듈(시점별 여야 판정·role 게이트) → [x] POL-1 enrichment 실태 조사(입장은 LLM 판정 확정)
+  - → [x] POL-2 행위자 프로필 API → [x] POL-3 쟁점 사전 24개 → [x] POL-4 타임라인
+  - → [x] POL-5 입장 분석(3,270 판정 🔶 사람 기준선 27.5% — rubric 재정렬 후속) → [x] POL-6 여야 구도
+  - → [x] POL-7 입장 eval 도구 → [x] POL-8 브리핑 분석 주입 → [x] POL-9 의원 프로필·양방향 대시보드
 - [x] 코드 전수 검토 + 1차 수정 (2026-07-06): 34건 도출(검토 32 + 평가 보고서 2), 12건 완료 —
   재적재 임베딩 유실 방지, 긴 발언 맥락 복원, 근거 블록 로그, 입력 검증, 테스트 pytest 정합화 등
   (`docs/fix_checklist.md`, 평가는 `docs/llm_comparison_report.md`)
-- [ ] 4단계: GovTech 배포 버전
+- [ ] 4단계: GovTech 배포 버전 — 진행 중 (A 방어선 ✅ rate limit·비용 상한 / B 배포 준비 ✅ 코드 완결 — 잔여: 계정 연결, README 런북 참조)
 
 ---
 
