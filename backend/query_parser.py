@@ -17,6 +17,30 @@
 import datetime
 import re
 
+# ── 질문 유형 라우터 (2026-07-14) ────────────────────────────────────────────
+# 배경 (LLM 답변 프로브 실측): ①특정 주체 질문에 타 발언자 패딩 ②소수 발언을
+# 정당 전체 입장으로 과대일반화 ③"경과" 질문에 시간 구조 부재.
+# 유형을 감지해 질문 옆에 유형별 지시문을 붙인다 (answer.build_user_message —
+# 정당 가드와 같은 '맞불' 배치, 시스템 프롬프트보다 준수율 높음이 기실측).
+_COMPARE_RE = re.compile(r"여야|입장\s*차이|정당\s*간|찬반|비교")
+_TIMELINE_RE = re.compile(r"경과|추이|흐름|연혁|변해\s*왔|바뀌어\s*왔|어떻게\s*진행")
+_ACTOR_RE = re.compile(
+    r"(정부|대통령실|[가-힣]{2,4}\s*(?:장관|차관|처장|청장|위원장|의원|후보자))"
+    r"[은는이가의]?\s*[^,.\n]{0,10}?(입장|생각|견해|반응|태도|주장|답변)"
+)
+
+
+def classify_question(q: str) -> set:
+    """질문 유형 집합 — {'compare','timeline','actor'} 의 부분집합 (복수 가능, 없으면 빈 집합)."""
+    types = set()
+    if _COMPARE_RE.search(q):
+        types.add("compare")
+    if _TIMELINE_RE.search(q):
+        types.add("timeline")
+    if _ACTOR_RE.search(q):
+        types.add("actor")
+    return types
+
 # ── 위원회 인식 (정식명·통용 표기 → 약칭) ───────────────────────────────────
 # 통용 별칭 추가 (2026-07-03): "외교위" 미인식 실측 — 필터를 못 잡으면 전체 검색으로
 # 넘어가지만, 복수 위원회 질문에서 등록 표기만 잡혀 나머지가 배제되는 문제와 결합해
