@@ -9,6 +9,14 @@ const GROUNDING_CLASS = {
   NONE: 'grounding-none',
 }
 
+// 사용자 표시용 한국어 라벨 — 값 자체(FULL 등)는 API 계약이라 그대로 둔다
+const GROUNDING_LABEL = {
+  FULL: '✓ 모든 내용 근거 확인됨',
+  PARTIAL: '일부만 근거 확인됨',
+  REFUSED: '기록에서 확인 불가',
+  NONE: '근거 연결 없음',
+}
+
 // 텍스트 속 [n]을 클릭 가능한 인용 버튼으로 치환
 function withCitations(children, onCiteClick) {
   return (Array.isArray(children) ? children : [children]).flatMap((child, i) => {
@@ -54,12 +62,11 @@ function AnswerPanel({ result, onCiteClick }) {
   const components = { p: cite('p'), li: cite('li'), strong: cite('strong'), em: cite('em') }
 
   const seconds = (result.latency_ms / 1000).toFixed(1)
-  const cost = result.usage?.est_cost_usd
 
   return (
     <div className="answer-panel">
       <span className={`grounding-badge ${GROUNDING_CLASS[result.grounding] ?? 'grounding-none'}`}>
-        Grounding: {result.grounding}
+        {GROUNDING_LABEL[result.grounding] ?? result.grounding}
       </span>
 
       {result.issue_context && (
@@ -79,7 +86,6 @@ function AnswerPanel({ result, onCiteClick }) {
       <div className="answer-meta">
         <span>
           {result.mode === 'report' ? '정책 브리핑' : '간단 답변'} · {seconds}초
-          {cost != null && ` · $${cost}`}
         </span>
         {result.query_id && (
           <span className="feedback">

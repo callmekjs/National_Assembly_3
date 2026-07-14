@@ -63,8 +63,8 @@ function TimelineChart({ months }) {
       <polyline fill="none" stroke="#d97706" strokeWidth="1.5" strokeDasharray="5 3" points={line(yM, 'mapped_core_turns')} />
       <text x={pad} y={H - 8} fontSize="11" fill="#666">{months[0].month}</text>
       <text x={W - pad} y={H - 8} fontSize="11" fill="#666" textAnchor="end">{months[months.length - 1].month}</text>
-      <text x={pad} y={16} fontSize="11" fill="#2563eb">— 코퍼스 발언량(좌축 정규화)</text>
-      <text x={pad} y={30} fontSize="11" fill="#d97706">-- 매핑 core(우축 정규화)</text>
+      <text x={pad} y={16} fontSize="11" fill="#2563eb">— 전체 발언 추이</text>
+      <text x={pad} y={30} fontSize="11" fill="#d97706">-- 이 쟁점 발언 추이 (상대 비율)</text>
     </svg>
   )
 }
