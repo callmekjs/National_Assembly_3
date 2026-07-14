@@ -461,14 +461,17 @@ def generate_answer(
     group = bool(q_committees and len(q_committees) > 1)
     block = build_source_block(sources, neighbors, group_by_committee=group)
 
+    # 주입 조건 (POL-8 → 2026-07-14 확장): report 전체 + qa 비교 질문.
+    # qa 비교는 소수 근거 발언이 진영 전체 입장으로 승격되는 문제(프로브 실측)를
+    # 전체 판정 집계(정당별 인원·방향)로 대체하기 위함.
     issue_block, issue_ctx = "", None
-    if mode == "report":
+    if mode == "report" or "compare" in classify_question(question):
         try:
-            found = issue_context_for(question)
+            found = issue_context_for(question, style="report" if mode == "report" else "qa")
             if found:
                 issue_block, issue_ctx = found
         except Exception:
-            logger.warning("이슈 분석 주입 실패 — 주입 생략하고 브리핑 계속", exc_info=True)
+            logger.warning("이슈 분석 주입 실패 — 주입 생략하고 답변 계속", exc_info=True)
 
     resp = _get_client().chat.completions.create(
         model=MODEL,

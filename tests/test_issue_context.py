@@ -80,8 +80,20 @@ def test_build_issue_block_low_and_fallback():
     assert "- 발언 피크:" not in build_issue_block(PARTY_DATA, None, [])
 
 
+def test_build_issue_block_qa_guide():
+    """qa 비교 질문용 가이드 — 섹션 지시('## 개요') 없이 서술 방식만 (2026-07-14)."""
+    from issue_context import _GUIDE_QA
+    block = build_issue_block(PARTY_DATA, TIMELINE, ACTORS, guide=_GUIDE_QA)
+    assert "## 개요" not in block                               # report 전용 지시 미포함
+    assert "정당별 인원·방향" in block                           # qa 지시 포함
+    assert "- 구도: " in block                                  # 데이터부는 동일
+    # 기본값은 기존 report 가이드 그대로 (하위 호환)
+    assert "'## 개요' 섹션에" in build_issue_block(PARTY_DATA, TIMELINE, ACTORS)
+
+
 if __name__ == "__main__":
     test_detect_issue()
     test_build_issue_block()
     test_build_issue_block_low_and_fallback()
+    test_build_issue_block_qa_guide()
     print("all passed")
