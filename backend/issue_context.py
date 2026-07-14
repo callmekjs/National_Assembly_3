@@ -16,6 +16,14 @@ _GUIDE = (
     "표기와 함께 2~3문장으로 반드시 요약해 포함한다. 개별 발언 인용 근거는 [n] 본문만 "
     "쓴다. 입장 세분류(찬성/우려 경계)는 오차가 있으니 방향(찬반) 중심으로 서술한다.)"
 )
+# qa 비교 질문용 — 섹션 구조가 없으므로 '개요 섹션' 지시 대신 서술 방식만 지시.
+# 소수 근거 발언의 진영 일반화(2026-07-14 프로브 실측)를 전체 판정 집계로 대체.
+_GUIDE_QA = (
+    "(코퍼스 분석 기준 — 아래 수치는 회의록 자동 분석 결과다. 지시: 여야·정당의 "
+    "전체 구도는 개별 발언이 아니라 이 데이터(정당별 인원·방향)를 근거로 서술하고 "
+    "\"(코퍼스 분석 기준)\"을 병기한다. 개별 발언 인용은 [n] 본문만 쓴다. "
+    "입장 세분류(찬성/우려 경계)는 오차가 있으니 방향(찬반) 중심으로 서술한다.)"
+)
 _LOW_WARN = "⚠ 이 이슈의 자동 매핑 정밀도는 기준 미달 — 수치 해석 주의"
 
 _issue_index: list[dict] | None = None
@@ -43,9 +51,10 @@ def _badge(side: list | None) -> str:
     return f" [{side[0]}]" if len(set(side)) == 1 else f" [{side[0]}→{side[1]}]"
 
 
-def build_issue_block(party_data: dict, timeline: dict | None, actors: list[dict]) -> str:
+def build_issue_block(party_data: dict, timeline: dict | None, actors: list[dict],
+                      guide: str = _GUIDE) -> str:
     """구도·피크·행위자 → LLM 주입용 컴팩트 텍스트. 순수 함수."""
-    lines = [f"[이슈: {party_data['title']}]", _GUIDE]
+    lines = [f"[이슈: {party_data['title']}]", guide]
     if party_data.get("mapping_quality") == "low":
         lines.append(_LOW_WARN)
 
@@ -107,8 +116,10 @@ def top_actors(issue_id: str, limit: int = 8) -> list[dict]:
         return [{"speaker": s, "n_turns": n} for s, n in cur.fetchall()]
 
 
-def issue_context_for(question: str) -> tuple[str, dict] | None:
-    """질문 → (분석 블록, issue_context dict) 또는 None (감지 실패·판정 없는 이슈)."""
+def issue_context_for(question: str, style: str = "report") -> tuple[str, dict] | None:
+    """질문 → (분석 블록, issue_context dict) 또는 None (감지 실패·판정 없는 이슈).
+
+    style: "report"(개요 섹션 요약 지시) | "qa"(비교 서술 방식만 지시 — 섹션 구조 없음)."""
     hit = detect_issue(question, load_issue_index())
     if hit is None:
         return None
@@ -117,5 +128,6 @@ def issue_context_for(question: str) -> tuple[str, dict] | None:
     if party_data is None:
         return None
     block = build_issue_block(party_data, issue_timeline(hit["issue_id"]),
-                              top_actors(hit["issue_id"]))
+                              top_actors(hit["issue_id"]),
+                              guide=_GUIDE_QA if style == "qa" else _GUIDE)
     return block, {"issue_id": hit["issue_id"], "title": hit["title"]}
