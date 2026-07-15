@@ -5,6 +5,35 @@ import MonthlyBars from './MonthlyBars'
 const STANCE_KO = { support: '찬성', oppose: '반대', concern: '우려', mixed: '혼재', no_stance: '무입장' }
 const STANCE_COLOR = { support: '#2563eb', oppose: '#dc2626', concern: '#d97706', mixed: '#7c3aed', no_stance: '#6b7280' }
 
+// 데이터 나열 대신 읽히는 문장으로 — 쟁점 상세의 "구도 요약 문장"과 같은 처방
+function buildSummary(profile) {
+  const lines = []
+  const total = profile.totals.turns
+  const committees = [...profile.by_committee].sort((a, b) => b.turns - a.turns)
+  if (committees.length === 1) {
+    lines.push(`${committees[0].committee}에서만 발언 — ${total.toLocaleString()}턴 · 회의 ${profile.totals.meetings}회`)
+  } else if (committees.length > 1) {
+    const top = committees[0]
+    const pct = Math.round((top.turns / Math.max(total, 1)) * 100)
+    lines.push(`${top.committee} 중심 활동 (발언의 ${pct}%) — 총 ${total.toLocaleString()}턴 · 회의 ${profile.totals.meetings}회`)
+  }
+  if (profile.by_month.length > 0) {
+    const peak = profile.by_month.reduce((a, b) => (b.turns > a.turns ? b : a))
+    if (peak.turns > 0) lines.push(`가장 활발했던 시기는 ${peak.month} (${peak.turns}턴)`)
+  }
+  if (profile.issue_stances.length > 0) {
+    const tops = [...profile.issue_stances].sort((a, b) => b.total_turns - a.total_turns).slice(0, 2)
+    lines.push(tops.map(s => `'${s.title}'에 ${STANCE_KO[s.stance]}`).join(' · ') + ' 입장')
+  }
+  if (profile.top_mentions.length > 0) {
+    lines.push(`자주 언급한 기관: ${profile.top_mentions.slice(0, 3).map(m => m.org).join(', ')}`)
+  }
+  const q = profile.utterance_types.question
+  if (q >= 0.65) lines.push('발언은 질의 중심')
+  else if (q > 0 && q <= 0.35) lines.push('발언은 진술(답변·보고) 중심')
+  return lines
+}
+
 export default function ActorView({ actor, onIssueClick, onShown }) {
   const [input, setInput] = useState(actor || '')
   const [profile, setProfile] = useState(null)
@@ -77,25 +106,10 @@ export default function ActorView({ actor, onIssueClick, onShown }) {
               {profile.party_history.map(h => `${h.period}: ${h.label || '—'}`).join(' / ')}
             </p>
           )}
-          <p style={{ fontSize: 13 }}>
-            발언 {profile.totals.turns.toLocaleString()}턴 · 회의 {profile.totals.meetings}회 · {profile.totals.first} ~ {profile.totals.last}
-          </p>
-
-          <h4>위원회 분포</h4>
-          {profile.by_committee.length === 1 ? (
-            // 위원회 1개면 최대값 대비 막대가 무조건 100% 폭 — 의미 없는 잉크라 텍스트로
-            <p style={{ fontSize: 13, margin: '2px 0' }}>
-              {profile.by_committee[0].committee} {profile.by_committee[0].turns.toLocaleString()}턴 (전체 발언)
-            </p>
-          ) : profile.by_committee.map(c => (
-            <div key={c.committee} style={{ display: 'flex', alignItems: 'center', gap: 8, margin: '2px 0', maxWidth: 560 }}>
-              <div style={{ width: 150, fontSize: 12, flexShrink: 0 }}>{c.committee}</div>
-              <div style={{ flex: 1, background: '#f3f4f6', borderRadius: 3, height: 14 }}>
-                <div style={{ width: `${(c.turns / profile.totals.turns) * 100}%`, background: '#2563eb', height: 14, borderRadius: 3 }} />
-              </div>
-              <div style={{ width: 60, fontSize: 12, textAlign: 'right', flexShrink: 0 }}>{c.turns}턴</div>
-            </div>
-          ))}
+          <ul style={{ margin: '12px 0 20px', padding: '14px 18px 14px 34px', maxWidth: 640,
+                       background: '#f8f9fa', borderRadius: 8, fontSize: 15, lineHeight: 1.7 }}>
+            {buildSummary(profile).map((line, i) => <li key={i}>{line}</li>)}
+          </ul>
 
           <h4>월별 발언 추이</h4>
           <MonthlyBars months={profile.by_month.map(m => ({ month: m.month, value: m.turns }))}
@@ -117,33 +131,22 @@ export default function ActorView({ actor, onIssueClick, onShown }) {
                     <tr key={s.issue_id} onClick={() => onIssueClick(s.issue_id)} className="clickable-row"
                         style={{ cursor: 'pointer', borderBottom: '1px solid #f1f3f5' }}
                         title="클릭하면 쟁점 분석으로 이동">
-                      <td style={{ padding: '5px 8px 5px 0' }}>{s.title}</td>
-                      <td style={{ textAlign: 'center', padding: '5px 8px', color: STANCE_COLOR[s.stance], fontWeight: 600 }}>{STANCE_KO[s.stance]}</td>
-                      <td style={{ textAlign: 'center', padding: '5px 0 5px 8px', fontSize: 12 }}>{s.total_turns}</td>
+                      <td style={{ padding: '6px 8px 6px 0' }}>{s.title}</td>
+                      <td style={{ textAlign: 'center', padding: '6px 8px', color: STANCE_COLOR[s.stance], fontWeight: 600 }}>{STANCE_KO[s.stance]}</td>
+                      <td style={{ textAlign: 'center', padding: '6px 0 6px 8px', fontSize: 13 }}>{s.total_turns}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
-              <p style={{ fontSize: 11, color: '#888' }}>입장은 LLM 자동 판정 — 방향 참고용 · 행 클릭 시 쟁점 분석으로 이동</p>
+              <p style={{ fontSize: 12, color: '#868e96' }}>입장은 LLM 자동 판정 — 방향 참고용 · 행 클릭 시 쟁점 분석으로 이동</p>
             </>
-          ) : <p style={{ fontSize: 13, color: '#666' }}>판정된 이슈 없음</p>}
-
-          <p style={{ fontSize: 13, margin: '14px 0' }}>
-            <strong>발언 유형</strong>{' '}
-            {Object.entries(profile.utterance_types).map(([k, v]) => `${k === 'question' ? '질의' : '진술'} ${(v * 100).toFixed(0)}%`).join(' · ') || '—'}
-            {profile.top_mentions.length > 0 && (
-              <>
-                <span style={{ color: '#ced4da', margin: '0 10px' }}>|</span>
-                <strong>주요 언급 기관</strong>{' '}
-                {profile.top_mentions.map(m => `${m.org}(${m.count})`).join(', ')}
-              </>
-            )}
-          </p>
+          ) : <p style={{ fontSize: 14, color: '#666' }}>판정된 이슈 없음</p>}
 
           <h4>최근 발언</h4>
-          {profile.recent_utterances.map(u => (
-            <p key={u.chunk_id} style={{ fontSize: 12, color: '#444', margin: '4px 0' }}>
-              [{u.date} · {u.committee}] {u.snippet}…
+          {profile.recent_utterances.slice(0, 3).map(u => (
+            <p key={u.chunk_id} style={{ fontSize: 14, color: '#333', margin: '10px 0', maxWidth: 780, lineHeight: 1.65 }}>
+              <span style={{ color: '#868e96', fontSize: 12, marginRight: 6 }}>{u.date} · {u.committee}</span>
+              {u.snippet}…
             </p>
           ))}
         </div>
