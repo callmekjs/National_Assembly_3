@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react'
 import './App.css'
-import { postQuery, pingHealth } from './api'
+import { postQuery, pingHealth, fetchMe, getToken, clearToken } from './api'
 import QueryForm from './components/QueryForm'
 import AnswerPanel from './components/AnswerPanel'
 import SourcePanel from './components/SourcePanel'
 import SourceModal from './components/SourceModal'
 import IssueView from './components/IssueView'
 import ActorView from './components/ActorView'
+import AuthModal from './components/AuthModal'
 
 // URL 쿼리 파라미터 ↔ 화면 상태 (공유 가능 링크: ?tab=issues&issue=medical-reform)
 const TABS = ['query', 'issues', 'actor']
@@ -42,6 +43,8 @@ function App() {
   const [selectedActor, setSelectedActor] = useState(initialUrl.actor)
   const [selectedIssue, setSelectedIssue] = useState(initialUrl.issue)
   const [serverStatus, setServerStatus] = useState('checking') // checking | ok | down
+  const [user, setUser] = useState(null)         // {username} | null
+  const [authOpen, setAuthOpen] = useState(false)
 
   // 상태 → URL 반영 (replaceState — 히스토리 오염 없이 현재 화면을 공유 가능하게)
   useEffect(() => {
@@ -54,6 +57,13 @@ function App() {
   useEffect(() => {
     pingHealth().then(() => setServerStatus('ok')).catch(() => setServerStatus('down'))
   }, [])
+
+  useEffect(() => {
+    if (!getToken()) return
+    fetchMe().then(me => setUser(me)).catch(() => clearToken())
+  }, [])
+
+  function logout() { clearToken(); setUser(null) }
 
   function openActor(name) { setSelectedActor(name); setTab('actor') }
   function openIssue(issueId) { setSelectedIssue(issueId); setTab('issues') }
@@ -100,6 +110,16 @@ function App() {
         <p className="subtitle">
           국회 회의록을 근거로 정책 의제, 행위자, 쟁점, 입장 차이, 시계열 흐름을 분석하는 GovTech RAG 서비스
         </p>
+        <div className="auth-corner">
+          {user ? (
+            <>
+              <span>{user.username}님</span>
+              <button type="button" onClick={logout}>로그아웃</button>
+            </>
+          ) : (
+            <button type="button" onClick={() => setAuthOpen(true)}>로그인 / 가입</button>
+          )}
+        </div>
       </header>
 
       {serverStatus === 'checking' && (
@@ -179,6 +199,10 @@ function App() {
       )}
       {tab === 'actor' && (
         <ActorView actor={selectedActor} onIssueClick={openIssue} onShown={setSelectedActor} />
+      )}
+
+      {authOpen && (
+        <AuthModal onClose={() => setAuthOpen(false)} onSuccess={name => setUser({ username: name })} />
       )}
 
       <footer>

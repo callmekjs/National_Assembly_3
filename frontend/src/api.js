@@ -7,10 +7,21 @@ const API_BASE = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
 const DEFAULT_TIMEOUT_MS = 20000
 const QUERY_TIMEOUT_MS = 90000
 
+// 인증 토큰 (localStorage) — XSS 시 탈취 가능하나 걸린 자산이 질의 히스토리뿐인
+// 데모라 수용. HttpOnly 쿠키는 Vercel↔Render 교차 출처(제3자 쿠키 차단)에서 더 취약.
+// (typeof 가드: vitest 기본 환경은 node 라 DOM/localStorage 가 없음 — api.test.js 참고)
+const TOKEN_KEY = 'auth_token'
+const hasStorage = typeof localStorage !== 'undefined'
+export function getToken() { return hasStorage ? localStorage.getItem(TOKEN_KEY) : null }
+export function setToken(t) { if (hasStorage) localStorage.setItem(TOKEN_KEY, t) }
+export function clearToken() { if (hasStorage) localStorage.removeItem(TOKEN_KEY) }
+
 async function request(path, options = {}, timeoutMs = DEFAULT_TIMEOUT_MS) {
+  const token = getToken()
+  const headers = { ...(options.headers || {}), ...(token ? { Authorization: `Bearer ${token}` } : {}) }
   let res
   try {
-    res = await fetch(`${API_BASE}${path}`, { ...options, signal: AbortSignal.timeout(timeoutMs) })
+    res = await fetch(`${API_BASE}${path}`, { ...options, headers, signal: AbortSignal.timeout(timeoutMs) })
   } catch (e) {
     if (e.name === 'TimeoutError' || e.name === 'AbortError') {
       throw new Error('응답이 너무 오래 걸립니다. 잠시 후 다시 시도해주세요.')
@@ -79,4 +90,28 @@ export function postFeedback(queryId, rating) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query_id: queryId, rating }),
   })
+}
+
+export function signup(username, password) {
+  return request('/auth/signup', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, password }),
+  })
+}
+
+export function login(username, password) {
+  return request('/auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, password }),
+  })
+}
+
+export function fetchMe() {
+  return request('/auth/me')
+}
+
+export function fetchMyQueries() {
+  return request('/me/queries')
 }

@@ -22,6 +22,7 @@ body {
 
 header {
   text-align: center;
+  position: relative;
 }
 
 header h1 {
@@ -514,4 +515,79 @@ footer {
   text-align: center;
   color: #adb5bd;
   font-size: 0.8rem;
+}
+
+/* 인증 — 헤더 우측 상태 + 모달 */
+.auth-corner {
+  position: absolute;
+  top: 1rem;
+  right: 0;
+  font-size: 0.85rem;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.auth-corner button {
+  font-size: 0.85rem;
+  padding: 0.3rem 0.7rem;
+  cursor: pointer;
+}
+
+.auth-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.auth-modal {
+  background: #fff;
+  border-radius: 10px;
+  padding: 1.4rem;
+  width: min(360px, 90vw);
+}
+
+.auth-tabs {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+
+.auth-tabs button {
+  flex: 1;
+  padding: 0.45rem;
+  cursor: pointer;
+}
+
+.auth-tabs button.active {
+  background: #212529;
+  color: #fff;
+}
+
+.auth-modal form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.auth-modal input {
+  padding: 0.55rem 0.7rem;
+  font-size: 0.95rem;
+}
+
+.auth-notice {
+  font-size: 0.75rem;
+  color: #868e96;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.auth-error {
+  font-size: 0.8rem;
+  color: #c92a2a;
+  margin: 0;
 }
