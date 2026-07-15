@@ -138,9 +138,62 @@ def test_me():
         _cleanup(name)
 
 
+def test_query_records_user_id():
+    if not HAS_DB:
+        print(_SKIP_MSG); return
+    name = _fresh_name()
+    try:
+        tok = client.post("/auth/signup", json={"username": name, "password": "test-pw-123"}).json()["token"]
+        # 검색 0건 → 사전차단 경로: LLM 미호출로 로그까지 도달 (test_api 의 기존 기법)
+        orig = main.hybrid_search
+        main.hybrid_search = lambda *a, **k: []
+        try:
+            r = client.post("/query", json={"question": "히스토리 기록 테스트 질문입니다"},
+                            headers={"Authorization": f"Bearer {tok}"})
+            check("토큰 질의 200", r.status_code == 200, r.status_code)
+            r2 = client.post("/query", json={"question": "무효 토큰도 익명으로 통과해야 한다"},
+                             headers={"Authorization": "Bearer garbage"})
+            check("무효 토큰도 질의 통과 (익명)", r2.status_code == 200, r2.status_code)
+        finally:
+            main.hybrid_search = orig
+        with db.get_conn() as conn, conn.cursor() as cur:
+            cur.execute(
+                "SELECT count(*) FROM query_logs ql JOIN users u USING (user_id) WHERE u.username = %s",
+                (name,),
+            )
+            check("user_id 기록됨", cur.fetchone()[0] == 1)
+    finally:
+        _cleanup(name)
+
+
+def test_me_queries():
+    if not HAS_DB:
+        print(_SKIP_MSG); return
+    name = _fresh_name()
+    try:
+        tok = client.post("/auth/signup", json={"username": name, "password": "test-pw-123"}).json()["token"]
+        orig = main.hybrid_search
+        main.hybrid_search = lambda *a, **k: []
+        try:
+            client.post("/query", json={"question": "내 기록 조회 테스트 질문"},
+                        headers={"Authorization": f"Bearer {tok}"})
+        finally:
+            main.hybrid_search = orig
+        r = client.get("/me/queries", headers={"Authorization": f"Bearer {tok}"})
+        check("me/queries 200", r.status_code == 200, r.status_code)
+        qs = r.json()["queries"]
+        check("본인 기록 1건 + 필드", len(qs) == 1 and qs[0]["question"] == "내 기록 조회 테스트 질문"
+              and set(qs[0]) >= {"query_id", "question", "mode", "grounding", "created_at"}, qs)
+        check("무인증 401", client.get("/me/queries").status_code == 401)
+    finally:
+        _cleanup(name)
+
+
 if __name__ == "__main__":
     test_signup_success_and_hash()
     test_signup_duplicate_and_format()
     test_login_and_uniform_failure()
     test_me()
+    test_query_records_user_id()
+    test_me_queries()
     print("전체 통과")

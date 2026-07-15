@@ -191,7 +191,7 @@ def health():
 
 
 def _log_query(req: QueryRequest, result: dict, grounding: str, latency_ms: int,
-               source_block: str | None = None) -> str | None:
+               source_block: str | None = None, user_id: int | None = None) -> str | None:
     """query_logs 1행 저장 → query_id. 로그는 부가 기능 — 실패해도 답변은 반환한다.
 
     source_block: LLM 에 실제로 들어간 근거 블록 — 이상 답변 사후 재현·품질 평가 재료.
@@ -203,8 +203,8 @@ def _log_query(req: QueryRequest, result: dict, grounding: str, latency_ms: int,
                 INSERT INTO query_logs
                   (question, mode, committee, date_from, date_to,
                    answer, grounding, citations, invalid_citations, usage, latency_ms,
-                   source_block)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                   source_block, user_id)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 RETURNING query_id
                 """,
                 (
@@ -215,6 +215,7 @@ def _log_query(req: QueryRequest, result: dict, grounding: str, latency_ms: int,
                     json.dumps(result["usage"], ensure_ascii=False) if result["usage"] else None,
                     latency_ms,
                     source_block,
+                    user_id,
                 ),
             )
             return str(cur.fetchone()[0])
@@ -226,7 +227,7 @@ def _log_query(req: QueryRequest, result: dict, grounding: str, latency_ms: int,
 
 
 @app.post("/query")
-def query(req: QueryRequest):
+def query(req: QueryRequest, authorization: str | None = Header(default=None)):
     """RAG 파이프라인 통합 (RAG-7) — curl 한 번에 답변+출처+신뢰등급.
 
     흐름: 하이브리드 검색 1회 → Grounding 사전차단 → (통과 시) 답변 생성(hits 재사용)
@@ -263,7 +264,9 @@ def query(req: QueryRequest):
     latency_ms = int((time.time() - t0) * 1000)
     # 근거 블록은 로그에만 저장 — API 응답에 그대로 내보내면 응답이 수십 KB 로 불어난다
     source_block = result.pop("source_block", None)
-    query_id = _log_query(req, result, grounding, latency_ms, source_block)
+    user = _bearer_user(authorization)  # 무효 토큰이어도 None — 질의는 익명으로 계속 (spec)
+    query_id = _log_query(req, result, grounding, latency_ms, source_block,
+                          user_id=user["user_id"] if user else None)
     logger.info("query_id=%s mode=%s grounding=%s latency_ms=%d", query_id, req.mode, grounding, latency_ms)
 
     response = {"query_id": query_id, "grounding": grounding, "latency_ms": latency_ms, **result}
@@ -551,3 +554,21 @@ def auth_me(authorization: str | None = Header(default=None)):
     if user is None:
         raise HTTPException(status_code=401, detail="로그인이 필요합니다")
     return {"username": user["username"]}
+
+
+@app.get("/me/queries")
+def my_queries(authorization: str | None = Header(default=None)):
+    """내 질의 히스토리 최근 20건 — 답변 재표시는 범위 밖 (질문 재실행 유도, spec)."""
+    user = _bearer_user(authorization)
+    if user is None:
+        raise HTTPException(status_code=401, detail="로그인이 필요합니다")
+    with get_conn() as conn, conn.cursor(cursor_factory=RealDictCursor) as cur:
+        cur.execute(
+            """
+            SELECT query_id::text, question, mode, grounding, created_at::text
+            FROM query_logs WHERE user_id = %s
+            ORDER BY created_at DESC LIMIT 20
+            """,
+            (user["user_id"],),
+        )
+        return {"queries": [dict(r) for r in cur.fetchall()]}
