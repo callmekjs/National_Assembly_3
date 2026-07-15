@@ -67,7 +67,9 @@ RATE_LIMIT_PER_MIN = int(os.environ.get("RATE_LIMIT_PER_MIN", "60"))
 DAILY_COST_LIMIT_USD = float(os.environ.get("DAILY_COST_LIMIT_USD", "1.0"))
 _llm_limiter = RateLimiter(RATE_LIMIT_LLM_PER_MIN)
 _general_limiter = RateLimiter(RATE_LIMIT_PER_MIN)
-_LLM_PATHS = ("/query", "/answer")   # LLM 호출 경로 — 강한 한도 + 비용 상한
+_LLM_PATHS = ("/query", "/answer")   # LLM 호출 경로 — 비용 상한 대상
+# 강한 rate limit 대상 = LLM 경로 + 인증 경로 (무차별 대입 방어 — spec 2026-07-15)
+_STRICT_PATHS = _LLM_PATHS + ("/auth/login", "/auth/signup")
 
 
 @app.middleware("http")
@@ -93,7 +95,7 @@ async def guard_middleware(request: Request, call_next):
     if path != "/health":
         ip = client_ip(request.headers.get("x-forwarded-for"),
                        request.client.host if request.client else "unknown")
-        limiter = _llm_limiter if path in _LLM_PATHS else _general_limiter
+        limiter = _llm_limiter if path in _STRICT_PATHS else _general_limiter
         if limiter.per_min > 0 and not limiter.allow(ip, time.time()):
             logger.info("guard 429 rate-limit ip=%s path=%s", ip, path)
             return JSONResponse(status_code=429, content={
