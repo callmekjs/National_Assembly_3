@@ -3,16 +3,16 @@ import { fetchIssues, fetchTimeline, fetchStances, fetchPartyStances } from '../
 import MonthlyBars from './MonthlyBars'
 
 const STANCE_KO = { support: '찬성', oppose: '반대', concern: '우려', mixed: '혼재', no_stance: '무입장' }
-const STANCE_COLOR = { support: '#2563eb', oppose: '#dc2626', concern: '#d97706', mixed: '#7c3aed', no_stance: '#6b7280' }
+const STANCE_COLOR = { support: 'var(--stance-support)', oppose: 'var(--stance-oppose)', concern: 'var(--stance-concern)', mixed: 'var(--stance-mixed)', no_stance: 'var(--stance-none)' }
 
 // 발언 단위 판정(counts) 축 — 행위자 대표 입장(STANCE_*)과 키가 다르다 (neutral·none)
 const COUNT_ORDER = ['support', 'oppose', 'concern', 'neutral', 'none']
 const COUNT_KO = { support: '찬성', oppose: '반대', concern: '우려', neutral: '중립', none: '판정외' }
-const COUNT_COLOR = { support: '#2563eb', oppose: '#dc2626', concern: '#d97706', neutral: '#9ca3af', none: '#e5e7eb' }
+const COUNT_COLOR = { support: 'var(--stance-support)', oppose: 'var(--stance-oppose)', concern: 'var(--stance-concern)', neutral: '#9ca3af', none: 'var(--ink-200)' }
 
 function StanceMiniBar({ counts, maxTotal }) {
   const total = COUNT_ORDER.reduce((s, k) => s + (counts[k] || 0), 0)
-  if (!total) return <span style={{ fontSize: 12, color: '#868e96' }}>—</span>
+  if (!total) return <span style={{ fontSize: 12, color: 'var(--ink-500)' }}>—</span>
   const tooltip = COUNT_ORDER.filter(k => counts[k] > 0)
     .map(k => `${COUNT_KO[k]} ${counts[k]}`).join(' · ')
   // 폭 = 발언 수 비례 (표 내 최대 기준, 하한 10%) — 4건과 35건이 같은 폭으로
@@ -27,7 +27,7 @@ function StanceMiniBar({ counts, maxTotal }) {
           ))}
         </div>
       </div>
-      <span style={{ width: 34, fontSize: 12, color: '#495057', textAlign: 'right', flexShrink: 0 }}>{total}</span>
+      <span style={{ width: 34, fontSize: 12, color: 'var(--ink-700)', textAlign: 'right', flexShrink: 0 }}>{total}</span>
     </div>
   )
 }
@@ -45,7 +45,7 @@ function PartyBar({ row, maxCount }) {
     <div style={{ display: 'flex', alignItems: 'center', gap: 8, margin: '4px 0' }}>
       <div style={{ width: 170, fontSize: 13, flexShrink: 0 }}>
         {row.party}{' '}
-        {badge && <span style={{ fontSize: 11, color: '#555', border: '1px solid #ccc', borderRadius: 4, padding: '0 4px' }}>{badge}</span>}
+        {badge && <span style={{ fontSize: 11, color: 'var(--ink-700)', border: '1px solid var(--ink-400)', borderRadius: 'var(--radius-sm)', padding: '0 4px' }}>{badge}</span>}
       </div>
       <div style={{ flex: 1 }}>
         <div style={{ width: `${widthPct}%`, display: 'flex', height: 18, borderRadius: 3, overflow: 'hidden' }}>
@@ -81,21 +81,21 @@ function PartyPanel({ data }) {
   return (
     <div>
       {data.mapping_quality === 'low' && (
-        <p style={{ color: '#d97706', fontSize: 12 }}>
+        <p style={{ color: 'var(--warning)', fontSize: 12 }}>
           ⚠ 이 이슈의 청크 매핑 정밀도는 게이트 기준(90%) 미달 — 구도 수치 해석 주의
         </p>
       )}
       {summary && (
-        <p style={{ fontSize: 13.5, fontWeight: 500, color: '#212529', margin: '2px 0 8px' }}>{summary}</p>
+        <p style={{ fontSize: 13.5, fontWeight: 500, color: 'var(--ink-900)', margin: '2px 0 8px' }}>{summary}</p>
       )}
       {data.parties.map(r => <PartyBar key={r.party} row={r} maxCount={maxCount} />)}
-      <p style={{ fontSize: 11, color: '#666' }}>
+      <p style={{ fontSize: 11, color: 'var(--ink-700)' }}>
         {Object.entries(STANCE_KO).map(([s, ko]) => (
           <span key={s} style={{ marginRight: 10 }}>
             <span style={{ color: STANCE_COLOR[s] }}>■</span> {ko}
           </span>
         ))}
-        <span style={{ color: '#868e96' }}>— 막대 길이는 인원수 비례</span>
+        <span style={{ color: 'var(--ink-500)' }}>— 막대 길이는 인원수 비례</span>
       </p>
     </div>
   )
@@ -117,7 +117,7 @@ function StanceRow({ actor, onActorClick, maxTotal }) {
     <>
       <tr onClick={() => setOpen(!open)} style={{ cursor: 'pointer' }}>
         <td onClick={e => { e.stopPropagation(); onActorClick?.(actor.speaker) }}
-            style={{ color: '#2563eb', textDecoration: 'underline', cursor: 'pointer' }}
+            style={{ color: 'var(--link)', textDecoration: 'underline', cursor: 'pointer' }}
             title="의원 프로필 보기">{actor.speaker}</td>
         <td>{actor.party || '—'}</td>
         <td><span style={{ color: STANCE_COLOR[actor.stance], fontWeight: 600 }}>{STANCE_KO[actor.stance]}</span></td>
@@ -125,7 +125,7 @@ function StanceRow({ actor, onActorClick, maxTotal }) {
         <td>{open ? '▲' : '▼'}</td>
       </tr>
       {open && actor.citations.map(cit => (
-        <tr key={cit.turn_id}><td colSpan="5" style={{ fontSize: 12, color: '#444', padding: '4px 12px' }}>
+        <tr key={cit.turn_id}><td colSpan="5" style={{ fontSize: 12, color: 'var(--ink-700)', padding: '4px 12px' }}>
           [{STANCE_KO[cit.stance] || cit.stance} · {cit.date}] {cit.snippet}…
         </td></tr>
       ))}
@@ -171,8 +171,8 @@ export default function IssueView({ selectedIssue, onActorClick, onSelChange }) 
   if (!sel) {
     return (
       <div>
-        {error && <p style={{ color: '#dc2626' }}>{error}</p>}
-        <p style={{ fontSize: 13, color: '#495057', marginBottom: 12 }}>
+        {error && <p style={{ color: 'var(--stance-oppose)' }}>{error}</p>}
+        <p style={{ fontSize: 13, color: 'var(--ink-700)', marginBottom: 12 }}>
           국회가 다룬 24개 쟁점 — 카드를 누르면 발언 추이·여야 구도·행위자 입장을 봅니다.
         </p>
         <IssueGrid issues={issues} onPick={pick} />
@@ -184,15 +184,15 @@ export default function IssueView({ selectedIssue, onActorClick, onSelChange }) 
     <div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
         <button type="button" onClick={() => pick(null)}
-                style={{ padding: '4px 10px', fontSize: 13, fontFamily: 'inherit', background: '#fff',
-                         color: '#495057', border: '1px solid #dee2e6', borderRadius: 6, cursor: 'pointer' }}>
+                style={{ padding: '4px 10px', fontSize: 13, fontFamily: 'inherit', background: 'var(--surface)',
+                         color: 'var(--ink-700)', border: '1px solid var(--ink-300)', borderRadius: 'var(--radius)', cursor: 'pointer' }}>
           ← 전체 쟁점
         </button>
         <label>이슈: <select value={sel} onChange={e => pick(e.target.value)}>
           {issues.map(i => <option key={i.issue_id} value={i.issue_id}>{i.title}</option>)}
         </select></label>
       </div>
-      {error && <p style={{ color: '#dc2626' }}>{error}</p>}
+      {error && <p style={{ color: 'var(--stance-oppose)' }}>{error}</p>}
       <h3>월별 발언 추이</h3>
       {timeline ? <TimelineChart months={timeline.months} /> : <p>불러오는 중…</p>}
       <h3>여야 구도</h3>
@@ -212,13 +212,13 @@ export default function IssueView({ selectedIssue, onActorClick, onSelChange }) 
               })()}
             </tbody>
           </table>
-          <p style={{ fontSize: 11, color: '#666' }}>
+          <p style={{ fontSize: 11, color: 'var(--ink-700)' }}>
             {COUNT_ORDER.map(s => (
               <span key={s} style={{ marginRight: 10 }}>
                 <span style={{ color: COUNT_COLOR[s] }}>■</span> {COUNT_KO[s]}
               </span>
             ))}
-            <span style={{ color: '#868e96' }}>— 막대는 발언 단위 판정 비율, 숫자는 판정 발언 수</span>
+            <span style={{ color: 'var(--ink-500)' }}>— 막대는 발언 단위 판정 비율, 숫자는 판정 발언 수</span>
           </p>
         </>
       ) : <p>입장 데이터 없음(판정된 이슈만 표시)</p>}

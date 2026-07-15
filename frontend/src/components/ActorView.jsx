@@ -3,7 +3,7 @@ import { fetchActor, searchActors } from '../api'
 import MonthlyBars from './MonthlyBars'
 
 const STANCE_KO = { support: '찬성', oppose: '반대', concern: '우려', mixed: '혼재', no_stance: '무입장' }
-const STANCE_COLOR = { support: '#2563eb', oppose: '#dc2626', concern: '#d97706', mixed: '#7c3aed', no_stance: '#6b7280' }
+const STANCE_COLOR = { support: 'var(--stance-support)', oppose: 'var(--stance-oppose)', concern: 'var(--stance-concern)', mixed: 'var(--stance-mixed)', no_stance: 'var(--stance-none)' }
 
 // 데이터 나열 대신 읽히는 문장으로 — 쟁점 상세의 "구도 요약 문장"과 같은 처방
 function buildSummary(profile) {
@@ -74,18 +74,19 @@ export default function ActorView({ actor, onIssueClick, onShown }) {
           <input value={input} onChange={e => setInput(e.target.value)}
                  onKeyDown={e => { if (e.key === 'Enter') load(input); if (e.key === 'Escape') setSuggestions([]) }}
                  onBlur={() => setTimeout(() => setSuggestions([]), 150)}
-                 placeholder="의원 이름 (예: 김윤)" style={{ padding: '6px 8px' }} />
+                 placeholder="의원 이름 (예: 김윤)"
+                 style={{ padding: '6px 8px', fontFamily: 'inherit', border: '1px solid var(--ink-300)', borderRadius: 'var(--radius)' }} />
           {suggestions.length > 0 && (
             <ul style={{ position: 'absolute', top: '100%', left: 0, zIndex: 10, minWidth: 220,
-                         margin: '4px 0 0', padding: 4, listStyle: 'none', background: '#fff',
-                         border: '1px solid #dee2e6', borderRadius: 6,
+                         margin: '4px 0 0', padding: 4, listStyle: 'none', background: 'var(--surface)',
+                         border: '1px solid var(--ink-300)', borderRadius: 'var(--radius)',
                          boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
               {suggestions.map(m => (
                 <li key={m.name}>
                   <button type="button" onMouseDown={() => { setInput(m.name); load(m.name) }}
                           style={{ width: '100%', textAlign: 'left', padding: '6px 8px', background: 'none',
                                    border: 'none', cursor: 'pointer', fontSize: 14, fontFamily: 'inherit' }}>
-                    {m.name} <span style={{ color: '#868e96', fontSize: 12 }}>{m.party}</span>
+                    {m.name} <span style={{ color: 'var(--ink-500)', fontSize: 12 }}>{m.party}</span>
                   </button>
                 </li>
               ))}
@@ -94,20 +95,20 @@ export default function ActorView({ actor, onIssueClick, onShown }) {
         </span>
         <button onClick={() => load(input)} disabled={loading}>{loading ? '조회 중…' : '조회'}</button>
       </div>
-      {err && <p style={{ color: '#6b7280' }}>{err}</p>}
+      {err && <p style={{ color: 'var(--stance-none)' }}>{err}</p>}
       {profile && (
         <div>
           <h3 style={{ marginBottom: 4 }}>
             {profile.display_name || profile.name}{' '}
-            {profile.party && <span style={{ fontSize: 13, color: '#555', border: '1px solid #ccc', borderRadius: 4, padding: '0 6px' }}>{profile.party}</span>}
+            {profile.party && <span style={{ fontSize: 13, color: 'var(--ink-700)', border: '1px solid var(--ink-400)', borderRadius: 'var(--radius-sm)', padding: '0 6px' }}>{profile.party}</span>}
           </h3>
           {profile.party_history.length > 0 && (
-            <p style={{ fontSize: 12, color: '#666', margin: '2px 0 8px' }}>
+            <p style={{ fontSize: 12, color: 'var(--ink-700)', margin: '2px 0 8px' }}>
               {profile.party_history.map(h => `${h.period}: ${h.label || '—'}`).join(' / ')}
             </p>
           )}
           <ul style={{ margin: '12px 0 20px', padding: '14px 18px 14px 34px', maxWidth: 640,
-                       background: '#f8f9fa', borderRadius: 8, fontSize: 15, lineHeight: 1.7 }}>
+                       background: 'var(--ink-100)', borderRadius: 'var(--radius)', fontSize: 15, lineHeight: 1.7 }}>
             {buildSummary(profile).map((line, i) => <li key={i}>{line}</li>)}
           </ul>
 
@@ -120,7 +121,7 @@ export default function ActorView({ actor, onIssueClick, onShown }) {
             <>
               <table style={{ maxWidth: 560, width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
-                  <tr style={{ borderBottom: '1px solid #dee2e6' }}>
+                  <tr style={{ borderBottom: '1px solid var(--ink-300)' }}>
                     <th style={{ textAlign: 'left', padding: '4px 8px 4px 0' }}>이슈</th>
                     <th style={{ padding: '4px 8px' }}>입장</th>
                     <th style={{ padding: '4px 0 4px 8px' }}>발언 수</th>
@@ -129,7 +130,7 @@ export default function ActorView({ actor, onIssueClick, onShown }) {
                 <tbody>
                   {profile.issue_stances.map(s => (
                     <tr key={s.issue_id} onClick={() => onIssueClick(s.issue_id)} className="clickable-row"
-                        style={{ cursor: 'pointer', borderBottom: '1px solid #f1f3f5' }}
+                        style={{ cursor: 'pointer', borderBottom: '1px solid var(--ink-200)' }}
                         title="클릭하면 쟁점 분석으로 이동">
                       <td style={{ padding: '6px 8px 6px 0' }}>{s.title}</td>
                       <td style={{ textAlign: 'center', padding: '6px 8px', color: STANCE_COLOR[s.stance], fontWeight: 600 }}>{STANCE_KO[s.stance]}</td>
@@ -138,21 +139,21 @@ export default function ActorView({ actor, onIssueClick, onShown }) {
                   ))}
                 </tbody>
               </table>
-              <p style={{ fontSize: 12, color: '#868e96' }}>입장은 LLM 자동 판정 — 방향 참고용 · 행 클릭 시 쟁점 분석으로 이동</p>
+              <p style={{ fontSize: 12, color: 'var(--ink-500)' }}>입장은 LLM 자동 판정 — 방향 참고용 · 행 클릭 시 쟁점 분석으로 이동</p>
             </>
-          ) : <p style={{ fontSize: 14, color: '#666' }}>판정된 이슈 없음</p>}
+          ) : <p style={{ fontSize: 14, color: 'var(--ink-700)' }}>판정된 이슈 없음</p>}
 
           <h4>최근 발언</h4>
           <ul style={{ margin: '8px 0', padding: '0 0 0 20px', maxWidth: 720 }}>
             {profile.recent_utterances.slice(0, 3).map(u => (
-              <li key={u.chunk_id} style={{ fontSize: 15, color: '#333', margin: '8px 0', lineHeight: 1.6 }}>
+              <li key={u.chunk_id} style={{ fontSize: 15, color: 'var(--ink-900)', margin: '8px 0', lineHeight: 1.6 }}>
                 {u.summary || `${u.snippet}…`}
-                <span style={{ color: '#868e96', fontSize: 12, marginLeft: 8 }}>{u.date} · {u.committee}</span>
+                <span style={{ color: 'var(--ink-500)', fontSize: 12, marginLeft: 8 }}>{u.date} · {u.committee}</span>
               </li>
             ))}
           </ul>
           {profile.recent_utterances.some(u => u.summary) && (
-            <p style={{ fontSize: 12, color: '#868e96' }}>요약은 LLM 자동 생성 — 원문 확인은 질의 화면에서</p>
+            <p style={{ fontSize: 12, color: 'var(--ink-500)' }}>요약은 LLM 자동 생성 — 원문 확인은 질의 화면에서</p>
           )}
         </div>
       )}

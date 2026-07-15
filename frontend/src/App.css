@@ -1,3 +1,74 @@
+/* ── 디자인 토큰 ──────────────────────────────────────────────
+   확정 방향(폰트 Pretendard·프라이머리 남색·중립 그레이 스케일)은 변경 금지.
+   여기 없는 신규 스톱(ink-200/400, link-*, chart-*, success/warning/danger-*)은
+   기존 코드에 흩어져 있던 반복 값을 이름 붙여 정리한 것 — 값 자체는 유지. */
+:root {
+  /* 타이포 */
+  --font-sans: 'Pretendard Variable', Pretendard, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+
+  /* 프라이머리(남색) */
+  --primary: #1e3a8a;
+  --primary-hover: #1e40af;
+  --primary-soft: #eff6ff;
+
+  /* 중립 그레이 스케일 */
+  --ink-900: #212529;
+  --ink-700: #495057;
+  --ink-500: #868e96;
+  --ink-400: #adb5bd;
+  --ink-300: #dee2e6;
+  --ink-200: #e9ecef;
+  --ink-100: #f8f9fa;
+  --surface: #ffffff;
+
+  /* 링크/인용 강조색 — 프라이머리와 별개로 기존에 쓰이던 값 */
+  --link: #0a58ca;
+  --link-soft: #e7f1ff;
+  --link-soft-hover: #cfe2ff;
+
+  /* 입장 시맨틱 색 — 의미가 실려 있어 값 유지, 이름만 부여 */
+  --stance-support: #2563eb;
+  --stance-oppose: #dc2626;
+  --stance-concern: #d97706;
+  --stance-mixed: #7c3aed;
+  --stance-none: #6b7280;
+
+  /* 상태 배지·배너 */
+  --success-soft: #d1e7dd;
+  --success: #0a3622;
+  --warning-soft: #fff3cd;
+  --warning-border: #ffe69c;
+  --warning: #664d03;
+  --danger-soft: #f8d7da;
+  --danger: #58151c;
+  --danger-text: #c92a2a;
+  --error-bg: #fff3f3;
+  --error-border: #f5c2c7;
+  --error-text: #842029;
+
+  /* 차트(월별 막대) 전용 듀오톤 */
+  --chart-bar: #93c5fd;
+  --chart-bar-peak: #1d4ed8;
+
+  /* 오버레이 */
+  --overlay: rgba(33, 37, 41, 0.55);
+
+  /* 모양 */
+  --radius-sm: 4px;
+  --radius: 8px;
+  --radius-card: 12px;
+  --radius-pill: 999px;
+
+  /* 간격 (4px 스케일 — 신규 컴포넌트용) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -5,9 +76,9 @@
 }
 
 body {
-  font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
-  background: #f8f9fa;
-  color: #212529;
+  font-family: var(--font-sans);
+  background: var(--ink-100);
+  color: var(--ink-900);
 }
 
 .container {
@@ -33,11 +104,11 @@ header h1 {
 
 .subtitle {
   font-size: 0.9rem;
-  color: #6c757d;
+  color: var(--ink-500);
   line-height: 1.5;
 }
 
-/* ── 탭 내비게이션: 활성 = 진하게 (mode-toggle 과 같은 대비 문법) ── */
+/* ── 탭 내비게이션: 활성 = 프라이머리 (mode-toggle 과 같은 대비 문법) ── */
 .tab-nav {
   display: flex;
   justify-content: center;
@@ -48,21 +119,21 @@ header h1 {
   padding: 0.5rem 1.25rem;
   font-size: 0.9rem;
   font-family: inherit;
-  background: #fff;
-  color: #495057;
-  border: 1px solid #dee2e6;
-  border-radius: 6px;
+  background: var(--surface);
+  color: var(--ink-700);
+  border: 1px solid var(--ink-300);
+  border-radius: var(--radius);
   cursor: pointer;
 }
 
 .tab-nav button:not(.active):hover {
-  border-color: #adb5bd;
+  border-color: var(--ink-400);
 }
 
 .tab-nav button.active {
-  background: #212529;
-  color: #fff;
-  border-color: #212529;
+  background: var(--primary);
+  color: var(--surface);
+  border-color: var(--primary);
   font-weight: 600;
 }
 
@@ -76,8 +147,8 @@ header h1 {
   width: 100%;
   padding: 0.875rem;
   font-size: 1rem;
-  border: 1px solid #dee2e6;
-  border-radius: 8px;
+  border: 1px solid var(--ink-300);
+  border-radius: var(--radius);
   resize: vertical;
   font-family: inherit;
   line-height: 1.5;
@@ -85,7 +156,8 @@ header h1 {
 
 .query-form textarea:focus {
   outline: none;
-  border-color: #495057;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-soft);
 }
 
 .query-form button {
@@ -93,16 +165,91 @@ header h1 {
   padding: 0.625rem 1.5rem;
   font-size: 0.95rem;
   font-weight: 600;
-  background: #212529;
-  color: #fff;
+  background: var(--primary);
+  color: var(--surface);
   border: none;
-  border-radius: 6px;
+  border-radius: var(--radius);
   cursor: pointer;
 }
 
+.query-form button:hover:not(:disabled) {
+  background: var(--primary-hover);
+}
+
 .query-form button:disabled {
-  background: #adb5bd;
+  background: var(--ink-400);
   cursor: not-allowed;
+}
+
+/* ── 랜딩 소개 섹션 (첫 방문 빈 상태, example-chips 바로 위) ──── */
+.hero {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding: var(--space-6) 0 var(--space-4);
+}
+
+.hero-lead {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--ink-900);
+  max-width: 640px;
+}
+
+.hero-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--space-3);
+}
+
+.hero-metric-card {
+  background: var(--primary-soft);
+  border: 1px solid var(--ink-300);
+  border-radius: var(--radius-card);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.hero-metric-label {
+  font-size: 0.78rem;
+  color: var(--ink-700);
+  font-weight: 600;
+}
+
+.hero-metric-value {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1.25;
+}
+
+.hero-metric-sub {
+  font-size: 0.74rem;
+  color: var(--ink-500);
+}
+
+.hero-diff-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--ink-900);
+  margin-bottom: var(--space-2);
+}
+
+.hero-diff-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-left: 1.2rem;
+  font-size: 0.9rem;
+  color: var(--ink-700);
+  line-height: 1.55;
+}
+
+.hero-cta-hint {
+  font-size: 0.85rem;
+  color: var(--ink-500);
 }
 
 /* ── 예시 질문 칩 (첫 방문 빈 상태) ────────────────────────── */
@@ -116,38 +263,38 @@ header h1 {
 
 .example-chips .chips-label {
   font-size: 0.8rem;
-  color: #868e96;
+  color: var(--ink-500);
 }
 
 .example-chips button {
   padding: 0.4rem 0.9rem;
   font-size: 0.85rem;
   font-family: inherit;
-  background: #fff;
-  color: #495057;
-  border: 1px solid #dee2e6;
-  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink-700);
+  border: 1px solid var(--ink-300);
+  border-radius: var(--radius-pill);
   cursor: pointer;
 }
 
 .example-chips button:hover {
-  border-color: #adb5bd;
-  background: #f8f9fa;
+  border-color: var(--ink-400);
+  background: var(--ink-100);
 }
 
 .error {
   padding: 0.875rem;
-  background: #fff3f3;
-  border: 1px solid #f5c2c7;
-  border-radius: 6px;
-  color: #842029;
+  background: var(--error-bg);
+  border: 1px solid var(--error-border);
+  border-radius: var(--radius);
+  color: var(--error-text);
   font-size: 0.9rem;
 }
 
 .answer-panel {
-  background: #fff;
-  border: 1px solid #dee2e6;
-  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid var(--ink-300);
+  border-radius: var(--radius-card);
   padding: 1.25rem;
   display: flex;
   flex-direction: column;
@@ -157,16 +304,16 @@ header h1 {
 .grounding-badge {
   display: inline-block;
   padding: 0.2rem 0.6rem;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   font-size: 0.78rem;
   font-weight: 600;
   width: fit-content;
 }
 
-.grounding-none    { background: #e9ecef; color: #495057; }
-.grounding-full    { background: #d1e7dd; color: #0a3622; }
-.grounding-partial { background: #fff3cd; color: #664d03; }
-.grounding-refused { background: #f8d7da; color: #58151c; }
+.grounding-none    { background: var(--ink-200); color: var(--ink-700); }
+.grounding-full    { background: var(--success-soft); color: var(--success); }
+.grounding-partial { background: var(--warning-soft); color: var(--warning); }
+.grounding-refused { background: var(--danger-soft); color: var(--danger); }
 
 .answer-text {
   line-height: 1.7;
@@ -183,23 +330,23 @@ header h1 {
 
 .mode-toggle {
   display: inline-flex;
-  border: 1px solid #dee2e6;
-  border-radius: 6px;
+  border: 1px solid var(--ink-300);
+  border-radius: var(--radius);
   overflow: hidden;
 }
 
 .mode-toggle button {
   padding: 0.5rem 1rem;
   font-size: 0.85rem;
-  background: #fff;
-  color: #495057;
+  background: var(--surface);
+  color: var(--ink-700);
   border: none;
   cursor: pointer;
 }
 
 .mode-toggle button.active {
-  background: #212529;
-  color: #fff;
+  background: var(--primary);
+  color: var(--surface);
   font-weight: 600;
 }
 
@@ -228,7 +375,7 @@ header h1 {
   font-size: 1.05rem;
   margin: 1.1rem 0 0.4rem;
   padding-bottom: 0.25rem;
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 1px solid var(--ink-200);
 }
 
 .answer-markdown h2:first-child {
@@ -248,27 +395,27 @@ header h1 {
 
 .cite-ref {
   border: none;
-  background: #e7f1ff;
-  color: #0a58ca;
+  background: var(--link-soft);
+  color: var(--link);
   font-size: 0.8em;
   font-weight: 600;
   padding: 0 0.25rem;
   margin: 0 0.1rem;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   vertical-align: baseline;
 }
 
 .cite-ref:hover {
-  background: #cfe2ff;
+  background: var(--link-soft-hover);
 }
 
 .ungrounded-banner {
   padding: 0.6rem 0.875rem;
-  background: #fff3cd;
-  border: 1px solid #ffe69c;
-  border-radius: 6px;
-  color: #664d03;
+  background: var(--warning-soft);
+  border: 1px solid var(--warning-border);
+  border-radius: var(--radius);
+  color: var(--warning);
   font-size: 0.85rem;
 }
 
@@ -277,8 +424,8 @@ header h1 {
   justify-content: space-between;
   align-items: center;
   padding-top: 0.75rem;
-  border-top: 1px solid #f1f3f5;
-  color: #868e96;
+  border-top: 1px solid var(--ink-200);
+  color: var(--ink-500);
   font-size: 0.8rem;
 }
 
@@ -292,9 +439,9 @@ header h1 {
 
 /* ── 출처 패널 ─────────────────────────────────────────────── */
 .source-panel {
-  background: #fff;
-  border: 1px solid #dee2e6;
-  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid var(--ink-300);
+  border-radius: var(--radius-card);
   padding: 1rem;
 }
 
@@ -304,7 +451,7 @@ header h1 {
 }
 
 .no-sources {
-  color: #868e96;
+  color: var(--ink-500);
   font-size: 0.88rem;
 }
 
@@ -320,9 +467,9 @@ header h1 {
 .source-card > button {
   width: 100%;
   text-align: left;
-  background: #f8f9fa;
-  border: 1px solid #e9ecef;
-  border-radius: 6px;
+  background: var(--ink-100);
+  border: 1px solid var(--ink-200);
+  border-radius: var(--radius);
   padding: 0.7rem 0.8rem;
   cursor: pointer;
   font-family: inherit;
@@ -332,12 +479,12 @@ header h1 {
 }
 
 .source-card > button:hover {
-  border-color: #adb5bd;
+  border-color: var(--ink-400);
 }
 
 .source-card.highlighted > button {
-  border-color: #0a58ca;
-  background: #e7f1ff;
+  border-color: var(--link);
+  background: var(--link-soft);
 }
 
 .source-head {
@@ -348,7 +495,7 @@ header h1 {
 }
 
 .source-n {
-  color: #0a58ca;
+  color: var(--link);
   font-weight: 700;
 }
 
@@ -359,20 +506,20 @@ header h1 {
 .cited-badge {
   margin-left: auto;
   font-size: 0.7rem;
-  background: #d1e7dd;
-  color: #0a3622;
+  background: var(--success-soft);
+  color: var(--success);
   padding: 0.1rem 0.4rem;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
 }
 
 .source-meta {
   font-size: 0.76rem;
-  color: #868e96;
+  color: var(--ink-500);
 }
 
 .source-snippet {
   font-size: 0.82rem;
-  color: #495057;
+  color: var(--ink-700);
   line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -382,14 +529,14 @@ header h1 {
 
 .source-open {
   font-size: 0.76rem;
-  color: #0a58ca;
+  color: var(--link);
 }
 
 /* ── 원문 모달 ─────────────────────────────────────────────── */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(33, 37, 41, 0.55);
+  background: var(--overlay);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -399,8 +546,8 @@ header h1 {
 
 .modal {
   position: relative;
-  background: #fff;
-  border-radius: 10px;
+  background: var(--surface);
+  border-radius: var(--radius-card);
   padding: 1.5rem;
   max-width: 720px;
   width: 100%;
@@ -418,7 +565,7 @@ header h1 {
   border: none;
   background: none;
   font-size: 1.5rem;
-  color: #868e96;
+  color: var(--ink-500);
   cursor: pointer;
   line-height: 1;
 }
@@ -430,15 +577,15 @@ header h1 {
 
 .modal-meta {
   font-size: 0.82rem;
-  color: #868e96;
+  color: var(--ink-500);
 }
 
 .modal-context {
   font-size: 0.82rem;
-  color: #adb5bd;
+  color: var(--ink-400);
   line-height: 1.6;
   padding-left: 0.75rem;
-  border-left: 3px solid #e9ecef;
+  border-left: 3px solid var(--ink-200);
 }
 
 .modal-text {
@@ -448,15 +595,15 @@ header h1 {
 }
 
 .modal-loading {
-  color: #868e96;
+  color: var(--ink-500);
   font-size: 0.9rem;
 }
 
 .modal-foot {
   padding-top: 0.75rem;
-  border-top: 1px solid #f1f3f5;
+  border-top: 1px solid var(--ink-200);
   font-size: 0.78rem;
-  color: #868e96;
+  color: var(--ink-500);
 }
 
 /* ── 쟁점 카드 그리드 (쟁점 분석 진입 화면) ─────────────────── */
@@ -472,31 +619,31 @@ header h1 {
   gap: 0.35rem;
   text-align: left;
   padding: 0.9rem;
-  background: #fff;
-  border: 1px solid #dee2e6;
-  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid var(--ink-300);
+  border-radius: var(--radius-card);
   cursor: pointer;
   font-family: inherit;
 }
 
 .issue-card:hover {
-  border-color: #495057;
+  border-color: var(--ink-700);
 }
 
 /* 클릭 가능한 테이블 행 — 인라인 스타일은 :hover 불가라 클래스로 */
 .clickable-row:hover {
-  background: #f8f9fa;
+  background: var(--ink-100);
 }
 
 .issue-card-title {
   font-size: 0.92rem;
   font-weight: 600;
-  color: #212529;
+  color: var(--ink-900);
 }
 
 .issue-card-desc {
   font-size: 0.78rem;
-  color: #495057;
+  color: var(--ink-700);
   line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -507,13 +654,13 @@ header h1 {
 .issue-card-meta {
   margin-top: auto;
   font-size: 0.72rem;
-  color: #868e96;
+  color: var(--ink-500);
 }
 
 footer {
   margin-top: auto;
   text-align: center;
-  color: #adb5bd;
+  color: var(--ink-400);
   font-size: 0.8rem;
 }
 
@@ -531,13 +678,22 @@ footer {
 .auth-corner button {
   font-size: 0.85rem;
   padding: 0.3rem 0.7rem;
+  font-family: inherit;
+  background: var(--surface);
+  color: var(--ink-700);
+  border: 1px solid var(--ink-300);
+  border-radius: var(--radius);
   cursor: pointer;
+}
+
+.auth-corner button:hover {
+  border-color: var(--ink-400);
 }
 
 .auth-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+  background: var(--overlay);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -545,8 +701,8 @@ footer {
 }
 
 .auth-modal {
-  background: #fff;
-  border-radius: 10px;
+  background: var(--surface);
+  border-radius: var(--radius-card);
   padding: 1.4rem;
   width: min(360px, 90vw);
 }
@@ -560,12 +716,19 @@ footer {
 .auth-tabs button {
   flex: 1;
   padding: 0.45rem;
+  font-family: inherit;
+  font-size: 0.9rem;
+  background: var(--surface);
+  color: var(--ink-700);
+  border: 1px solid var(--ink-300);
+  border-radius: var(--radius);
   cursor: pointer;
 }
 
 .auth-tabs button.active {
-  background: #212529;
-  color: #fff;
+  background: var(--primary);
+  color: var(--surface);
+  border-color: var(--primary);
 }
 
 .auth-modal form {
@@ -577,17 +740,47 @@ footer {
 .auth-modal input {
   padding: 0.55rem 0.7rem;
   font-size: 0.95rem;
+  font-family: inherit;
+  border: 1px solid var(--ink-300);
+  border-radius: var(--radius);
+}
+
+.auth-modal input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-soft);
+}
+
+.auth-modal button[type='submit'] {
+  padding: 0.6rem 1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: inherit;
+  background: var(--primary);
+  color: var(--surface);
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.auth-modal button[type='submit']:hover:not(:disabled) {
+  background: var(--primary-hover);
+}
+
+.auth-modal button[type='submit']:disabled {
+  background: var(--ink-400);
+  cursor: not-allowed;
 }
 
 .auth-notice {
   font-size: 0.75rem;
-  color: #868e96;
+  color: var(--ink-500);
   margin: 0;
   line-height: 1.5;
 }
 
 .auth-error {
   font-size: 0.8rem;
-  color: #c92a2a;
+  color: var(--danger-text);
   margin: 0;
 }
