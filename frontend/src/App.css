@@ -851,6 +851,62 @@ footer {
   cursor: not-allowed;
 }
 
+/* ── 질의 대기 UX: 경과 시간 + 시간 기반 단계 메시지 ─────────── */
+.query-progress {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--surface);
+  border: 1px solid var(--ink-300);
+  border-radius: var(--radius-card);
+  margin-top: var(--space-4);
+  font-size: 0.9rem;
+  color: var(--ink-700);
+}
+
+.query-progress-spinner {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  border: 2px solid var(--primary-soft);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: qp-spin 0.9s linear infinite;
+}
+
+@keyframes qp-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .query-progress-spinner {
+    animation: none;
+    border-top-color: var(--primary-soft);
+    border-left-color: var(--primary);
+  }
+}
+
+.query-progress-stage {
+  font-weight: 600;
+  color: var(--ink-900);
+}
+
+.query-progress-elapsed {
+  margin-left: auto;
+  font-size: 0.8rem;
+  color: var(--ink-500);
+  font-variant-numeric: tabular-nums; /* 초 카운트 시 폭 흔들림(CLS) 방지 */
+  flex-shrink: 0;
+}
+
+/* report 모드 사전 고지 — 폼 아래 한 줄 */
+.mode-hint {
+  font-size: 0.8rem;
+  color: var(--ink-500);
+  margin: 0;
+}
+
 /* ── 모바일 (375px 기준, 600px 이하) ──────────────────────────
    index.css 의 1024px 폰트 축소(18→16px)·위 900px result-grid 축소와 겹치지 않는
    전화기 전용 층. 터치 타깃 44px 은 여기서만 강제 — 데스크톱 마우스 밀도 유지. */
@@ -936,5 +992,9 @@ footer {
 
   .modal-overlay {
     padding: 0.75rem;
+  }
+
+  .query-progress {
+    flex-wrap: wrap;
   }
 }

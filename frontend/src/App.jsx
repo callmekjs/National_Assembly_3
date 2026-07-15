@@ -10,6 +10,7 @@ import ActorView from './components/ActorView'
 import AuthModal from './components/AuthModal'
 import MyQueries from './components/MyQueries'
 import Hero from './components/Hero'
+import QueryProgress from './components/QueryProgress'
 
 // URL 쿼리 파라미터 ↔ 화면 상태 (공유 가능 링크: ?tab=issues&issue=medical-reform)
 const TABS = ['query', 'issues', 'actor']
@@ -168,6 +169,8 @@ function App() {
             />
 
             <MyQueries user={user} onPick={q => setQuestion(q)} />
+
+            {loading && <QueryProgress mode={mode} />}
 
             {!result && !loading && (
               <>

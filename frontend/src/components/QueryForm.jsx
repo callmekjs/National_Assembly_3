@@ -9,8 +9,6 @@ function QueryForm({ question, setQuestion, mode, setMode, loading, onSubmit }) 
     }
   }
 
-  const loadingLabel = mode === 'report' ? '브리핑 생성 중... (약 15초)' : '검색 중... (약 5초)'
-
   return (
     <form
       className="query-form"
@@ -44,9 +42,12 @@ function QueryForm({ question, setQuestion, mode, setMode, loading, onSubmit }) 
           </button>
         </div>
         <button type="submit" disabled={loading || !question.trim()}>
-          {loading ? loadingLabel : '질문하기'}
+          {loading ? '생성 중…' : '질문하기'}
         </button>
       </div>
+      {mode === 'report' && !loading && (
+        <p className="mode-hint">정책 브리핑은 보통 10~20초 걸립니다 — 여러 근거를 구조화해 정리합니다.</p>
+      )}
     </form>
   )
 }
