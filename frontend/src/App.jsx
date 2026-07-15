@@ -8,6 +8,7 @@ import SourceModal from './components/SourceModal'
 import IssueView from './components/IssueView'
 import ActorView from './components/ActorView'
 import AuthModal from './components/AuthModal'
+import MyQueries from './components/MyQueries'
 
 // URL 쿼리 파라미터 ↔ 화면 상태 (공유 가능 링크: ?tab=issues&issue=medical-reform)
 const TABS = ['query', 'issues', 'actor']
@@ -161,6 +162,8 @@ function App() {
               loading={loading}
               onSubmit={handleSubmit}
             />
+
+            <MyQueries user={user} onPick={q => setQuestion(q)} />
 
             {!result && !loading && (
               <div className="example-chips">
