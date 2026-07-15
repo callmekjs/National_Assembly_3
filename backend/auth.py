@@ -61,3 +61,24 @@ def decode_token(token: str) -> dict | None:
         return {"user_id": int(payload["sub"]), "username": payload["username"]}
     except (jwt.InvalidTokenError, KeyError, ValueError):
         return None
+
+
+def ensure_schema() -> None:
+    """users 테이블 + query_logs.user_id 자가 생성 (멱등) — 배포 DB 마이그레이션 단계 제거.
+
+    utterance_summaries 와 같은 패턴. 실패해도 앱은 뜬다(인증은 부가 기능) —
+    호출측(lifespan)이 try/except 로 감싼다."""
+    from db import get_conn
+    with get_conn() as conn, conn.cursor() as cur:
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS users (
+                user_id       SERIAL PRIMARY KEY,
+                username      TEXT NOT NULL UNIQUE,
+                password_hash TEXT NOT NULL,
+                created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+            )
+        """)
+        cur.execute(
+            "ALTER TABLE query_logs ADD COLUMN IF NOT EXISTS user_id INT REFERENCES users(user_id)"
+        )
+        conn.commit()

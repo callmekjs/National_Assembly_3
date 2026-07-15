@@ -7,14 +7,16 @@ import uuid
 from contextlib import asynccontextmanager
 from typing import Literal
 
-from fastapi import FastAPI, HTTPException, Query, Request
+from fastapi import FastAPI, Header, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from starlette.concurrency import run_in_threadpool
 from openai import OpenAIError
+import psycopg2
 from psycopg2.extras import RealDictCursor
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
+import auth
 from actors import actor_profile, search_members
 from issues import issue_party_stances, issue_stances, issue_timeline, list_issues
 from answer import MODE_CONFIG, NO_EVIDENCE, generate_answer
@@ -41,6 +43,10 @@ _log_failures = 0
 async def lifespan(app: FastAPI):
     # 앱 시작: connection pool 준비 / 종료: 반납
     init_pool()
+    try:
+        auth.ensure_schema()
+    except Exception:
+        logger.warning("auth 스키마 준비 실패 — 인증 기능만 비활성 (서비스는 계속)", exc_info=True)
     yield
     close_pool()
 
@@ -141,6 +147,25 @@ class FeedbackRequest(BaseModel):
     query_id: str
     rating: int = Field(ge=1, le=5)  # 프론트: 👍=5, 👎=1
     comment: str | None = Field(None, max_length=2000)
+
+
+class AuthRequest(BaseModel):
+    username: str
+    password: str
+
+    @field_validator("username")
+    @classmethod
+    def _username_rule(cls, v: str) -> str:
+        if not auth.valid_username(v):
+            raise ValueError("아이디는 영문·숫자·한글 2~20자입니다")
+        return v
+
+    @field_validator("password")
+    @classmethod
+    def _password_rule(cls, v: str) -> str:
+        if not auth.valid_password(v):
+            raise ValueError("비밀번호는 8자 이상 72바이트 이하입니다")
+        return v
 
 
 @app.get("/health")
@@ -478,3 +503,45 @@ def post_feedback(req: FeedbackRequest):
         if cur.rowcount == 0:
             raise HTTPException(status_code=404, detail=f"query_id not found: {req.query_id}")
     return {"status": "ok", "query_id": req.query_id}
+
+
+def _bearer_user(authorization: str | None) -> dict | None:
+    """Authorization 헤더 → {user_id, username} | None. 무효 토큰도 None (익명 통과용)."""
+    if not authorization or not authorization.startswith("Bearer "):
+        return None
+    return auth.decode_token(authorization[len("Bearer "):])
+
+
+@app.post("/auth/signup")
+def auth_signup(req: AuthRequest):
+    """가입 즉시 로그인 — 토큰 반환. 이메일 등 개인정보는 받지 않는다 (spec)."""
+    try:
+        with get_conn() as conn, conn.cursor() as cur:
+            cur.execute(
+                "INSERT INTO users (username, password_hash) VALUES (%s, %s) RETURNING user_id",
+                (req.username, auth.hash_password(req.password)),
+            )
+            user_id = cur.fetchone()[0]
+            conn.commit()
+    except psycopg2.errors.UniqueViolation:
+        raise HTTPException(status_code=409, detail="이미 사용 중인 아이디입니다")
+    return {"token": auth.create_token(user_id, req.username), "username": req.username}
+
+
+@app.post("/auth/login")
+def auth_login(req: AuthRequest):
+    with get_conn() as conn, conn.cursor() as cur:
+        cur.execute("SELECT user_id, password_hash FROM users WHERE username = %s", (req.username,))
+        row = cur.fetchone()
+    # 아이디 존재 여부와 무관하게 단일 메시지 — 계정 열거 방지 (spec)
+    if row is None or not auth.verify_password(req.password, row[1]):
+        raise HTTPException(status_code=401, detail="아이디 또는 비밀번호가 올바르지 않습니다")
+    return {"token": auth.create_token(row[0], req.username), "username": req.username}
+
+
+@app.get("/auth/me")
+def auth_me(authorization: str | None = Header(default=None)):
+    user = _bearer_user(authorization)
+    if user is None:
+        raise HTTPException(status_code=401, detail="로그인이 필요합니다")
+    return {"username": user["username"]}
