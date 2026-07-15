@@ -784,3 +784,157 @@ footer {
   color: var(--danger-text);
   margin: 0;
 }
+
+/* ── 테이블 공통: 페이지가 아니라 요소 내부에서만 가로 스크롤 ── */
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 행위자 입장 테이블 (IssueView) — 셀 여백을 CSS 로 일원화 */
+.stance-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.stance-table th,
+.stance-table td {
+  padding: 6px 8px;
+  text-align: left;
+}
+
+/* 이슈별 입장 테이블 (ActorView) */
+.actor-issues-table {
+  max-width: 560px;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.actor-issues-table th,
+.actor-issues-table td {
+  padding: 6px 8px;
+}
+
+/* 의원 검색 컨트롤 — 브라우저 기본 스타일이던 것을 토큰 체계로 */
+.actor-search-input {
+  padding: 8px 10px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  border: 1px solid var(--ink-300);
+  border-radius: var(--radius);
+}
+
+.actor-search-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-soft);
+}
+
+.actor-search-btn {
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: inherit;
+  background: var(--primary);
+  color: var(--surface);
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.actor-search-btn:hover:not(:disabled) {
+  background: var(--primary-hover);
+}
+
+.actor-search-btn:disabled {
+  background: var(--ink-400);
+  cursor: not-allowed;
+}
+
+/* ── 모바일 (375px 기준, 600px 이하) ──────────────────────────
+   index.css 의 1024px 폰트 축소(18→16px)·위 900px result-grid 축소와 겹치지 않는
+   전화기 전용 층. 터치 타깃 44px 은 여기서만 강제 — 데스크톱 마우스 밀도 유지. */
+@media (max-width: 600px) {
+  .container {
+    padding: 1.25rem 1rem;
+    gap: 1.25rem;
+  }
+
+  header h1 {
+    font-size: 1.4rem;
+  }
+
+  /* 절대 배치가 제목과 겹침 — 문서 흐름으로 복귀 */
+  .auth-corner {
+    position: static;
+    justify-content: center;
+    margin-top: 0.5rem;
+  }
+
+  /* 터치 타깃 44px — 인라인 인용 버튼(.cite-ref)은 본문 흐름상 예외 */
+  .tab-nav button,
+  .example-chips button,
+  .mode-toggle button,
+  .query-form button,
+  .auth-corner button,
+  .auth-tabs button,
+  .auth-modal input,
+  .auth-modal button[type='submit'],
+  .myqueries-toggle,
+  .actor-search-input,
+  .actor-search-btn,
+  .actor-suggest button {
+    min-height: 44px;
+  }
+
+  .feedback button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .stance-table th,
+  .stance-table td,
+  .actor-issues-table th,
+  .actor-issues-table td {
+    padding: 12px 8px; /* 클릭 가능한 행 — 행 높이로 44px 확보 */
+  }
+
+  /* 제출 버튼: 엄지 존에서 꽉 차게 */
+  .form-actions {
+    flex-wrap: wrap;
+  }
+
+  .query-form button[type='submit'] {
+    flex: 1 1 100%;
+  }
+
+  .mode-toggle {
+    flex: 1 1 auto;
+  }
+
+  .mode-toggle button {
+    flex: 1;
+  }
+
+  /* Hero: 2×2 메트릭 그리드로 압축 — 4개 세로 스택이 예시 칩을 폴드 밖으로 밀어냄 */
+  .hero {
+    gap: var(--space-4);
+    padding: var(--space-4) 0 var(--space-2);
+  }
+
+  .hero-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hero-metric-card {
+    padding: var(--space-3);
+  }
+
+  .hero-metric-value {
+    font-size: 1.1rem;
+  }
+
+  .modal-overlay {
+    padding: 0.75rem;
+  }
+}

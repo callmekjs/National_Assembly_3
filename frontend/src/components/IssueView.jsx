@@ -121,7 +121,7 @@ function StanceRow({ actor, onActorClick, maxTotal }) {
             title="의원 프로필 보기">{actor.speaker}</td>
         <td>{actor.party || '—'}</td>
         <td><span style={{ color: STANCE_COLOR[actor.stance], fontWeight: 600 }}>{STANCE_KO[actor.stance]}</span></td>
-        <td style={{ padding: '2px 8px' }}><StanceMiniBar counts={actor.counts} maxTotal={maxTotal} /></td>
+        <td><StanceMiniBar counts={actor.counts} maxTotal={maxTotal} /></td>
         <td>{open ? '▲' : '▼'}</td>
       </tr>
       {open && actor.citations.map(cit => (
@@ -200,18 +200,20 @@ export default function IssueView({ selectedIssue, onActorClick, onSelChange }) 
       <h3>행위자 입장 {stances ? `(${stances.actors.length}명)` : ''}</h3>
       {stances ? (
         <>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead><tr><th>발언자</th><th>정당</th><th>입장</th><th style={{ minWidth: 140 }}>입장 분포</th><th></th></tr></thead>
-            <tbody>
-              {(() => {
-                const maxTotal = Math.max(...stances.actors.map(
-                  a => COUNT_ORDER.reduce((s, k) => s + (a.counts[k] || 0), 0)), 1)
-                return stances.actors.map(a => (
-                  <StanceRow key={a.speaker} actor={a} onActorClick={onActorClick} maxTotal={maxTotal} />
-                ))
-              })()}
-            </tbody>
-          </table>
+          <div className="table-scroll">
+            <table className="stance-table">
+              <thead><tr><th>발언자</th><th>정당</th><th>입장</th><th style={{ minWidth: 140 }}>입장 분포</th><th></th></tr></thead>
+              <tbody>
+                {(() => {
+                  const maxTotal = Math.max(...stances.actors.map(
+                    a => COUNT_ORDER.reduce((s, k) => s + (a.counts[k] || 0), 0)), 1)
+                  return stances.actors.map(a => (
+                    <StanceRow key={a.speaker} actor={a} onActorClick={onActorClick} maxTotal={maxTotal} />
+                  ))
+                })()}
+              </tbody>
+            </table>
+          </div>
           <p style={{ fontSize: 11, color: 'var(--ink-700)' }}>
             {COUNT_ORDER.map(s => (
               <span key={s} style={{ marginRight: 10 }}>
