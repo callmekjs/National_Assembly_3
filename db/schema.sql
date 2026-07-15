@@ -167,3 +167,12 @@ CREATE TABLE IF NOT EXISTS issue_stances (
   mapped_at   TIMESTAMPTZ DEFAULT now(),
   PRIMARY KEY (issue_id, turn_id)
 );
+
+-- 11. 최근 발언 한 줄 요약 캐시 (의원 프로필). 코퍼스가 정적이라 영구 유효 —
+--     backend/utterance_summary.py 가 첫 조회 시 자가 생성(CREATE IF NOT EXISTS)하므로
+--     이 정의는 문서화 목적. 배포 DB 에도 첫 사용 시 자동 생성된다.
+CREATE TABLE IF NOT EXISTS utterance_summaries (
+  chunk_id   TEXT PRIMARY KEY,
+  summary    TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);

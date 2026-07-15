@@ -20,6 +20,7 @@ from answer import display_speaker
 from db import get_conn
 from issues import aggregate_stances
 from party import RULING_PERIODS, member_party, party_label
+from utterance_summary import summarize_utterances
 
 
 def canonical_org(org: str) -> str:
@@ -164,18 +165,27 @@ def actor_profile(name: str) -> dict | None:
             for org, turn_ids in sorted(merged.items(), key=lambda kv: -len(kv[1]))[:10]
         ]
 
+        # 요약 입력은 150자 스니펫보다 긴 600자 — 발언 서두는 의례 문구가 많아
+        # 잘린 앞부분만으로는 핵심이 안 나온다. 스니펫은 폴백 표시용으로 유지.
         cur.execute(
             """
             SELECT ch.chunk_id, ch.meeting_date::text AS date, co.name AS committee,
-                   left(ch.text, 150) AS snippet
+                   left(ch.text, 150) AS snippet, left(ch.text, 600) AS llm_text
             FROM chunks ch JOIN committees co ON co.committee_id = ch.committee_id
             WHERE ch.speaker = ANY(%s) AND NOT ch.is_short AND ch.chunk_index = 1
             ORDER BY ch.meeting_date DESC, ch.chunk_id DESC
-            LIMIT 5
+            LIMIT 3
             """,
             (variants,),
         )
         recent = cur.fetchall()
+
+    summaries = summarize_utterances(
+        [{"chunk_id": r["chunk_id"], "text": r["llm_text"]} for r in recent]
+    )
+    for r in recent:
+        r["summary"] = summaries.get(r["chunk_id"])
+        del r["llm_text"]  # LLM 입력용 — 응답 페이로드에서 제외
 
     party, history = build_party_history(name)
     return {

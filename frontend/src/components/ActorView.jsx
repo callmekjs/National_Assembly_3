@@ -143,12 +143,17 @@ export default function ActorView({ actor, onIssueClick, onShown }) {
           ) : <p style={{ fontSize: 14, color: '#666' }}>판정된 이슈 없음</p>}
 
           <h4>최근 발언</h4>
-          {profile.recent_utterances.slice(0, 3).map(u => (
-            <p key={u.chunk_id} style={{ fontSize: 14, color: '#333', margin: '10px 0', maxWidth: 780, lineHeight: 1.65 }}>
-              <span style={{ color: '#868e96', fontSize: 12, marginRight: 6 }}>{u.date} · {u.committee}</span>
-              {u.snippet}…
-            </p>
-          ))}
+          <ul style={{ margin: '8px 0', padding: '0 0 0 20px', maxWidth: 720 }}>
+            {profile.recent_utterances.slice(0, 3).map(u => (
+              <li key={u.chunk_id} style={{ fontSize: 15, color: '#333', margin: '8px 0', lineHeight: 1.6 }}>
+                {u.summary || `${u.snippet}…`}
+                <span style={{ color: '#868e96', fontSize: 12, marginLeft: 8 }}>{u.date} · {u.committee}</span>
+              </li>
+            ))}
+          </ul>
+          {profile.recent_utterances.some(u => u.summary) && (
+            <p style={{ fontSize: 12, color: '#868e96' }}>요약은 LLM 자동 생성 — 원문 확인은 질의 화면에서</p>
+          )}
         </div>
       )}
     </div>
