@@ -95,6 +95,7 @@ python scripts/extractor_v1.py 과방위 외통위
      `BACKEND_CORS_ORIGINS`(Vercel 도메인, 배포 후 갱신 — 형식은
      `https://<app>.vercel.app`, 끝 슬래시 없음), `RERANKER_ENABLED=1`,
      `PYTHON_VERSION=3.12.10`
+   - `JWT_SECRET`: 회원 토큰 서명 키 — 임의의 긴 문자열 (예: `python -c "import secrets; print(secrets.token_hex(32))"`)
 4. **Vercel**: Add New Project → 같은 저장소 → Root Directory `frontend` →
    환경변수 `VITE_API_URL`(Render URL) → Deploy → 도메인을 Render 의
    `BACKEND_CORS_ORIGINS` 에 반영(재배포)

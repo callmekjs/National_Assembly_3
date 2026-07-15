@@ -176,3 +176,14 @@ CREATE TABLE IF NOT EXISTS utterance_summaries (
   summary    TEXT NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- 12. 회원 (2026-07-15 spec). 이메일 등 개인정보 없음 — 아이디+bcrypt 해시만.
+--     backend/auth.py ensure_schema 가 시작 시 자가 생성 (query_logs.user_id 포함) —
+--     이 정의는 문서화 목적.
+CREATE TABLE IF NOT EXISTS users (
+  user_id       SERIAL PRIMARY KEY,
+  username      TEXT NOT NULL UNIQUE,   -- 영문·숫자·한글 2~20자
+  password_hash TEXT NOT NULL,          -- bcrypt (원문은 어디에도 저장하지 않음)
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+ALTER TABLE query_logs ADD COLUMN IF NOT EXISTS user_id INT REFERENCES users(user_id);
