@@ -70,7 +70,7 @@ function AnswerPanel({ result, onCiteClick }) {
       </span>
 
       {result.issue_context && (
-        <div style={{ fontSize: 12, color: '#2563eb', margin: '4px 0' }}>
+        <div style={{ fontSize: 12, color: 'var(--link)', margin: '4px 0' }}>
           📊 이슈 분석 반영: {result.issue_context.title}
         </div>
       )}

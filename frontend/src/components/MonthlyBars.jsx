@@ -15,22 +15,22 @@ export default function MonthlyBars({ months, unit = '건', ariaLabel = '월별 
   const ticks = [...new Set([0, ...Array.from({ length: n }, (_, i) => i).filter(i => i % step === 0), n - 1])]
   return (
     <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ maxWidth: 720 }} role="img" aria-label={ariaLabel}>
-      <line x1={padX} y1={H - padBottom} x2={W - padX} y2={H - padBottom} stroke="#e5e7eb" />
+      <line x1={padX} y1={H - padBottom} x2={W - padX} y2={H - padBottom} stroke="var(--ink-200)" />
       {months.map((m, i) => (
         <rect key={m.month} x={x(i)} y={y(vals[i])} width={barW}
               height={Math.max(H - padBottom - y(vals[i]), vals[i] > 0 ? 1.5 : 0)}
-              fill={i === peakIdx ? '#1d4ed8' : '#93c5fd'} rx="1">
+              fill={i === peakIdx ? 'var(--chart-bar-peak)' : 'var(--chart-bar)'} rx="1">
           <title>{`${m.month} · ${vals[i]}${unit}`}</title>
         </rect>
       ))}
       {vals[peakIdx] > 0 && (
         <text x={Math.min(Math.max(x(peakIdx) + barW / 2, 70), W - 70)} y={y(vals[peakIdx]) - 8}
-              fontSize="12" fontWeight="600" fill="#1d4ed8" textAnchor="middle">
+              fontSize="12" fontWeight="600" fill="var(--chart-bar-peak)" textAnchor="middle">
           {months[peakIdx].month} · {vals[peakIdx]}{unit}
         </text>
       )}
       {ticks.map(i => (
-        <text key={i} y={H - 8} fontSize="11" fill="#666"
+        <text key={i} y={H - 8} fontSize="11" fill="var(--ink-700)"
               x={i === 0 ? padX : i === n - 1 ? W - padX : x(i) + barW / 2}
               textAnchor={i === 0 ? 'start' : i === n - 1 ? 'end' : 'middle'}>
           {months[i].month}

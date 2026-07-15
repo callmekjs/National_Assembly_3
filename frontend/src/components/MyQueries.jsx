@@ -26,14 +26,16 @@ export default function MyQueries({ user, onPick }) {
   return (
     <div style={{ margin: '10px 0' }}>
       <button type="button" onClick={() => setOpen(!open)}
-              style={{ fontSize: 13, padding: '4px 10px', cursor: 'pointer' }}>
+              style={{ fontSize: 13, padding: '4px 10px', cursor: 'pointer', fontFamily: 'inherit',
+                       background: 'var(--surface)', color: 'var(--ink-700)',
+                       border: '1px solid var(--ink-300)', borderRadius: 'var(--radius)' }}>
         {open ? '▾' : '▸'} 내 질문 기록
       </button>
       {open && (
         <div style={{ marginTop: 6 }}>
-          {err && <p style={{ fontSize: 13, color: '#c92a2a' }}>{err}</p>}
+          {err && <p style={{ fontSize: 13, color: 'var(--danger-text)' }}>{err}</p>}
           {items && items.length === 0 && (
-            <p style={{ fontSize: 13, color: '#868e96' }}>아직 기록이 없습니다 — 질문하면 자동으로 저장됩니다.</p>
+            <p style={{ fontSize: 13, color: 'var(--ink-500)' }}>아직 기록이 없습니다 — 질문하면 자동으로 저장됩니다.</p>
           )}
           {items && items.length > 0 && (
             <ul style={{ margin: 0, padding: '0 0 0 18px', maxWidth: 720 }}>
@@ -42,10 +44,10 @@ export default function MyQueries({ user, onPick }) {
                   <button type="button" onClick={() => onPick(q.question)}
                           title="클릭하면 입력창에 채워집니다"
                           style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer',
-                                   fontSize: 14, fontFamily: 'inherit', color: '#1c7ed6', textAlign: 'left' }}>
+                                   fontSize: 14, fontFamily: 'inherit', color: 'var(--link)', textAlign: 'left' }}>
                     {q.question}
                   </button>
-                  <span style={{ color: '#868e96', fontSize: 12, marginLeft: 8 }}>
+                  <span style={{ color: 'var(--ink-500)', fontSize: 12, marginLeft: 8 }}>
                     {q.created_at.slice(0, 10)} · {GROUNDING_KO[q.grounding] || q.grounding}
                   </span>
                 </li>
