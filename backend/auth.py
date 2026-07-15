@@ -45,6 +45,12 @@ def verify_password(pw: str, hashed: str) -> bool:
         return False
 
 
+# 타이밍 부채널 방지 — 없는 아이디도 bcrypt 1회 수행해 응답 시간을 균일화
+# (없으면 없는 아이디는 즉시 401 → 응답 시간으로 계정 존재 여부가 샌다).
+# 모듈 로드 시 1회 생성 — 앱 시작에 bcrypt 1회(~100ms) 비용이 추가된다.
+DUMMY_HASH = hash_password("timing-equalizer-dummy")
+
+
 def create_token(user_id: int, username: str) -> str:
     payload = {
         "sub": str(user_id),  # JWT 표준상 sub 는 문자열

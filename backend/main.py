@@ -533,8 +533,12 @@ def auth_login(req: AuthRequest):
     with get_conn() as conn, conn.cursor() as cur:
         cur.execute("SELECT user_id, password_hash FROM users WHERE username = %s", (req.username,))
         row = cur.fetchone()
-    # 아이디 존재 여부와 무관하게 단일 메시지 — 계정 열거 방지 (spec)
-    if row is None or not auth.verify_password(req.password, row[1]):
+    # 아이디 존재 여부와 무관하게 단일 메시지·단일 응답 시간 — 계정 열거 방지 (spec)
+    # 타이밍 부채널 방지: 없는 아이디도 bcrypt 1회 수행 (단락 평가로 건너뛰면
+    # 응답 시간 차이로 계정 존재 여부가 샌다)
+    hashed = row[1] if row else auth.DUMMY_HASH
+    ok = auth.verify_password(req.password, hashed) and row is not None
+    if not ok:
         raise HTTPException(status_code=401, detail="아이디 또는 비밀번호가 올바르지 않습니다")
     return {"token": auth.create_token(row[0], req.username), "username": req.username}
 
