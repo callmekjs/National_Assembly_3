@@ -61,7 +61,10 @@ function App() {
 
   useEffect(() => {
     if (!getToken()) return
-    fetchMe().then(me => setUser(me)).catch(() => clearToken())
+    fetchMe().then(me => setUser(me)).catch(e => {
+      // 401(무효 토큰)만 삭제 — 콜드스타트 타임아웃·네트워크 실패로 유효 토큰을 지우지 않는다
+      if (e.status === 401) clearToken()
+    })
   }, [])
 
   function logout() { clearToken(); setUser(null) }

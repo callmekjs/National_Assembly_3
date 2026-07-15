@@ -10,11 +10,19 @@ import logging
 import os
 import re
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 
 import bcrypt
 import jwt
+from dotenv import load_dotenv
 
 logger = logging.getLogger("uvicorn.error")
+
+# main.py 의 import 순서상 (import auth 가 from db import ... 보다 먼저 실행되어)
+# db.py 의 load_dotenv 가 아직 평가되지 않은 시점에 이 모듈이 로드될 수 있다.
+# load_dotenv 는 멱등이므로 여기서도 동일하게 호출해 JWT_SECRET 이 .env 에서
+# 조용히 무시되는 것을 막는다.
+load_dotenv(Path(__file__).parent.parent / ".env")
 
 JWT_SECRET = os.environ.get("JWT_SECRET", "")
 if not JWT_SECRET:

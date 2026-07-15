@@ -38,7 +38,9 @@ async function request(path, options = {}, timeoutMs = DEFAULT_TIMEOUT_MS) {
       const body = await res.json()
       if (typeof body.detail === 'string') detail = body.detail
     } catch { /* JSON 아니면 무시 */ }
-    throw new Error(detail || `요청이 실패했습니다 (HTTP ${res.status})`)
+    const err = new Error(detail || `요청이 실패했습니다 (HTTP ${res.status})`)
+    err.status = res.status
+    throw err
   }
   return res.json()
 }
