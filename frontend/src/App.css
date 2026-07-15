@@ -482,6 +482,11 @@ header h1 {
   border-color: #495057;
 }
 
+/* 클릭 가능한 테이블 행 — 인라인 스타일은 :hover 불가라 클래스로 */
+.clickable-row:hover {
+  background: #f8f9fa;
+}
+
 .issue-card-title {
   font-size: 0.92rem;
   font-weight: 600;
