@@ -9,6 +9,7 @@ import IssueView from './components/IssueView'
 import ActorView from './components/ActorView'
 import AuthModal from './components/AuthModal'
 import MyQueries from './components/MyQueries'
+import Hero from './components/Hero'
 
 // URL 쿼리 파라미터 ↔ 화면 상태 (공유 가능 링크: ?tab=issues&issue=medical-reform)
 const TABS = ['query', 'issues', 'actor']
@@ -127,12 +128,12 @@ function App() {
       </header>
 
       {serverStatus === 'checking' && (
-        <div style={{ background: '#fef3c7', color: '#92400e', padding: '8px 12px', borderRadius: 6, marginBottom: 12, fontSize: 14 }}>
+        <div style={{ background: 'var(--warning-soft)', color: 'var(--warning)', padding: '8px 12px', borderRadius: 'var(--radius)', marginBottom: 12, fontSize: 14 }}>
           무료 서버를 깨우는 중입니다 (최대 1분)…
         </div>
       )}
       {serverStatus === 'down' && (
-        <div style={{ background: '#fee2e2', color: '#991b1b', padding: '8px 12px', borderRadius: 6, marginBottom: 12, fontSize: 14 }}>
+        <div style={{ background: 'var(--danger-soft)', color: 'var(--danger)', padding: '8px 12px', borderRadius: 'var(--radius)', marginBottom: 12, fontSize: 14 }}>
           서버 연결 실패 — 잠시 후 새로고침해주세요.
         </div>
       )}
@@ -169,14 +170,17 @@ function App() {
             <MyQueries user={user} onPick={q => setQuestion(q)} />
 
             {!result && !loading && (
-              <div className="example-chips">
-                <span className="chips-label">이런 질문을 해보세요</span>
-                {EXAMPLES.map((q) => (
-                  <button key={q} type="button" onClick={() => askExample(q)}>
-                    {q}
-                  </button>
-                ))}
-              </div>
+              <>
+                <Hero />
+                <div className="example-chips">
+                  <span className="chips-label">이런 질문을 해보세요</span>
+                  {EXAMPLES.map((q) => (
+                    <button key={q} type="button" onClick={() => askExample(q)}>
+                      {q}
+                    </button>
+                  ))}
+                </div>
+              </>
             )}
 
             {error && <div className="error">{error}</div>}
