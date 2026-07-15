@@ -5,3 +5,5 @@ python-dotenv==1.0.1
 psycopg2-binary==2.9.12   # PostgreSQL 연결 (RAG-0)
 openai==2.21.0            # 질문 임베딩·답변 생성 (RAG-3, RAG-6)
 # pgvector 는 DB 확장이라 파이썬 패키지 불필요 (SQL 로 사용)
+bcrypt==4.2.1             # 비밀번호 해시 (인증 — 해시·서명은 직접 구현 금지 영역)
+PyJWT==2.10.1             # JWT 서명/검증 (인증)
