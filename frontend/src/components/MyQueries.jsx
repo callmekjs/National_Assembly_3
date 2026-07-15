@@ -11,9 +11,13 @@ export default function MyQueries({ user, onPick }) {
   const [err, setErr] = useState(null)
 
   useEffect(() => {
-    if (!open || items !== null) return
-    fetchMyQueries().then(d => setItems(d.queries)).catch(e => setErr(e.message))
-  }, [open, items])
+    if (!open || items !== null || !user) return
+    let ignore = false  // 계정 전환·언마운트 후 도착한 늦은 응답 폐기 (스테일 덮어쓰기 방지)
+    fetchMyQueries()
+      .then(d => { if (!ignore) setItems(d.queries) })
+      .catch(e => { if (!ignore) setErr(e.message) })
+    return () => { ignore = true }
+  }, [open, items, user])
 
   // 다른 계정으로 바뀌면 캐시 무효화
   useEffect(() => { setItems(null); setErr(null) }, [user?.username])
