@@ -7,14 +7,16 @@ import uuid
 from contextlib import asynccontextmanager
 from typing import Literal
 
-from fastapi import FastAPI, HTTPException, Query, Request
+from fastapi import FastAPI, Header, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from starlette.concurrency import run_in_threadpool
 from openai import OpenAIError
+import psycopg2
 from psycopg2.extras import RealDictCursor
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
+import auth
 from actors import actor_profile, search_members
 from issues import issue_party_stances, issue_stances, issue_timeline, list_issues
 from answer import MODE_CONFIG, NO_EVIDENCE, generate_answer
@@ -41,6 +43,10 @@ _log_failures = 0
 async def lifespan(app: FastAPI):
     # 앱 시작: connection pool 준비 / 종료: 반납
     init_pool()
+    try:
+        auth.ensure_schema()
+    except Exception:
+        logger.warning("auth 스키마 준비 실패 — 인증 기능만 비활성 (서비스는 계속)", exc_info=True)
     yield
     close_pool()
 
@@ -61,7 +67,9 @@ RATE_LIMIT_PER_MIN = int(os.environ.get("RATE_LIMIT_PER_MIN", "60"))
 DAILY_COST_LIMIT_USD = float(os.environ.get("DAILY_COST_LIMIT_USD", "1.0"))
 _llm_limiter = RateLimiter(RATE_LIMIT_LLM_PER_MIN)
 _general_limiter = RateLimiter(RATE_LIMIT_PER_MIN)
-_LLM_PATHS = ("/query", "/answer")   # LLM 호출 경로 — 강한 한도 + 비용 상한
+_LLM_PATHS = ("/query", "/answer")   # LLM 호출 경로 — 비용 상한 대상
+# 강한 rate limit 대상 = LLM 경로 + 인증 경로 (무차별 대입 방어 — spec 2026-07-15)
+_STRICT_PATHS = _LLM_PATHS + ("/auth/login", "/auth/signup")
 
 
 @app.middleware("http")
@@ -87,7 +95,7 @@ async def guard_middleware(request: Request, call_next):
     if path != "/health":
         ip = client_ip(request.headers.get("x-forwarded-for"),
                        request.client.host if request.client else "unknown")
-        limiter = _llm_limiter if path in _LLM_PATHS else _general_limiter
+        limiter = _llm_limiter if path in _STRICT_PATHS else _general_limiter
         if limiter.per_min > 0 and not limiter.allow(ip, time.time()):
             logger.info("guard 429 rate-limit ip=%s path=%s", ip, path)
             return JSONResponse(status_code=429, content={
@@ -143,6 +151,25 @@ class FeedbackRequest(BaseModel):
     comment: str | None = Field(None, max_length=2000)
 
 
+class AuthRequest(BaseModel):
+    username: str
+    password: str
+
+    @field_validator("username")
+    @classmethod
+    def _username_rule(cls, v: str) -> str:
+        if not auth.valid_username(v):
+            raise ValueError("아이디는 영문·숫자·한글 2~20자입니다")
+        return v
+
+    @field_validator("password")
+    @classmethod
+    def _password_rule(cls, v: str) -> str:
+        if not auth.valid_password(v):
+            raise ValueError("비밀번호는 8자 이상 72바이트 이하입니다")
+        return v
+
+
 @app.get("/health")
 def health():
     """서버 + DB 상태 확인. DB 장애 시에도 200 으로 상태를 알린다 (모니터링용)."""
@@ -164,7 +191,7 @@ def health():
 
 
 def _log_query(req: QueryRequest, result: dict, grounding: str, latency_ms: int,
-               source_block: str | None = None) -> str | None:
+               source_block: str | None = None, user_id: int | None = None) -> str | None:
     """query_logs 1행 저장 → query_id. 로그는 부가 기능 — 실패해도 답변은 반환한다.
 
     source_block: LLM 에 실제로 들어간 근거 블록 — 이상 답변 사후 재현·품질 평가 재료.
@@ -176,8 +203,8 @@ def _log_query(req: QueryRequest, result: dict, grounding: str, latency_ms: int,
                 INSERT INTO query_logs
                   (question, mode, committee, date_from, date_to,
                    answer, grounding, citations, invalid_citations, usage, latency_ms,
-                   source_block)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                   source_block, user_id)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 RETURNING query_id
                 """,
                 (
@@ -188,6 +215,7 @@ def _log_query(req: QueryRequest, result: dict, grounding: str, latency_ms: int,
                     json.dumps(result["usage"], ensure_ascii=False) if result["usage"] else None,
                     latency_ms,
                     source_block,
+                    user_id,
                 ),
             )
             return str(cur.fetchone()[0])
@@ -199,7 +227,7 @@ def _log_query(req: QueryRequest, result: dict, grounding: str, latency_ms: int,
 
 
 @app.post("/query")
-def query(req: QueryRequest):
+def query(req: QueryRequest, authorization: str | None = Header(default=None)):
     """RAG 파이프라인 통합 (RAG-7) — curl 한 번에 답변+출처+신뢰등급.
 
     흐름: 하이브리드 검색 1회 → Grounding 사전차단 → (통과 시) 답변 생성(hits 재사용)
@@ -236,7 +264,9 @@ def query(req: QueryRequest):
     latency_ms = int((time.time() - t0) * 1000)
     # 근거 블록은 로그에만 저장 — API 응답에 그대로 내보내면 응답이 수십 KB 로 불어난다
     source_block = result.pop("source_block", None)
-    query_id = _log_query(req, result, grounding, latency_ms, source_block)
+    user = _bearer_user(authorization)  # 무효 토큰이어도 None — 질의는 익명으로 계속 (spec)
+    query_id = _log_query(req, result, grounding, latency_ms, source_block,
+                          user_id=user["user_id"] if user else None)
     logger.info("query_id=%s mode=%s grounding=%s latency_ms=%d", query_id, req.mode, grounding, latency_ms)
 
     response = {"query_id": query_id, "grounding": grounding, "latency_ms": latency_ms, **result}
@@ -478,3 +508,67 @@ def post_feedback(req: FeedbackRequest):
         if cur.rowcount == 0:
             raise HTTPException(status_code=404, detail=f"query_id not found: {req.query_id}")
     return {"status": "ok", "query_id": req.query_id}
+
+
+def _bearer_user(authorization: str | None) -> dict | None:
+    """Authorization 헤더 → {user_id, username} | None. 무효 토큰도 None (익명 통과용)."""
+    if not authorization or not authorization.startswith("Bearer "):
+        return None
+    return auth.decode_token(authorization[len("Bearer "):])
+
+
+@app.post("/auth/signup")
+def auth_signup(req: AuthRequest):
+    """가입 즉시 로그인 — 토큰 반환. 이메일 등 개인정보는 받지 않는다 (spec)."""
+    try:
+        with get_conn() as conn, conn.cursor() as cur:
+            cur.execute(
+                "INSERT INTO users (username, password_hash) VALUES (%s, %s) RETURNING user_id",
+                (req.username, auth.hash_password(req.password)),
+            )
+            user_id = cur.fetchone()[0]
+            conn.commit()
+    except psycopg2.errors.UniqueViolation:
+        raise HTTPException(status_code=409, detail="이미 사용 중인 아이디입니다")
+    return {"token": auth.create_token(user_id, req.username), "username": req.username}
+
+
+@app.post("/auth/login")
+def auth_login(req: AuthRequest):
+    with get_conn() as conn, conn.cursor() as cur:
+        cur.execute("SELECT user_id, password_hash FROM users WHERE username = %s", (req.username,))
+        row = cur.fetchone()
+    # 아이디 존재 여부와 무관하게 단일 메시지·단일 응답 시간 — 계정 열거 방지 (spec)
+    # 타이밍 부채널 방지: 없는 아이디도 bcrypt 1회 수행 (단락 평가로 건너뛰면
+    # 응답 시간 차이로 계정 존재 여부가 샌다)
+    hashed = row[1] if row else auth.DUMMY_HASH
+    ok = auth.verify_password(req.password, hashed) and row is not None
+    if not ok:
+        raise HTTPException(status_code=401, detail="아이디 또는 비밀번호가 올바르지 않습니다")
+    return {"token": auth.create_token(row[0], req.username), "username": req.username}
+
+
+@app.get("/auth/me")
+def auth_me(authorization: str | None = Header(default=None)):
+    user = _bearer_user(authorization)
+    if user is None:
+        raise HTTPException(status_code=401, detail="로그인이 필요합니다")
+    return {"username": user["username"]}
+
+
+@app.get("/me/queries")
+def my_queries(authorization: str | None = Header(default=None)):
+    """내 질의 히스토리 최근 20건 — 답변 재표시는 범위 밖 (질문 재실행 유도, spec)."""
+    user = _bearer_user(authorization)
+    if user is None:
+        raise HTTPException(status_code=401, detail="로그인이 필요합니다")
+    with get_conn() as conn, conn.cursor(cursor_factory=RealDictCursor) as cur:
+        cur.execute(
+            """
+            SELECT query_id::text, question, mode, grounding, created_at::text
+            FROM query_logs WHERE user_id = %s
+            ORDER BY created_at DESC LIMIT 20
+            """,
+            (user["user_id"],),
+        )
+        return {"queries": [dict(r) for r in cur.fetchall()]}

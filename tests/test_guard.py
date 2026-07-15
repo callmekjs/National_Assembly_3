@@ -51,8 +51,18 @@ def test_daily_cost_cache():
     reset_cost_cache()
 
 
+def test_auth_paths_in_strict_group():
+    """/auth/login·signup 이 강한 한도(분당 5) 그룹에 있어야 무차별 대입이 막힌다.
+    비용 상한 경로(_LLM_PATHS)에는 없어야 한다 — auth 는 LLM 을 안 쓴다."""
+    import main
+    check("auth 가 강한 한도 그룹에", "/auth/login" in main._STRICT_PATHS
+          and "/auth/signup" in main._STRICT_PATHS, main._STRICT_PATHS)
+    check("auth 는 비용 상한 밖", "/auth/login" not in main._LLM_PATHS, main._LLM_PATHS)
+
+
 if __name__ == "__main__":
     test_rate_limiter()
     test_client_ip()
     test_daily_cost_cache()
+    test_auth_paths_in_strict_group()
     print("all passed")
