@@ -188,6 +188,82 @@ def test_speaker_role_consistency():
     check("귀속: 일반어+직함 비매칭", speaker_role_consistency(generic, srcs19) == [])
 
 
+# ── speaker_role_consistency 오탐 4건 회귀 (2026-07-25 스모크 실증) ──────────────
+
+def test_speaker_role_consistency_false_positive_regressions():
+    """확정 오탐 4건 — 실제 스모크 답변 문형 그대로 (data/eval/verification_regress_report.md)."""
+    # eval_011: "그는 통일부가 …" 의 '그'는 조정식 위원(비정부) — 내포절 주어(통일부)를
+    # 문장 주어로 오인해 gov 분기가 발동했었다. 대명사 주어 승계로 해소.
+    srcs11 = [_src(1, "이재강", "더불어민주당(당시 여당)"),
+              _src(2, "조정식", "더불어민주당(당시 여당)")]
+    ans11 = ("이재강 위원은 이러한 조치가 남북 간의 협력 관계 복원과 한반도 평화 정착을 위한 "
+             "노력의 일환이라고 강조했습니다[1]. "
+             "조정식 위원은 새 정부 출범 이후 대북전단 살포가 중단되었지만, 여전히 무차별적인 "
+             "살포가 재개될 가능성이 있다고 우려를 표명했습니다[2]. "
+             "그는 통일부가 이 문제의 해결 주체로 나서야 한다고 주장했습니다[2].")
+    flags11 = speaker_role_consistency(ans11, srcs11)
+    check("귀속(오탐 해소): eval_011 '그는 통일부가' 대명사 승계", flags11 == [], str(flags11))
+
+    # eval_029: "그는 외교부가 …" 의 '그'는 홍기원 위원(비정부) — 동일 패턴.
+    srcs29 = [_src(1, "홍기원", "더불어민주당(당시 야당)")]
+    ans29 = ("홍기원 위원은 2024년 11월 11일 외통위에서 조태열 장관에게 재외국민 보호 예산과 "
+             "관련된 자료 제출 문제를 질문했습니다. "
+             "그는 외교부가 국회에 자료 제출을 거부하고 있어 예산 심의가 어렵다고 지적하며, "
+             "외교부의 사고방식을 바꿔야 한다고 강조했습니다[1].")
+    flags29 = speaker_role_consistency(ans29, srcs29)
+    check("귀속(오탐 해소): eval_029 '그는 외교부가' 대명사 승계", flags29 == [], str(flags29))
+
+    # eval_019 ×2: '이름(정당명)' 표기가 화자명으로 인식되지 않아 소유격 '정부의'에
+    # gov 분기가 오발동했었다. _NAME_PARTY 재사용으로 화자 인식.
+    srcs19a = [_src(1, "이재정", "더불어민주당(당시 야당)")]
+    ans19a = ("이재정(더불어민주당)은 과거 정부의 통제 없는 합의 과정에 대한 우려를 나타내며, "
+              "현재의 상황에서도 국회의 역할이 중요하다고 강조했습니다[1].")
+    flags19a = speaker_role_consistency(ans19a, srcs19a)
+    check("귀속(오탐 해소): eval_019 이재정(더불어민주당) 화자 인식", flags19a == [], str(flags19a))
+
+    srcs19b = [_src(4, "한민수", "더불어민주당(당시 야당)")]
+    ans19b = ("한민수(더불어민주당)는 정부의 방송장악 시도를 비판하며, 정부의 정책에 대한 "
+              "강한 반대 입장을 드러냈습니다[4].")
+    flags19b = speaker_role_consistency(ans19b, srcs19b)
+    check("귀속(오탐 해소): eval_019 한민수(더불어민주당) 화자 인식", flags19b == [], str(flags19b))
+
+
+def test_speaker_role_consistency_true_positives_preserved():
+    """수정 후에도 정탐은 유지되어야 한다 (오탐 수정이 미탐을 만들지 않는지 확인)."""
+    # eval_013 (기존 테스트와 동일 문형 재확인): 승계 주어 기관 vs 비정부 화자
+    srcs = [_src(5, "곽현준", None, role="수석전문위원")]
+    ans = ("외교부는 재외국민 보호 방안을 검토하고 있다고 밝혔습니다. "
+           "관련 법안도 제안되었습니다[5].")
+    flags = speaker_role_consistency(ans, srcs)
+    check("귀속(정탐 보존): eval_013 승계 기관 flag 유지", len(flags) == 1, str(flags))
+
+    # eval_013 실제 스모크 문형: "이재명 정부의 국정과제로" 단독 문장 — 소유격이지만
+    # 문장에 다른 주어 후보가 없는 경우는 gov 분기 발동 유지 (신규 고정).
+    srcs13 = [_src(4, "곽현준", None, role="수석전문위원")]
+    ans13 = "이재명 정부의 국정과제로 추진되고 있습니다[4]."
+    flags13 = speaker_role_consistency(ans13, srcs13)
+    check("귀속(정탐 보존): eval_013 '이재명 정부의 국정과제로' 소유격 gov 분기 유지",
+          len(flags13) == 1, str(flags13))
+
+    # eval_019 정탐: '김수경(정부측)' — '정부측'은 _NAME_PARTY 정당명 목록에 없어
+    # 화자로 인식되지 않는다 → gov 분기 유지 → [1] 이 비정부 화자면 flag 유지되어야 함.
+    srcs19c = [_src(1, "이재정", "더불어민주당(당시 야당)")]
+    ans19c = ("정부측은 오물풍선 문제에 대해 우려를 표명했습니다. "
+              "김수경(정부측)은 이 문제를 다룰 때 신중해야 한다고 언급했습니다[1].")
+    flags19c = speaker_role_consistency(ans19c, srcs19c)
+    check("귀속(정탐 보존): eval_019 김수경(정부측) 비정부 인용 flag 유지",
+          len(flags19c) == 1, str(flags19c))
+
+    # 회귀(2026-07-25 재스모크 실측): "실명 소위원장(정당)" 처럼 _NAME_PARTY 의
+    # optional 직함군에 없는 복합 직함이 오면 실명이 공백에 막혀 버려지고 직함
+    # 단어("소위원장")가 이름으로 잘못 캡처되던 문제 — 직함 단독 캡처는 제외해야 함.
+    srcs_role = [_src(4, "복기왕", "더불어민주당(당시 여당)")]
+    ans_role = "복기왕 소위원장(더불어민주당)은 법안을 통해 이를 제어할 필요성을 강조했습니다[4]."
+    flags_role = speaker_role_consistency(ans_role, srcs_role)
+    check("귀속(오탐 방지): '소위원장(정당)' 직함 단독 캡처가 미등장 화자로 오탐되지 않음",
+          not any("소위원장" in f and "미등장" in f for f in flags_role), str(flags_role))
+
+
 # ── party_label_consistency (spec §0-1·§4-2, eval_057) ───────────────────────────────
 
 def test_party_label_consistency():
@@ -331,6 +407,8 @@ if __name__ == "__main__":
     test_qa_pair_question()
     test_qa_pairing_dates()
     test_speaker_role_consistency()
+    test_speaker_role_consistency_false_positive_regressions()
+    test_speaker_role_consistency_true_positives_preserved()
     test_party_label_consistency()
     test_keyword_containment()
     test_ruling_period_consistency()

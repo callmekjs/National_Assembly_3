@@ -193,6 +193,33 @@ _NOT_NAMES = frozenset([
     "해당", "관련", "소속", "여당", "야당", "양당", "양측", "모든", "다른", "일부",
     "동일", "같은", "각각", "국회", "정부", "당시", "여러", "다수", "소수", "상임",
 ])
+# 직함 단독어 — _NAME_PARTY 는 "실명 직함(정당)" 구조를 기대하지만 직함이 "소위원장"
+# 처럼 _NAME_PARTY 의 optional 직함군(위원장|위원|의원)에 없는 복합어면, 앞의 진짜
+# 실명은 공백에 막혀 버려지고 직함 단어 자체가 "이름"으로 잘못 캡처된다
+# (2026-07-25 회귀 스모크에서 실측: "복기왕 소위원장(더불어민주당)" → 이름='소위원장').
+# 직함 접미로 끝나는 캡처는 화자명 후보에서 제외 — 실명이 이 접미로 끝나는 경우는 없다.
+_ROLE_SUFFIXES = ("위원장", "위원", "의원", "장관", "차관", "청장", "처장", "총리", "후보자", "대변인")
+
+# 대명사 주어 승계 (2026-07-25 오탐 수정, eval_011·029): "그는/그가 …" 로 시작하는
+# 문장은 직전 명시 화자를 승계한 것으로 본다 — 내포절 주어(예: "그는 통일부가 …")를
+# 문장 주어로 오인해 gov 분기가 오발동하는 것을 막는다. 공백·따옴표 프리픽스 허용.
+_PRONOUN_SUBJECT = re.compile(r"^[\s'\"“”‘’]*(?:그는|그녀는|그가|그녀가)")
+
+
+def _sentence_names(sent: str) -> list[str]:
+    """문장 속 명시 화자명 — '이름+직함' 또는 '이름(정당명)' 표기 모두 인식.
+
+    2026-07-25 오탐 수정(eval_019): "이재정(더불어민주당)은 …" 처럼 직함 없이
+    정당명만 병기된 표기는 기존 _NAMED_SPEAKER 로 잡히지 않아 gov 분기가
+    오발동했다 — party_label_consistency 의 _NAME_PARTY 를 재사용해 보강.
+    단, _NAME_PARTY 캡처가 직함 단독어(_ROLE_SUFFIXES)로 끝나면 제외한다.
+    """
+    names = [m for m in _NAMED_SPEAKER.findall(sent) if m not in _NOT_NAMES]
+    names += [
+        m.group(1) for m in _NAME_PARTY.finditer(sent)
+        if m.group(1) not in _NOT_NAMES and not m.group(1).endswith(_ROLE_SUFFIXES)
+    ]
+    return names
 
 
 def speaker_role_consistency(answer: str, cited_sources: list[dict]) -> list[str]:
@@ -202,6 +229,8 @@ def speaker_role_consistency(answer: str, cited_sources: list[dict]) -> list[str
     (b) 기관 귀속: 문장 주어가 정부 기관(명시 또는 문단 승계)인데 그 문장의 인용
         화자가 정부측이 아님 — 승계 기반은 'inherited' 표시 (spec 2차 휴리스틱)
     거절 문장(확인 불가 공시)은 검사하지 않는다.
+    대명사 주어("그는/그가 …")는 같은 문단 내 직전 명시 화자를 승계 — gov 분기를
+    타지 않고 inherited_gov 도 갱신하지 않는다 (2026-07-25 오탐 수정).
     """
     by_n = {s["n"]: s for s in cited_sources}
     all_speaker_keys: set[str] = set()
@@ -210,14 +239,21 @@ def speaker_role_consistency(answer: str, cited_sources: list[dict]) -> list[str
 
     flags: list[str] = []
     inherited_gov = False
+    para_has_named_speaker = False
     prev_para = None
     for sent, pi in _paragraph_sentences(answer):
         if pi != prev_para:
             inherited_gov = False
+            para_has_named_speaker = False
             prev_para = pi
         if _REFUSAL_SENT.search(sent):
             continue
-        names = [m for m in _NAMED_SPEAKER.findall(sent) if m not in _NOT_NAMES]
+        names = _sentence_names(sent)
+
+        if not names and para_has_named_speaker and _PRONOUN_SUBJECT.match(sent):
+            # 대명사 주어 승계 — 직전 명시 화자에 귀속, gov 분기 스킵 (inherited_gov 불변)
+            continue
+
         gov_explicit = bool(_GOV_SUBJECT.search(sent))
         cited = _cited_in(sent, by_n)
 
@@ -226,6 +262,7 @@ def speaker_role_consistency(answer: str, cited_sources: list[dict]) -> list[str
             if cited and not any(n in all_speaker_keys for n in names):
                 flags.append(f"미등장 화자 '{names[0]}' 에 발언 귀속: {sent[:40]}")
             inherited_gov = False  # 화자명이 나오면 기관 승계 끊김 (명시 주어 전환)
+            para_has_named_speaker = True
         elif gov_explicit or inherited_gov:
             # (b) 정부 기관 주어 — 인용 화자가 정부측이 아니면 귀속 오류
             for s in cited:
