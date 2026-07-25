@@ -315,5 +315,37 @@ def main():
     print("\nALL PASS")
 
 
+# ── 질문 유형 라우터: _COMPARE_RE 후보 D (spec §0-2, 2026-07-25) ──────────────
+
+from query_parser import classify_question  # noqa: E402
+
+
+def test_compare_re_candidate_d():
+    # 기존 매칭 유지
+    check("라우터: '비교' 리터럴", "compare" in classify_question(
+        "정부 입장과 야당 의원들의 비판적 시각을 비교해 주세요."))
+    check("라우터: '여야' 리터럴", "compare" in classify_question(
+        "여야 입장을 정리해 주세요."))
+    # 후보 A 패턴 — eval_057·068 실측 질의
+    check("라우터: 여당…야당 근접쌍 (eval_057)", "compare" in classify_question(
+        "가계부채 관리 방안에 대해 여당과 야당 위원들은 어떻게 다른 입장을 보였나요?"))
+    check("라우터: 여당…야당 근접쌍 (eval_068)", "compare" in classify_question(
+        "전세사기 특별법에 대한 여당과 야당 위원들의 입장은 어떻게 달랐나요?"))
+    check("라우터: 야당…여당 역순", "compare" in classify_question(
+        "야당 그리고 여당 위원들의 견해는?"))
+    # 후보 D 추가 패턴 — 정당명 직접 쌍 (eval_050)
+    check("라우터: 더불어민주당…국민의힘 쌍", "compare" in classify_question(
+        "이 법안에 대한 더불어민주당과 국민의힘의 입장 정리해줘"))
+    check("라우터: 국민의힘…더불어민주당 역순", "compare" in classify_question(
+        "국민의힘 측과 더불어민주당 측 발언을 알려줘"))
+    # 오탐 방지 — 비교 아닌 질문은 여전히 비매칭
+    check("라우터: 일반 질문 비매칭", "compare" not in classify_question(
+        "의대 정원 확대에 대해 어떤 논의가 있었나요?"))
+    check("라우터: 정당명 1개만은 비매칭", "compare" not in classify_question(
+        "더불어민주당 의원들의 발언을 알려줘"))
+    check("라우터: 인물 비교는 의도적 제외 (spec §0-2)", "compare" not in classify_question(
+        "조태열 전 장관과 조현 현 장관의 답변 차이는?"))
+
+
 if __name__ == "__main__":
     main()
