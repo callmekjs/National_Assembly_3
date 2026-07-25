@@ -313,6 +313,8 @@ def main():
     test_classify_question()
     test_type_guides()
     test_compare_re_candidate_d()
+    test_coverage_guard()
+    test_build_user_message_extra_guards()
     print("\nALL PASS")
 
 
@@ -346,6 +348,33 @@ def test_compare_re_candidate_d():
         "더불어민주당 의원들의 발언을 알려줘"))
     check("라우터: 인물 비교는 의도적 제외 (spec §0-2)", "compare" not in classify_question(
         "조태열 전 장관과 조현 현 장관의 답변 차이는?"))
+
+
+# ── 검증층 접합 (2026-07-25, spec §2-1·§3·§6) ────────────────────────────────
+
+from answer import _coverage_guard, QA_PAIR_GUIDE  # noqa: E402
+
+
+def test_coverage_guard():
+    one_sided = [
+        {"n": 1, "speaker": "김우영", "party": "더불어민주당(당시 여당)"},
+        {"n": 2, "speaker": "박민규", "party": "더불어민주당(당시 야당)"},
+    ]
+    guard = _coverage_guard(one_sided, {"compare"})
+    check("가드: 한쪽 진영이면 지시문 생성", "더불어민주당" in guard and "확인할 수 없습니다" in guard)
+
+    covered = one_sided + [{"n": 3, "speaker": "강민국", "party": "국민의힘(당시 야당)"}]
+    check("가드: 양 진영이면 빈 문자열", _coverage_guard(covered, {"compare"}) == "")
+    check("가드: 비교 질문 아니면 빈 문자열", _coverage_guard(one_sided, set()) == "")
+
+
+def test_build_user_message_extra_guards():
+    msg = build_user_message("여당과 야당 입장은?", "[1] 근거", extra_guards="\n\n(안내: 테스트 가드)")
+    check("조립: extra_guards 삽입", "(안내: 테스트 가드)" in msg)
+    check("조립: 가드는 근거 블록 앞", msg.index("테스트 가드") < msg.index("===== 근거 블록 시작"))
+    msg2 = build_user_message("질문", "[1] 근거")
+    check("조립: extra_guards 기본값 하위호환", "테스트 가드" not in msg2)
+    check("조립: QA_PAIR_GUIDE 상수 존재", "질의-답변" in QA_PAIR_GUIDE)
 
 
 if __name__ == "__main__":
