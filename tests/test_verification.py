@@ -94,6 +94,11 @@ def test_speaker_both_sides():
     yeoya = "김우영 위원[1]의 발언에 여야 모두 주목했고, 김우영 위원이 재차 강조했습니다[1]."
     check("양진영: '여야' 단어는 비매칭", speaker_both_sides(yeoya, srcs) is False)
 
+    # 리뷰 fix: 상대 진영 반응 서술을 오탐하지 않음 (화자는 일관되게 여당)
+    opposite_reaction = ("여당 측에서는 김우영 위원이 특별법 보완을 주장했습니다[1]. "
+                         "이에 대해 야당 반대에도 불구하고 김우영 위원은 원안을 재차 강조했습니다[1].")
+    check("양진영: 상대 진영 반응 서술은 오탐하지 않음", speaker_both_sides(opposite_reaction, srcs) is False)
+
 
 # ── Q-A 짝짓기 (spec §3, eval_029) ───────────────────────────────────────────
 
@@ -128,6 +133,14 @@ def test_qa_pairing_dates():
     ]
     check("QA짝: 같은 회의면 통과", qa_pairing_dates(fabricated, same_meeting, q29) is False)
     check("QA짝: QA 질문 아니면 통과", qa_pairing_dates(fabricated, srcs, "무기 지원 논의 알려줘") is False)
+
+    # 리뷰 fix: 날짜 결측 source는 판정 제외 (크래시 없음, 예외 격리)
+    with_none_date = [
+        _src(1, "홍기원", "더불어민주당(당시 야당)", date=None, committee="외통위"),
+        _src(5, "조태열", "정부측", "2025-02-19", committee="외통위", role="장관"),
+    ]
+    check("QA짝: 날짜 결측 source는 판정 제외(크래시 없음)",
+          qa_pairing_dates(fabricated, with_none_date, q29) is False)
 
 
 if __name__ == "__main__":

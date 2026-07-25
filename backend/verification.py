@@ -49,9 +49,7 @@ def comparison_coverage(sources: list[dict]) -> dict:
 
 # ── 화자·진영 이중 사용 (spec §2-2, eval_068) ────────────────────────────────
 
-_SIDE_RULING = re.compile(r"여당|찬성")
-_SIDE_OPPO = re.compile(r"야당|반대")
-_SIDE_WINDOW = 20  # 화자명 주변 탐색 폭 (spec §2-2 "주변 20자")
+_SIDE_FRAME = re.compile(r"(여당|야당)(\s*측)?(\s*(에서는|에서|소속|의원들?|의|인))?\s*$")
 
 
 def _speaker_keys(speaker: str | None) -> set[str]:
@@ -66,24 +64,25 @@ def _speaker_keys(speaker: str | None) -> set[str]:
 
 
 def speaker_both_sides(answer: str, cited_sources: list[dict]) -> bool:
-    """같은 화자가 답변 안에서 여당·야당(또는 찬성·반대) 양쪽 프레이밍에 배치됐는가.
+    """같은 화자가 답변 안에서 여당·야당 양쪽 프레이밍에 배치됐는가.
 
-    화자명 등장 위치 ±20자 창에서 대조 키워드를 본다 — 순수 정규식, LLM 불필요.
-    '여야'라는 단어는 여당/야당 어느 패턴에도 걸리지 않는다.
+    화자명 직전 수식(여당 측/야당 소속/야당인 등)만 프레이밍으로 인정 — 주변 창 방식은
+    상대 진영 반응 서술('야당 반대에도 불구하고')을 오탐해 폐기 (2026-07-25 리뷰).
+    순수 정규식, LLM 불필요.
     """
     for s in cited_sources:
         for name in _speaker_keys(s.get("speaker")):
             hits = [m.start() for m in re.finditer(re.escape(name), answer)]
             if len(hits) < 2:
                 continue
-            ruling_side = oppo_side = False
+            frames = {}  # {pos: '여당'|'야당'|None}
             for pos in hits:
-                window = answer[max(0, pos - _SIDE_WINDOW): pos + len(name) + _SIDE_WINDOW]
-                if _SIDE_RULING.search(window):
-                    ruling_side = True
-                if _SIDE_OPPO.search(window):
-                    oppo_side = True
-            if ruling_side and oppo_side:
+                # 화자명 직전 12자에서 프레이밍 찾기
+                before = answer[max(0, pos - 12): pos]
+                m = _SIDE_FRAME.search(before)
+                frames[pos] = m.group(1) if m else None
+            # 같은 화자의 서로 다른 등장이 여당·야당 양쪽으로 명시 프레이밍되면 True
+            if None not in frames.values() and len(set(frames.values())) > 1:
                 return True
     return False
 
@@ -93,6 +92,7 @@ def speaker_both_sides(answer: str, cited_sources: list[dict]) -> bool:
 _QA_VERB = re.compile(r"질(?:문|의)")
 _QA_ASKER = re.compile(r"[가-힣]{2,4}\s*(?:위원|의원)")
 _QA_ANSWERER = re.compile(r"장관|차관|총리|처장|청장|위원장|후보자|대통령")
+_VALID_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}")
 
 
 def qa_pair_question(question: str) -> bool:
@@ -108,7 +108,12 @@ def qa_pair_question(question: str) -> bool:
 def _mentions_date(answer: str, iso_date: str) -> bool:
     """답변이 해당 날짜를 언급하는가 — 'YYYY년 M월' / ISO / 'M월 D일' 표기 인정."""
     d = str(iso_date)[:10]
-    year, month, day = int(d[:4]), int(d[5:7]), int(d[8:10])
+    if not _VALID_DATE.match(d):
+        return False
+    try:
+        year, month, day = int(d[:4]), int(d[5:7]), int(d[8:10])
+    except (ValueError, IndexError):
+        return False
     return (f"{year}년 {month}월" in answer or d in answer
             or f"{month}월 {day}일" in answer)
 
@@ -119,13 +124,17 @@ def qa_pairing_dates(answer: str, cited_sources: list[dict], question: str) -> b
 
     eval_029: 질문 인용 = 외통위 2024-11-11, 답변 인용 = 2025-02 업무보고 —
     서로 다른 회의를 같은 회의의 질의-답변으로 단정. 답변이 서로 다른 날짜를
-    2개 이상 명시하면 정직한 공시로 보고 통과.
+    2개 이상 명시하면 정직한 공시로 보고 통과. 날짜 결측 source는 판정 제외
+    (2026-07-25 리뷰: 예외 격리 — 검증층 크래시 방지).
     """
     if not qa_pair_question(question) or len(cited_sources) < 2:
         return False
-    meetings = {(s.get("committee"), str(s.get("date"))) for s in cited_sources}
+    # 유효한 날짜의 source만 집계
+    valid_sources = [s for s in cited_sources
+                     if _VALID_DATE.match(str(s.get("date"))[:10])]
+    meetings = {(s.get("committee"), str(s.get("date"))) for s in valid_sources}
     if len(meetings) < 2:
         return False
-    dates = {str(s.get("date")) for s in cited_sources}
+    dates = {str(s.get("date")) for s in valid_sources}
     disclosed = sum(1 for d in dates if _mentions_date(answer, d))
     return disclosed < 2
