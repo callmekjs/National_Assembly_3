@@ -45,3 +45,87 @@ def comparison_coverage(sources: list[dict]) -> dict:
     """
     parties = sorted({p for s in sources if (p := core_party(s.get("party")))})
     return {"core_parties": parties, "covered": len(parties) >= 2}
+
+
+# ── 화자·진영 이중 사용 (spec §2-2, eval_068) ────────────────────────────────
+
+_SIDE_RULING = re.compile(r"여당|찬성")
+_SIDE_OPPO = re.compile(r"야당|반대")
+_SIDE_WINDOW = 20  # 화자명 주변 탐색 폭 (spec §2-2 "주변 20자")
+
+
+def _speaker_keys(speaker: str | None) -> set[str]:
+    """'柳榮夏(유영하)' → {'柳榮夏','유영하'} / '김현' → {'김현'} — 병기 표기 분해."""
+    if not speaker:
+        return set()
+    keys = {speaker}
+    m = re.match(r"^(.+?)\((.+?)\)$", speaker)
+    if m:
+        keys.update({m.group(1), m.group(2)})
+    return keys
+
+
+def speaker_both_sides(answer: str, cited_sources: list[dict]) -> bool:
+    """같은 화자가 답변 안에서 여당·야당(또는 찬성·반대) 양쪽 프레이밍에 배치됐는가.
+
+    화자명 등장 위치 ±20자 창에서 대조 키워드를 본다 — 순수 정규식, LLM 불필요.
+    '여야'라는 단어는 여당/야당 어느 패턴에도 걸리지 않는다.
+    """
+    for s in cited_sources:
+        for name in _speaker_keys(s.get("speaker")):
+            hits = [m.start() for m in re.finditer(re.escape(name), answer)]
+            if len(hits) < 2:
+                continue
+            ruling_side = oppo_side = False
+            for pos in hits:
+                window = answer[max(0, pos - _SIDE_WINDOW): pos + len(name) + _SIDE_WINDOW]
+                if _SIDE_RULING.search(window):
+                    ruling_side = True
+                if _SIDE_OPPO.search(window):
+                    oppo_side = True
+            if ruling_side and oppo_side:
+                return True
+    return False
+
+
+# ── 거짓 Q-A 짝짓기 (spec §3, eval_029) ──────────────────────────────────────
+
+_QA_VERB = re.compile(r"질(?:문|의)")
+_QA_ASKER = re.compile(r"[가-힣]{2,4}\s*(?:위원|의원)")
+_QA_ANSWERER = re.compile(r"장관|차관|총리|처장|청장|위원장|후보자|대통령")
+
+
+def qa_pair_question(question: str) -> bool:
+    """질문이 'A 위원이 …질의… B 장관 …답변' Q-A 짝 패턴인가.
+
+    질의·답변 두 동사 + 질문자(의원)·답변자(직함) 신호가 모두 있어야 True —
+    '장관의 답변 내용은?' 같은 단일 대상 질문의 오탐 방지.
+    """
+    return (bool(_QA_VERB.search(question)) and "답변" in question
+            and bool(_QA_ASKER.search(question)) and bool(_QA_ANSWERER.search(question)))
+
+
+def _mentions_date(answer: str, iso_date: str) -> bool:
+    """답변이 해당 날짜를 언급하는가 — 'YYYY년 M월' / ISO / 'M월 D일' 표기 인정."""
+    d = str(iso_date)[:10]
+    year, month, day = int(d[:4]), int(d[5:7]), int(d[8:10])
+    return (f"{year}년 {month}월" in answer or d in answer
+            or f"{month}월 {day}일" in answer)
+
+
+def qa_pairing_dates(answer: str, cited_sources: list[dict], question: str) -> bool:
+    """Q-A 짝 질문에서 인용들이 서로 다른 회의(committee+date)를 가리키는데
+    답변이 날짜 차이를 공시하지 않으면 True (flag).
+
+    eval_029: 질문 인용 = 외통위 2024-11-11, 답변 인용 = 2025-02 업무보고 —
+    서로 다른 회의를 같은 회의의 질의-답변으로 단정. 답변이 서로 다른 날짜를
+    2개 이상 명시하면 정직한 공시로 보고 통과.
+    """
+    if not qa_pair_question(question) or len(cited_sources) < 2:
+        return False
+    meetings = {(s.get("committee"), str(s.get("date"))) for s in cited_sources}
+    if len(meetings) < 2:
+        return False
+    dates = {str(s.get("date")) for s in cited_sources}
+    disclosed = sum(1 for d in dates if _mentions_date(answer, d))
+    return disclosed < 2
