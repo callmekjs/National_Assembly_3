@@ -419,6 +419,17 @@ header h1 {
   font-size: 0.85rem;
 }
 
+/* ungrounded-banner(전체 박스)보다 한 단계 낮은 무게 — 좌측 강조선만 사용해
+   "본문 근거 없음"보다 약한 신호(자동 검증 도구의 부가 의심)임을 구분한다 */
+.verification-banner {
+  padding: 0.5rem 0.75rem;
+  background: var(--warning-soft);
+  border-left: 3px solid var(--warning-border);
+  border-radius: var(--radius-sm);
+  color: var(--warning);
+  font-size: 0.8rem;
+}
+
 .answer-meta {
   display: flex;
   justify-content: space-between;
