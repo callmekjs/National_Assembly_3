@@ -261,7 +261,22 @@ def test_speaker_role_consistency_true_positives_preserved():
     ans_role = "복기왕 소위원장(더불어민주당)은 법안을 통해 이를 제어할 필요성을 강조했습니다[4]."
     flags_role = speaker_role_consistency(ans_role, srcs_role)
     check("귀속(오탐 방지): '소위원장(정당)' 직함 단독 캡처가 미등장 화자로 오탐되지 않음",
-          not any("소위원장" in f and "미등장" in f for f in flags_role), str(flags_role))
+          flags_role == [], str(flags_role))
+
+    # 재리뷰(Fable) 실증 회귀: _ROLE_SUFFIXES 가 _NAMED_SPEAKER 직함 10종 파생이라
+    # 간사·(원내)대표 계열이 뚫려 있었다 — "박찬대 원내대표(더불어민주당)는" → '원내대표'
+    # 가, "김민석 간사(더불어민주당)는" → '간사' 가 미등장 화자로 오탐되던 문제.
+    srcs_leader = [_src(1, "박찬대", "더불어민주당(당시 여당)")]
+    ans_leader = "박찬대 원내대표(더불어민주당)는 국회 일정 조율 방안을 설명했습니다[1]."
+    flags_leader = speaker_role_consistency(ans_leader, srcs_leader)
+    check("귀속(오탐 방지): '원내대표(정당)' 직함 단독 캡처가 미등장 화자로 오탐되지 않음",
+          flags_leader == [], str(flags_leader))
+
+    srcs_secretary = [_src(2, "김민석", "더불어민주당(당시 여당)")]
+    ans_secretary = "김민석 간사(더불어민주당)는 법안 처리 일정에 대해 설명했습니다[2]."
+    flags_secretary = speaker_role_consistency(ans_secretary, srcs_secretary)
+    check("귀속(오탐 방지): '간사(정당)' 직함 단독 캡처가 미등장 화자로 오탐되지 않음",
+          flags_secretary == [], str(flags_secretary))
 
 
 # ── party_label_consistency (spec §0-1·§4-2, eval_057) ───────────────────────────────
