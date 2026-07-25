@@ -993,6 +993,43 @@ bcrypt 1회 수행해 응답 시간 균일화. ② MyQueries 계정 전환 시 �
 테스트: 백엔드 신규 11(test_auth 5 + test_auth_api 6) + guard 1, 프론트 vitest 5.
 배포 영향: Render 환경변수 `JWT_SECRET` 1줄 + requirements에 bcrypt·PyJWT 추가.
 
+### 답변-근거 자동 검증 층 1단계 + 회귀 스모크 (2026-07-25)
+
+스펙 `docs/superpowers/specs/2026-07-15-answer-verification-design.md` (§0 "미통과
+검수 → 회귀 아님 확정" 8건의 근본원인 매핑이 요구사항 근거). 9개 태스크 1바퀴로 완결.
+
+- **`backend/verification.py` 신규(규칙 7종, LLM 호출 0)**: 진영 커버리지
+  (`comparison_coverage` — "당시 여당/야당"은 시점 라벨이지 정당이 아니라는 함정 처리)
+  · 화자·진영 이중 프레이밍(`speaker_both_sides`) · 거짓 Q-A 짝짓기 날짜 정합성
+  (`qa_pairing_dates`) · 화자/기관 귀속(`speaker_role_consistency`, 문단 주어 승계는
+  `inherited` 표시) · 정당 라벨 일치(`party_label_consistency`, 위성정당 표기 원본
+  대조) · 키워드 포함률(`keyword_containment`, 표적 이탈 패딩) · 정권기 일치
+  (`ruling_period_consistency`, `party.py RULING_PERIODS` 재사용). 규칙별 예외 격리
+  (`verify()` 의 `run()` 래퍼) — 검증층 버그가 답변 생성 실패로 번지지 않는다.
+- **사전 지시 2종**: `answer.py` 의 `_coverage_guard`(비교 질문 진영 커버리지 사전
+  경고) + `QA_PAIR_GUIDE`(Q-A 짝 질문 날짜 명시 유도) — 생성 전 프롬프트 방어.
+- **`_COMPARE_RE` 후보 D 확장**(`query_parser.py`): "여당…야당" 근접 패턴 +
+  "더불어민주당…국민의힘" 정당명 쌍 패턴 추가. 75문항 실측 재현 2/8→6/8,
+  비교질문 외 오탐 0 — 기존에 이미 구현된 비교 질문 방어(`_TYPE_GUIDES`,
+  `issue_context_for`)가 057·068 에서 애초에 발동하지 않던 구멍을 정규식 1줄
+  수정으로 메움.
+- **강등 접합**: `verify()` 는 `generate_answer()` 내부에서 호출(200자 절단 전
+  전문 sources 필요), `verification_flags` 가 비어있지 않으면 `invalid_citations`
+  와 동일한 자리에서 FULL→PARTIAL 강등(`main.py`). 새 등급 신설 없음(마스터 4-9
+  4단계 계약 유지). `query_logs.verification`(JSONB) 원본 그대로 적재.
+  프론트 검증 배지(POL-8 근거 배지 패턴 재사용)로 flag 노출.
+- **회귀 스모크 (`scripts/verification_regress.py`, 신규 LLM 호출 = gpt-4o-mini
+  8회 ~$0.005)**: 확정 실패 8건(eval_011·013·019·029·035·055·057·068) 재실행 —
+  8/8 예외 없이 완주. flag 발생 6/8(`data/eval/verification_regress_report.md`),
+  eval_011 은 §4-3 결정 ④에 따라 1단계 표적 밖(2단계 이월)이라 애초 미커버 대상.
+  flag 는 "생성이 오류를 재현했을 때"만 뜨는 신호라 개수 자체가 자동 합격선이
+  아니다 — 사람 대조용 재료로 리포트에 문항별 answer 전문·flags·detail 을 남김
+  (1차 소견은 `.superpowers/sdd/task-9-report.md` 참조).
+- pytest 123 passed(신규 스모크 스크립트 포함 회귀 없음).
+- **2단계 백로그(결정 ④⑤에 따라 의도적 미포함)**: §4-3 다중 대상 부재공시(eval_011
+  표적) · §5-2 혼합 접근(규칙+LLM 재검토) · §5-3 은 75문항 전체 재측정(§7-4, LLM
+  judge 비용 발생 — 실행 여부는 사용자 승인 필요).
+
 ## 코드 전수 검토 + 1차 수정 (2026-07-06)
 
 > 전체 코드베이스 검토(병렬 리뷰 3축: 백엔드/ETL/프론트+테스트) + 외부 리뷰(친구) 지적을
