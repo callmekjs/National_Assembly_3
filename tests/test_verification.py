@@ -16,9 +16,13 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "backend"))
 from verification import (  # noqa: E402
     comparison_coverage,
     core_party,
+    keyword_containment,
+    party_label_consistency,
     qa_pair_question,
     qa_pairing_dates,
+    ruling_period_consistency,
     speaker_both_sides,
+    speaker_role_consistency,
 )
 
 
@@ -148,10 +152,102 @@ def test_qa_pairing_dates():
           qa_pairing_dates(fabricated, with_none_date, q29) is False)
 
 
+# ── speaker_role_consistency (spec §4-2, eval_013·019) ───────────────────────
+
+def test_speaker_role_consistency():
+    # eval_013 재현: 외교부 문단에서 주어 생략 문장이 수석전문위원 발언[5]을 인용
+    srcs = [_src(5, "곽현준", None, role="수석전문위원")]
+    ans = ("외교부는 재외국민 보호 방안을 검토하고 있다고 밝혔습니다. "
+           "관련 법안도 제안되었습니다[5].")
+    flags = speaker_role_consistency(ans, srcs)
+    check("귀속: 승계 주어 기관 vs 비정부 화자 감지", len(flags) == 1, str(flags))
+    check("귀속: inherited 표시", "inherited" in flags[0], str(flags))
+
+    # 명시 주어가 정부기관 + 정부측 인용이면 통과
+    gov = [_src(2, "김병환", "정부측", role="금융위원장")]
+    ok = "금융위원회는 가계부채 관리 방안을 설명했습니다[2]."
+    check("귀속: 정부기관+정부측 인용 통과", speaker_role_consistency(ok, gov) == [])
+
+    # eval_019 재현: 인용 근거에 없는 화자에게 발언 귀속 (환각 화자)
+    srcs19 = [_src(1, "김우영", "더불어민주당(당시 야당)")]
+    hallucinated = "김수경 차관은 오물풍선 대응을 설명했습니다[1]."
+    flags = speaker_role_consistency(hallucinated, srcs19)
+    check("귀속: 미등장 화자 감지 (환각)", any("김수경" in f for f in flags), str(flags))
+
+    # 인용 화자와 일치하는 명시 주어는 통과
+    ok2 = "김우영 위원은 특별법 보완을 주장했습니다[1]."
+    check("귀속: 일치 화자 통과", speaker_role_consistency(ok2, srcs19) == [])
+
+    # 거절 문장은 검사 제외 ("김수경 차관의 발언은 확인할 수 없습니다"는 정직한 처리)
+    refusal = "김수경 차관의 발언은 제공된 회의록에서 확인할 수 없습니다."
+    check("귀속: 거절 문장 제외", speaker_role_consistency(refusal, srcs19) == [])
+
+    # 일반어 오탐 방지: '해당 위원' '여당 의원'은 화자명이 아니다
+    generic = "해당 위원의 지적에 여당 의원들도 동의했습니다[1]. 김우영 위원의 발언입니다[1]."
+    check("귀속: 일반어+직함 비매칭", speaker_role_consistency(generic, srcs19) == [])
+
+
+# ── party_label_consistency (spec §0-1·§4-2, eval_057) ───────────────────────────────
+
+def test_party_label_consistency():
+    # eval_057 재현: 주입 라벨은 더불어민주연합(위성정당 표기 유지)인데 답변은 더불어민주당
+    srcs = [_src(3, "한창민", "더불어민주연합(당시 여당)")]
+    wrong = "한창민 위원(더불어민주당)은 은행 규제를 언급했습니다[3]."
+    flags = party_label_consistency(wrong, srcs)
+    check("정당: 위성정당 오표기 감지", len(flags) == 1 and "한창민" in flags[0], str(flags))
+
+    right = "한창민 위원(더불어민주연합)은 은행 규제를 언급했습니다[3]."
+    check("정당: 일치 표기 통과", party_label_consistency(right, srcs) == [])
+
+    # 근거에 없는 화자의 정당 병기는 이 규칙 대상 아님 (speaker_role 이 잡는다)
+    other = "박형수 위원(국민의힘)은 반대했습니다[3]."
+    check("정당: 미등장 화자는 이 규칙 통과", party_label_consistency(other, srcs) == [])
+
+
+# ── keyword_containment (spec §4-2, eval_055) ────────────────────────────────
+
+def test_keyword_containment():
+    q = "기업은행의 임금 체계 논의를 알려줘"
+    # eval_055 재현: 인용 근거 본문에 '기업은행'이 없는데 문장 주어로 사용
+    srcs = [_src(4, "유영하", "국민의힘(당시 야당)", text="우리은행 부당대출 관련 질의입니다.")]
+    padded = "기업은행 임금 체계에 대한 논의가 있었습니다[4]."
+    flags = keyword_containment(padded, srcs, q)
+    check("키워드: 근거에 없는 기관 주어 감지", len(flags) == 1 and "기업은행" in flags[0], str(flags))
+
+    grounded = [_src(4, "강민국", "국민의힘(당시 야당)", text="기업은행의 임금 문제를 지적합니다.")]
+    check("키워드: 근거에 있으면 통과", keyword_containment(padded, grounded, q) == [])
+
+    check("키워드: 질문에 기관명 없으면 검사 안 함",
+          keyword_containment(padded, srcs, "임금 체계 논의 알려줘") == [])
+
+    no_cite = "기업은행 임금 체계에 대한 논의가 있었습니다."
+    check("키워드: 인용 없는 문장 제외", keyword_containment(no_cite, srcs, q) == [])
+
+
+# ── ruling_period_consistency (spec §4-2, eval_035) ──────────────────────────
+
+def test_ruling_period_consistency():
+    # eval_035 재현: 2024-08(전 정권기) 발언을 '현 정부' 비판으로 인용
+    srcs = [_src(2, "위성락", None, "2024-08-27", role="증인")]
+    wrong = "현 정부의 외교 기조에 대한 비판이 제기됐습니다[2]."
+    flags = ruling_period_consistency(wrong, srcs)
+    check("정권기: 전 정권 발언을 현 정부 서술에 인용 감지", len(flags) == 1, str(flags))
+
+    current = [_src(2, "김영배", "더불어민주당(당시 여당)", "2025-09-01")]
+    check("정권기: 현 정권기 발언은 통과", ruling_period_consistency(wrong, current) == [])
+
+    neutral = "정부의 외교 기조에 대한 비판이 제기됐습니다[2]."
+    check("정권기: '현/새 정부' 표현 없으면 통과", ruling_period_consistency(neutral, srcs) == [])
+
+
 if __name__ == "__main__":
     test_core_party()
     test_comparison_coverage()
     test_speaker_both_sides()
     test_qa_pair_question()
     test_qa_pairing_dates()
+    test_speaker_role_consistency()
+    test_party_label_consistency()
+    test_keyword_containment()
+    test_ruling_period_consistency()
     print("\n전체 통과")
