@@ -185,12 +185,11 @@ _GOV_SUBJECT = re.compile(
 )
 
 # 답변 속 "이름+직함" — 화자 귀속 검출용. 일반어 프리픽스는 이름이 아니다.
-_NAMED_SPEAKER = re.compile(r"([가-힣]{2,4})\s*(?:위원장|위원|의원|장관|차관|청장|처장|총리|후보자|대변인)")
+# 조직명 구조적 차단: 위원(?!회) 는 "위원회"의 "위원"을 직함이 아닌 것으로 처리
+_NAMED_SPEAKER = re.compile(r"([가-힣]{2,4})\s*(?:위원장|위원(?!회)|의원|장관|차관|청장|처장|총리|후보자|대변인)")
 _NOT_NAMES = frozenset([
     "해당", "관련", "소속", "여당", "야당", "양당", "양측", "모든", "다른", "일부",
     "동일", "같은", "각각", "국회", "정부", "당시", "여러", "다수", "소수", "상임",
-    # 조직명 프리픽스 (금융위원회의 '금융' 등이 화자명으로 오인되지 않도록)
-    "금융", "방송", "공정", "외교", "통일", "국방", "법무", "행정", "기획", "보건",
 ])
 
 
@@ -305,13 +304,16 @@ _CURRENT_START = RULING_PERIODS[-1][0]  # 정권교체 경계 (party.py 재사�
 
 def ruling_period_consistency(answer: str, cited_sources: list[dict]) -> list[str]:
     """'현 정부/새 정부' 서술 문장이 이전 정권기 발언을 인용하면 flag (eval_035 —
-    2024-08 의 윤 정부 비판 발언이 현 정부 비판으로 오독)."""
+    2024-08 의 윤 정부 비판 발언이 현 정부 비판으로 오독). 날짜 결측 source는 판정 제외 (크래시 없음, 예외 격리)."""
     by_n = {s["n"]: s for s in cited_sources}
     flags = []
     for sent, _ in _paragraph_sentences(answer):
         if not _CURRENT_GOV.search(sent) or _REFUSAL_SENT.search(sent):
             continue
         for s in _cited_in(sent, by_n):
+            # 날짜 결측 source는 판정 제외 (크래시 방지)
+            if not _VALID_DATE.match(str(s.get("date"))[:10]):
+                continue
             d = date.fromisoformat(str(s.get("date"))[:10])
             if d < _CURRENT_START:
                 flags.append(f"[{s['n']}] {s['date']} (이전 정권기) 발언을 현 정부 서술에 인용")

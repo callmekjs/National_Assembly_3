@@ -239,6 +239,34 @@ def test_ruling_period_consistency():
     neutral = "정부의 외교 기조에 대한 비판이 제기됐습니다[2]."
     check("정권기: '현/새 정부' 표현 없으면 통과", ruling_period_consistency(neutral, srcs) == [])
 
+    # 회귀: date=None source는 크래시 없이 건너뜀 (예외격리)
+    with_none = [_src(2, "김영배", "더불어민주당(당시 여당)", date=None)]
+    check("정권기: date=None source는 판정 제외 (크래시 없음)",
+          ruling_period_consistency("현 정부의 외교 기조에 대한 비판이 제기됐습니다[2].", with_none) == [])
+
+
+# ── 회귀 테스트: 4자 기관명 구조적 차단 ──────────────────────────────────────
+
+def test_speaker_role_consistency_org_names():
+    """4자 기관명(방송통신위원회·공정거래위원회)이 화자명으로 오인되지 않음을 확인."""
+    # 방송통신위원회 + 정부측 위원장 인용
+    srcs = [_src(2, "김병환", "정부측", role="방송통신위원장")]
+    sent = "방송통신위원회는 방송법 개정안을 발표했습니다[2]."
+    check("귀속: 4자 기관명 위원회는 화자 아님 (구조적 lookahead)",
+          speaker_role_consistency(sent, srcs) == [])
+
+    # 공정거래위원회 + 정부측 위원장 인용
+    srcs2 = [_src(3, "박경미", "정부측", role="공정거래위원장")]
+    sent2 = "공정거래위원회는 독점금지법 위반 사항을 적발했습니다[3]."
+    check("귀속: 공정거래위원회 + 정부측 인용 통과",
+          speaker_role_consistency(sent2, srcs2) == [])
+
+    # 기존 테스트 유지: 2자 기관명도 여전히 차단
+    gov3 = [_src(2, "김병환", "정부측", role="금융위원장")]
+    ok3 = "금융위원회는 가계부채 관리 방안을 설명했습니다[2]."
+    check("귀속: 금융위원회도 여전히 통과",
+          speaker_role_consistency(ok3, gov3) == [])
+
 
 if __name__ == "__main__":
     test_core_party()
@@ -250,4 +278,5 @@ if __name__ == "__main__":
     test_party_label_consistency()
     test_keyword_containment()
     test_ruling_period_consistency()
+    test_speaker_role_consistency_org_names()
     print("\n전체 통과")
