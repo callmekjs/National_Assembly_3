@@ -18,6 +18,7 @@ import re
 from datetime import date
 
 from party import RULING_PERIODS, speaker_group
+from query_parser import classify_question
 
 logger = logging.getLogger(__name__)
 
@@ -319,3 +320,62 @@ def ruling_period_consistency(answer: str, cited_sources: list[dict]) -> list[st
             if d < _CURRENT_START:
                 flags.append(f"[{s['n']}] {s['date']} (이전 정권기) 발언을 현 정부 서술에 인용")
     return flags
+
+
+# ── 통합 진입점 (spec §6) ────────────────────────────────────────────────────
+
+def verify(
+    question: str,
+    answer: str,
+    sources: list[dict],
+    cited_numbers: list[int],
+    question_types: set | None = None,
+) -> dict:
+    """규칙 전부 실행 → {"flags": [...], "detail": {...}}.
+
+    - cited_numbers 에 해당하는 sources 만 대상 (spec §2-1) — 인용 0건(거절 답변)은
+      검증하지 않는다 (REFUSED 에 flag 노이즈를 얹지 않는다)
+    - 규칙별 예외 격리: 죽은 규칙은 detail["errors"] 에 이름만 남기고 계속
+      (검증층 버그가 답변 생성 실패로 번지지 않게 — issue_context 패턴)
+    """
+    detail: dict = {}
+    flags: list[str] = []
+    cited = [s for s in sources if s["n"] in set(cited_numbers)]
+    if not cited:
+        return {"flags": [], "detail": {}}
+
+    types = question_types if question_types is not None else classify_question(question)
+
+    def run(name, fn):
+        try:
+            return fn()
+        except Exception:
+            logger.warning("verification 규칙 %s 실패 — 건너뜀", name, exc_info=True)
+            detail.setdefault("errors", []).append(name)
+            return None
+
+    if "compare" in types:
+        cov = run("comparison_coverage", lambda: comparison_coverage(cited))
+        if cov is not None:
+            detail["comparison_coverage"] = cov
+            if not cov["covered"]:
+                flags.append("comparison_one_sided")
+
+    if run("speaker_both_sides", lambda: speaker_both_sides(answer, cited)):
+        flags.append("speaker_both_sides")
+
+    if run("qa_pairing_dates", lambda: qa_pairing_dates(answer, cited, question)):
+        flags.append("qa_pairing_date_mismatch")
+
+    for flag_name, fn in (
+        ("speaker_role_mismatch", lambda: speaker_role_consistency(answer, cited)),
+        ("party_label_mismatch", lambda: party_label_consistency(answer, cited)),
+        ("keyword_missing", lambda: keyword_containment(answer, cited, question)),
+        ("ruling_period_mismatch", lambda: ruling_period_consistency(answer, cited)),
+    ):
+        found = run(flag_name, fn)
+        if found:
+            flags.append(flag_name)
+            detail[flag_name] = found
+
+    return {"flags": flags, "detail": detail}

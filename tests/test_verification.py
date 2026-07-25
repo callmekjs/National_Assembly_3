@@ -23,6 +23,7 @@ from verification import (  # noqa: E402
     ruling_period_consistency,
     speaker_both_sides,
     speaker_role_consistency,
+    verify,
 )
 
 
@@ -286,6 +287,43 @@ def test_speaker_role_consistency_org_names():
           speaker_role_consistency(sent6, srcs6) == [])
 
 
+# ── verify 통합 (spec §6) ────────────────────────────────────────────────
+
+def test_verify_integration():
+    q = "전세사기 특별법에 대한 여당과 야당 위원들의 입장은 어떻게 달랐나요?"
+    # eval_068 재현: 민주당 인용만으로 여야 대립 구성
+    srcs = [
+        _src(1, "김우영", "더불어민주당(당시 여당)", text="특별법 보완이 필요합니다."),
+        _src(2, "박민규", "더불어민주당(당시 여당)", text="피해자 구제가 우선입니다."),
+    ]
+    ans = ("여당 김우영 위원은 특별법 보완을 주장했습니다[1]. "
+           "야당 측에서는 피해자 구제를 요구했습니다[2].")
+    v = verify(q, ans, srcs, [1, 2])
+    check("verify: comparison_one_sided flag", "comparison_one_sided" in v["flags"], str(v))
+    check("verify: coverage detail 포함", v["detail"]["comparison_coverage"]["core_parties"] == ["더불어민주당"])
+
+    # 문제 없는 답변은 빈 flags
+    q2 = "전세사기 특별법 논의를 알려줘"
+    clean = "김우영 위원은 특별법 보완을 주장했습니다[1]."
+    check("verify: 정상 답변은 빈 flags", verify(q2, clean, srcs, [1])["flags"] == [])
+
+    # 인용 0건(거절 답변)은 검증하지 않는다 — REFUSED 답변에 flag 노이즈 방지
+    refused = "제공된 회의록에서 확인할 수 없습니다."
+    check("verify: 인용 0건은 빈 flags", verify(q, refused, srcs, [])["flags"] == [])
+
+
+def test_verify_rule_isolation(monkeypatch):
+    # 규칙 하나가 죽어도 verify 는 나머지 결과를 반환한다 (예외 격리)
+    import verification
+    def boom(*a, **kw):
+        raise RuntimeError("규칙 버그")
+    monkeypatch.setattr(verification, "speaker_both_sides", boom)
+    srcs = [_src(1, "김우영", "더불어민주당(당시 여당)", text="본문")]
+    v = verification.verify("발언 알려줘", "김우영 위원이 발언했습니다[1].", srcs, [1])
+    check("격리: 예외에도 dict 반환", isinstance(v, dict) and "flags" in v)
+    check("격리: errors 에 규칙명 기록", "speaker_both_sides" in v["detail"].get("errors", []), str(v))
+
+
 if __name__ == "__main__":
     test_core_party()
     test_comparison_coverage()
@@ -297,4 +335,5 @@ if __name__ == "__main__":
     test_keyword_containment()
     test_ruling_period_consistency()
     test_speaker_role_consistency_org_names()
+    test_verify_integration()
     print("\n전체 통과")
