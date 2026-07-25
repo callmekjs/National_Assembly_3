@@ -312,6 +312,7 @@ def main():
     test_build_user_message_issue_block()
     test_classify_question()
     test_type_guides()
+    test_compare_re_candidate_d()
     print("\nALL PASS")
 
 
