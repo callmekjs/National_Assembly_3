@@ -99,6 +99,11 @@ def test_speaker_both_sides():
                          "이에 대해 야당 반대에도 불구하고 김우영 위원은 원안을 재차 강조했습니다[1].")
     check("양진영: 상대 진영 반응 서술은 오탐하지 않음", speaker_both_sides(opposite_reaction, srcs) is False)
 
+    # 재리뷰: 찬성/반대 키워드 복원 (spec §2-2 "여당/야당/찬성/반대 대조 키워드")
+    stance_both = ("찬성 측에서는 김우영 위원이 특별법 보완을 주장했습니다[1]. "
+                   "반면 반대 측 김우영 위원은 정부 대응을 비판했습니다[1].")
+    check("양진영: 찬성·반대 측 프레이밍 감지 (스펙 §2-2 복원)", speaker_both_sides(stance_both, srcs) is True)
+
 
 # ── Q-A 짝짓기 (spec §3, eval_029) ───────────────────────────────────────────
 

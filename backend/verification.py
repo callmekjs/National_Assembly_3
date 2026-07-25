@@ -49,7 +49,8 @@ def comparison_coverage(sources: list[dict]) -> dict:
 
 # ── 화자·진영 이중 사용 (spec §2-2, eval_068) ────────────────────────────────
 
-_SIDE_FRAME = re.compile(r"(여당|야당)(\s*측)?(\s*(에서는|에서|소속|의원들?|의|인))?\s*$")
+_SIDE_FRAME_RULING = re.compile(r"(여당|찬성)(\s*측)?(\s*(에서는|에서|소속|의원들?|입장|의|인))?\s*$")
+_SIDE_FRAME_OPPO = re.compile(r"(야당|반대)(\s*측)?(\s*(에서는|에서|소속|의원들?|입장|의|인))?\s*$")
 
 
 def _speaker_keys(speaker: str | None) -> set[str]:
@@ -64,10 +65,12 @@ def _speaker_keys(speaker: str | None) -> set[str]:
 
 
 def speaker_both_sides(answer: str, cited_sources: list[dict]) -> bool:
-    """같은 화자가 답변 안에서 여당·야당 양쪽 프레이밍에 배치됐는가.
+    """같은 화자가 답변 안에서 여당/야당/찬성/반대 양쪽 프레이밍에 배치됐는가.
 
-    화자명 직전 수식(여당 측/야당 소속/야당인 등)만 프레이밍으로 인정 — 주변 창 방식은
+    화자명 직전 수식(여당 측/찬성 측/야당 소속/반대 측 등)만 프레이밍으로 인정 — 주변 창 방식은
     상대 진영 반응 서술('야당 반대에도 불구하고')을 오탐해 폐기 (2026-07-25 리뷰).
+    찬성/반대는 여당/야당으로 정규화 (spec §2-2 "여당/야당/찬성/반대 대조 키워드").
+    직전 수식 방식은 괄호 정당명 등 개입 텍스트에 약함 — 정밀도 우선 (minor trade-off).
     순수 정규식, LLM 불필요.
     """
     for s in cited_sources:
@@ -79,8 +82,12 @@ def speaker_both_sides(answer: str, cited_sources: list[dict]) -> bool:
             for pos in hits:
                 # 화자명 직전 12자에서 프레이밍 찾기
                 before = answer[max(0, pos - 12): pos]
-                m = _SIDE_FRAME.search(before)
-                frames[pos] = m.group(1) if m else None
+                if _SIDE_FRAME_RULING.search(before):
+                    frames[pos] = '여당'
+                elif _SIDE_FRAME_OPPO.search(before):
+                    frames[pos] = '야당'
+                else:
+                    frames[pos] = None
             # 같은 화자의 서로 다른 등장이 여당·야당 양쪽으로 명시 프레이밍되면 True
             if None not in frames.values() and len(set(frames.values())) > 1:
                 return True
