@@ -203,8 +203,8 @@ def _log_query(req: QueryRequest, result: dict, grounding: str, latency_ms: int,
                 INSERT INTO query_logs
                   (question, mode, committee, date_from, date_to,
                    answer, grounding, citations, invalid_citations, usage, latency_ms,
-                   source_block, user_id)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                   source_block, user_id, verification)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 RETURNING query_id
                 """,
                 (
@@ -216,6 +216,8 @@ def _log_query(req: QueryRequest, result: dict, grounding: str, latency_ms: int,
                     latency_ms,
                     source_block,
                     user_id,
+                    json.dumps(result.get("verification"), ensure_ascii=False)
+                    if result.get("verification") else None,
                 ),
             )
             return str(cur.fetchone()[0])
@@ -249,7 +251,7 @@ def query(req: QueryRequest, authorization: str | None = Header(default=None)):
         result = {
             "answer": NO_EVIDENCE, "mode": req.mode,
             "sources": [], "citations": [], "cited_numbers": [], "invalid_citations": [],
-            "usage": None, "issue_context": None,
+            "usage": None, "issue_context": None, "verification": None,
         }
         grounding, ungrounded = gate, False
     else:
@@ -260,6 +262,11 @@ def query(req: QueryRequest, authorization: str | None = Header(default=None)):
         except OpenAIError as e:
             raise HTTPException(status_code=502, detail=f"LLM 호출 실패: {type(e).__name__}")
         grounding, ungrounded = judge(result)
+        # 검증층 강등 (spec §1) — invalid_citations 와 같은 자리의 새 강등 사유 하나.
+        # judge() 는 무변경, 새 등급 신설도 없다 (4단계 유지)
+        vflags = (result.get("verification") or {}).get("flags") or []
+        if vflags and grounding == "FULL":
+            grounding = "PARTIAL"
 
     latency_ms = int((time.time() - t0) * 1000)
     # 근거 블록은 로그에만 저장 — API 응답에 그대로 내보내면 응답이 수십 KB 로 불어난다

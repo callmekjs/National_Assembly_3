@@ -187,3 +187,6 @@ CREATE TABLE IF NOT EXISTS users (
   created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 ALTER TABLE query_logs ADD COLUMN IF NOT EXISTS user_id INT REFERENCES users(user_id);
+
+-- 검증층 flag 이력 (답변-근거 자동 검증 1단계, 2026-07-25 spec §5-1)
+ALTER TABLE query_logs ADD COLUMN IF NOT EXISTS verification JSONB;

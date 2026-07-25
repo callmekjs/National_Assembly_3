@@ -221,6 +221,52 @@ def test_guard_rate_limit_and_cost():
         guard.reset_cost_cache()
 
 
+# ── 검증층 강등 접합 (2026-07-25, spec §1) ───────────────────────────────────
+
+def test_query_verification_demotes_grounding():
+    """verification flags 가 있으면 FULL→PARTIAL 강등 + 응답에 verification 포함."""
+    if not HAS_DB:
+        print(_SKIP_MSG)
+        return
+
+    fake_hits = [{"chunk_id": "x_turn_0001_chunk_001", "speaker": "김우영", "role": "위원",
+                  "committee": "국토위", "meeting_date": "2025-09-01", "page_start": 1,
+                  "snippet": "특별법", "kw_rank": 1, "vec_score": 0.9}]
+    flagged_result = {
+        "answer": "여당은 찬성했고[1] 야당은 반대했습니다[1].",
+        "mode": "qa", "issue_context": None,
+        "sources": [], "citations": [], "cited_numbers": [1], "invalid_citations": [],
+        "source_block": "블록", "usage": None,
+        "verification": {"flags": ["comparison_one_sided"],
+                         "detail": {"comparison_coverage": {"core_parties": ["더불어민주당"], "covered": False}}},
+    }
+
+    orig_hybrid, orig_gate, orig_gen, orig_log = (
+        main.hybrid_search, main.pre_gate, main.generate_answer, main._log_query,
+    )
+    main.hybrid_search = lambda *a, **kw: fake_hits
+    main.pre_gate = lambda hits: None
+    main.generate_answer = lambda *a, **kw: dict(flagged_result)
+    main._log_query = lambda *a, **kw: "00000000-0000-0000-0000-000000000000"
+    try:
+        r = client.post("/query", json={"question": "여당과 야당 입장은 어떻게 달랐나요?"})
+        check("검증강등: 200", r.status_code == 200, r.status_code)
+        body = r.json()
+        check("검증강등: flags 있으면 FULL→PARTIAL", body["grounding"] == "PARTIAL", body["grounding"])
+        check("검증강등: 응답에 verification 포함",
+              body["verification"]["flags"] == ["comparison_one_sided"], body.get("verification"))
+
+        # flags 없으면 강등 없음
+        clean = {**flagged_result, "verification": {"flags": [], "detail": {}}}
+        main.generate_answer = lambda *a, **kw: dict(clean)
+        r2 = client.post("/query", json={"question": "여당과 야당 입장은 어떻게 달랐나요?"})
+        check("검증강등: 빈 flags 는 강등하지 않는다", r2.json()["grounding"] == "FULL", r2.json()["grounding"])
+    finally:
+        main.hybrid_search, main.pre_gate, main.generate_answer, main._log_query = (
+            orig_hybrid, orig_gate, orig_gen, orig_log,
+        )
+
+
 def main_():
     test_health()
     test_validation_422()
@@ -230,6 +276,7 @@ def main_():
     test_issues_list()
     test_actor_search()
     test_guard_rate_limit_and_cost()
+    test_query_verification_demotes_grounding()
     print("\nALL PASS" if HAS_DB else "\nDB 없음 — 전체 건너뜀")
 
 
