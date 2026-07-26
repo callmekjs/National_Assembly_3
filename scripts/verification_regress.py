@@ -51,7 +51,12 @@ def main():
             f"- query: {item['query']}",
             f"- flags: `{v['flags']}`",
             f"- detail: `{json.dumps(v['detail'], ensure_ascii=False)}`",
-            f"- grounding 강등: {'예 (FULL→PARTIAL)' if v['flags'] else '아니오'}",
+            # 2026-07-26 최종 리뷰 동승 minor: "grounding 강등: 예" 는 이 스크립트가
+            # 실제로 확인하지 않은 사실을 단정한 기록이었다 (main.py 의 강등은
+            # grounding=="FULL" 조건이 함께 있어야 실행되는데, 이 스크립트는 judge()
+            # 를 호출하지 않아 사전 grounding 을 모른다 — eval_068 실측 거짓 기록
+            # 재발 방지). 이 스크립트가 실제로 아는 사실만 적는다: flag 발생 여부.
+            f"- flag 발생: {'예' if v['flags'] else '아니오'}",
             "- answer:", "```", result["answer"], "```", "",
         ]
     lines.insert(2, f"**flag 발생: {flagged}/8** (사람 대조 필요 — flag 0 이어도 이번 생성이 정상이면 통과)")

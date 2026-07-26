@@ -124,7 +124,10 @@ _TURN_ID = re.compile(r"^(?P<src>.+_turn_)(?P<no>\d+)$")
 # ("이준석 의원의 발언은 … 확인할 수 없습니다")은 프리픽스가 달라 제거되지 않는다.
 _DANGLING_TAIL = re.compile(r"(?:이\s?외의?|이\s?부분은)[^.\n]*확인할 수 없습니다\.?\s*$")
 _PARTY_DISCLAIMER = re.compile(r"[^.\n]*소속 정당[^.\n]*확인할 수 없습니다\.?\s*$")
-_PARTY_QUESTION = re.compile(r"여야|정당|진영|소속")
+# '여당'과 '야당'이 따로 등장(연속된 '여야' 리터럴이 아님)하는 질문형은 기존
+# 목록의 사각지대였다 (eval_057·068 실측 질의 — _COMPARE_RE 후보 D 가 classify_question
+# 쪽에서 잡던 것과 같은 사각지대, 2026-07-26 최종 리뷰 동승 minor).
+_PARTY_QUESTION = re.compile(r"여야|정당|진영|소속|여당|야당")
 
 
 _PARTY_GUARD = (

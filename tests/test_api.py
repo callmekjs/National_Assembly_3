@@ -97,6 +97,11 @@ def test_query_pre_gate_none():
     check("사전차단: 고정 문구", "확인할 수 없습니다" in body["answer"], body["answer"])
     check("사전차단: sources 빈 목록", body["sources"] == [])
     check("사전차단: query_id 발급 (로그 저장)", body.get("query_id"), body.get("query_id"))
+    # 2026-07-26 최종 리뷰 동승 minor: pre-gate 응답도 verification 키가 존재해야
+    # 프론트가 매 응답에서 일관되게 body.verification 을 읽을 수 있다 (LLM 미호출
+    # 경로라 값은 None — answer.py generate_answer() 의 pre-gate 반환 dict와 동일 계약).
+    check("사전차단: verification 키 존재", "verification" in body, body.keys())
+    check("사전차단: verification 값은 None (LLM 미호출)", body["verification"] is None, body.get("verification"))
 
 
 def test_openai_error_502():

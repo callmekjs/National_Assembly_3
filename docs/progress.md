@@ -1020,11 +1020,10 @@ bcrypt 1회 수행해 응답 시간 균일화. ② MyQueries 계정 전환 시 �
   프론트 검증 배지(POL-8 근거 배지 패턴 재사용)로 flag 노출.
 - **회귀 스모크 (`scripts/verification_regress.py`, 신규 LLM 호출 = gpt-4o-mini
   8회 ~$0.005)**: 확정 실패 8건(eval_011·013·019·029·035·055·057·068) 재실행 —
-  8/8 예외 없이 완주. flag 발생 6/8(`data/eval/verification_regress_report.md`),
+  8/8 예외 없이 완주. flag 발생 4/8 (9fix 후, `data/eval/verification_regress_report.md`),
   eval_011 은 §4-3 결정 ④에 따라 1단계 표적 밖(2단계 이월)이라 애초 미커버 대상.
   flag 는 "생성이 오류를 재현했을 때"만 뜨는 신호라 개수 자체가 자동 합격선이
-  아니다 — 사람 대조용 재료로 리포트에 문항별 answer 전문·flags·detail 을 남김
-  (1차 소견은 `.superpowers/sdd/task-9-report.md` 참조).
+  아니다 — 사람 대조용 재료로 리포트에 문항별 answer 전문·flags·detail 을 남김.
 - pytest 123 passed(신규 스모크 스크립트 포함 회귀 없음).
 - **2단계 백로그(결정 ④⑤에 따라 의도적 미포함)**: §4-3 다중 대상 부재공시(eval_011
   표적) · §5-2 혼합 접근(규칙+LLM 재검토) · §5-3 은 75문항 전체 재측정(§7-4, LLM
