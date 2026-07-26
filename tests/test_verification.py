@@ -279,6 +279,192 @@ def test_speaker_role_consistency_true_positives_preserved():
           flags_secretary == [], str(flags_secretary))
 
 
+def test_f2_ellipsis_subject_continues_person_regressions():
+    """F2 확장(replay 재측정 실증, 2026-07-26): 대명사('그는') 없이 생략된 주어가
+    문단의 기존 인물 화자를 승계하는 문형 — 문장 중간에 안긴 절(embedded clause)의
+    기관 언급이 이 문장의 실제 주어로 오인되면 안 된다. replay 재측정에서 잔존
+    flag 18/58 의 지배적 원인으로 실증된 패턴(eval_002·003·008 실제 스모크 문형)."""
+    # eval_002 실측: "또한, X가 Y했다는 점을 언급하며, 통일부가 ~해줄 것을
+    # 요청했습니다" — 문장의 실제 주어는 앞 문단에서 승계된 홍기원(대명사 없음).
+    srcs002 = [_src(1, "홍기원", "더불어민주당(당시 야당)")]
+    ans002 = (
+        "홍기원 위원은 오물풍선 문제에 대해 통일부의 책임을 강조하며, 대북전단 풍선 "
+        "날리기가 남북관계에 긴장을 초래한다고 지적했습니다. "
+        "그는 통일부가 이러한 사실을 명확히 인식해야 한다고 주장했습니다. "
+        "또한, 접경지역 주민들이 대북전단으로 인해 고통을 호소하고 있다는 점을 언급하며, "
+        "통일부가 이 문제에 대해 더 많은 고려를 해줄 것을 요청했습니다[1]."
+    )
+    flags002 = speaker_role_consistency(ans002, srcs002)
+    check("F2확장(오탐 해소): eval_002 '또한, …통일부가 ~해줄 것을 요청' 안김절 오귀속 해소",
+          flags002 == [], str(flags002))
+
+    # eval_008 실측: "마지막으로, 외교부 및 통일부 소관 예산안…의결하겠다고 발표"
+    # — 외교부/통일부는 '소관' 을 수식하는 관형어일 뿐 문장 주어가 아니다.
+    srcs008 = [_src(4, "김영배", "더불어민주당(당시 여당)", role="소위원장")]
+    ans008 = (
+        "김영배 소위원장은 외교부 소관 예산안 및 기금운용계획안에 대한 심사를 진행하며, "
+        "정부 측의 태도에 대해 비판적인 입장을 표명했습니다. "
+        "그는 외교부가 국회의 의견을 무시하는 태도를 보였다고 지적했습니다. "
+        "마지막으로, 외교부 및 통일부 소관 예산안과 기금운용계획안에 대해 수정한 부분은 "
+        "수정대로, 나머지는 정부 원안대로 의결하겠다고 발표했습니다[4]."
+    )
+    flags008 = speaker_role_consistency(ans008, srcs008)
+    check("F2확장(오탐 해소): eval_008 '마지막으로, 외교부 및 통일부 소관…' 관형어 오귀속 해소",
+          flags008 == [], str(flags008))
+
+    # 정탐 보존: 새 문단에서 명시적으로 기관이 문두 주어인 문장은 여전히 gov 분기 유지
+    # (para_has_named_speaker 가 새 문단에서 리셋되므로 이 확장이 적용되지 않아야 함).
+    srcs_new_para = [_src(2, "곽현준", None, role="수석전문위원")]
+    ans_new_para = (
+        "김우영 위원은 특별법 보완을 주장했습니다[1].\n\n"
+        "외교부는 이 문제에 대해 신중히 검토하겠다고 밝혔습니다[2]."
+    )
+    srcs_new_para_full = [_src(1, "김우영", "더불어민주당(당시 여당)")] + srcs_new_para
+    flags_new_para = speaker_role_consistency(ans_new_para, srcs_new_para_full)
+    check("F2확장(정탐 보존): 새 문단의 명시적 '외교부는' 문두 주어는 flag 유지",
+          len(flags_new_para) == 1, str(flags_new_para))
+
+
+def test_f1_f2_replay_second_pass_regressions():
+    """replay 재측정 2차 실증(2026-07-26) — F1~F8 1차 수정 후에도 잔존한 flag 18/58
+    중 구조적으로 안전하게 고칠 수 있는 5건의 근본 원인. 실제 eval 스모크 문형 그대로."""
+    # eval_004·046 실측: "그는 외교부 장관에게"(공백 있는 띄어쓰기형) — 대명사 '그는'이
+    # _NAMED_SPEAKER 의 [이름]+공백+[기관접두]+[직함] 구조에 우연히 들어맞아
+    # 유령 이름으로 캡처됐다. 대명사는 애초에 이름 후보가 아니다.
+    srcs004 = [_src(1, "윤후덕", "더불어민주당(당시 야당)"), _src(2, "윤후덕", "더불어민주당(당시 야당)")]
+    ans004 = (
+        "윤후덕 위원은 재외국민 보호와 관련하여 미국의 에너지부가 한국을 민감국가로 "
+        "분류한 것에 대해 언급했습니다. "
+        "그는 외교부 장관에게 이와 관련된 경위를 파악하고 있는 중이라는 답변을 인용하며, "
+        "공식적인 확인이 이루어지지 않았음을 강조했습니다[1][2]."
+    )
+    flags004 = speaker_role_consistency(ans004, srcs004)
+    check("F1확장(오탐 해소): eval_004 '그는 외교부 장관에게' 대명사 유령 캡처 해소",
+          flags004 == [], str(flags004))
+
+    # eval_066 실측: "관련하여"(4자, _NOT_NAMES 의 '관련' 접두 파생어) 가 직함
+    # 직전에 오면 유령 이름으로 캡처됐다. '관련' 계열 활용형은 이름이 아니다.
+    srcs066 = [_src(1, "이진숙", None, role="방송통신위원장후보자")]
+    ans066 = "첫째, 방송·통신 산업의 어려운 현안과 관련하여 후보자는 뉴미디어의 확산과 공공성 약화에 대한 우려를 언급했습니다[1]."
+    flags066 = speaker_role_consistency(ans066, srcs066)
+    check("F1확장(오탐 해소): eval_066 '…관련하여 후보자는' 유령 캡처 해소",
+          flags066 == [], str(flags066))
+
+    # eval_048 실측: 국회 상임위원회 명칭(예: "산업통상자원중소벤처기업위원회")이
+    # 8자를 넘는 긴 복합 기관명이라 기존 _GENERIC_SUBJECT_HEAD 상한(8자)에 안 걸렸고,
+    # 문장 뒤쪽에 열거된 부처명("산업통상자원부")이 목적어인데도 gov 분기가 발동했다.
+    srcs048 = [_src(1, "이철규", "국민의힘(당시 여당)", role="위원장", committee="산자중기위")]
+    ans048 = ("산업통상자원중소벤처기업위원회에서는 산업통상자원부, 중소벤처기업부, 특허청 "
+              "소관의 예산안과 기금운용계획안이 의결되었습니다[1].")
+    flags048 = speaker_role_consistency(ans048, srcs048)
+    check("F1확장(오탐 해소): eval_048 국회 상임위 긴 복합명 + 목적어 부처 열거 해소",
+          flags048 == [], str(flags048))
+
+    # eval_069 실측: "과학기술정보방송통신위원회"(국회 상임위) 안에 "방송통신위원회"
+    # (정부 방송통신위원회, _GOV_SUBJECT 항목)가 어절 경계 없이 부분 문자열로 우연히
+    # 들어있어 오매칭됐다 — _GOV_SUBJECT 전체에 어절 경계(?<![가-힣]) 적용으로 차단.
+    srcs069 = [_src(1, "최민희", "더불어민주당(당시 야당)", role="위원장", committee="과방위")]
+    ans069 = ("2025년 5월 8일 과학기술정보방송통신위원회에서는 SK텔레콤 해킹 관련 청문회가 "
+              "열렸습니다. 이 청문회의 주요 목적은 책임 소재를 명확히 하는 것이었습니다[1].")
+    flags069 = speaker_role_consistency(ans069, srcs069)
+    check("F1확장(오탐 해소): eval_069 '과학기술정보방송통신위원회' 내 '방송통신위원회' 부분열 오매칭 해소",
+          flags069 == [], str(flags069))
+
+    # eval_049 실측: "OO장관 후보자"(인사청문 대상자, 아직 행정부 소속 아님 — party.py
+    # 의 후보자 규칙과 동일 원칙)는 부처명을 포함해도 정부측 서술이 아니다.
+    srcs049 = [_src(4, "조현", None, role="외교부장관후보자")]
+    ans049 = ("이와 함께, 외교부장관 후보자는 2025년 7월에 한국의 외교가 국제정치의 새로운 "
+              "현상에 직면하고 있다고 강조했습니다[4].")
+    flags049 = speaker_role_consistency(ans049, srcs049)
+    check("F1확장(오탐 해소): eval_049 '외교부장관 후보자는' 후보자 예외 해소",
+          flags049 == [], str(flags049))
+
+    # 정탐 보존: 후보자 예외가 진짜 정부측 서술까지 면제하면 안 된다 (직함이
+    # '후보자'로 끝나지 않는 일반 정부기관 주어는 여전히 gov 분기 발동).
+    srcs_gov_pin = [_src(2, "곽현준", None, role="수석전문위원")]
+    ans_gov_pin = "외교부는 재외국민 보호 방안을 검토하고 있다고 밝혔습니다[2]."
+    flags_gov_pin = speaker_role_consistency(ans_gov_pin, srcs_gov_pin)
+    check("F1확장(정탐 보존): 후보자 예외는 일반 '외교부는' 정부 서술 flag 를 없애지 않음",
+          len(flags_gov_pin) == 1, str(flags_gov_pin))
+
+
+# ── F1 회귀: _NAMED_SPEAKER 유령 캡처 (최종 리뷰 Critical) ─────────────────────
+
+def test_f1_named_speaker_ghost_capture():
+    """'조현 외교부장관은…' 처럼 이름+융합 직함(부처명+직함, 공백 없음) 문형에서
+    부처 접두('외교부')가 이름으로 유령 캡처되지 않아야 한다."""
+    srcs = [_src(1, "조현", "정부측", role="장관")]
+    ans = "조현 외교부장관은 신중히 검토하겠다고 답변했습니다[1]."
+    check("F1: 조현 외교부장관 — 유령 캡처 없이 통과", speaker_role_consistency(ans, srcs) == [])
+
+    srcs5 = [_src(5, "조태열", "정부측", role="장관")]
+    ans5 = "조태열 외교부장관은 재외국민 보호 대책을 설명했습니다[5]."
+    check("F1: 조태열 외교부장관 — 유령 캡처 없이 통과", speaker_role_consistency(ans5, srcs5) == [])
+
+    srcs_p = [_src(1, "강민국", "국민의힘(당시 야당)")]
+    ans_p = "국민의힘 의원들은 특별법 처리에 반대했습니다[1]."
+    flags_p = speaker_role_consistency(ans_p, srcs_p)
+    check("F1: 국민의힘 의원들은 — 정당명 유령 캡처 없음",
+          not any("국민의힘" in f for f in flags_p), str(flags_p))
+
+    # 재현율 확인: 진짜 미등장 화자는 여전히 flag ('조현'이 정확히 잡혀야 한다 — '외교부'가 아니라)
+    srcs_mismatch = [_src(1, "김우영", "더불어민주당(당시 야당)")]
+    ans_mismatch = "조현 외교부장관은 신중히 검토하겠다고 답변했습니다[1]."
+    flags_mismatch = speaker_role_consistency(ans_mismatch, srcs_mismatch)
+    check("F1: 실제 미등장 화자는 '조현'으로 정확히 잡힘 (재현율)",
+          any(f.startswith("미등장 화자 '조현'") for f in flags_mismatch), str(flags_mismatch))
+
+
+# ── F2 회귀: _GOV_SUBJECT 언급≠주어 (최종 리뷰 Critical) ───────────────────────
+
+def test_f2_gov_subject_not_mere_mention():
+    """목적어 위치의 기관 언급만으로 gov 분기가 발동하지 않아야 한다 — 문장 주어가
+    비기관 일반 주어(의원들은/이들은/에서는)일 때는 스킵."""
+    srcs = [_src(3, "김철수", "더불어민주당(당시 야당)")]
+    ans = "야당 의원들은 외교부의 소극적인 대응을 강하게 비판했습니다[3]."
+    check("F2: '야당 의원들은 외교부의…' 목적어 언급은 gov 분기 미발동",
+          speaker_role_consistency(ans, srcs) == [])
+
+    ans2 = "이들은 정부의 결정이 잘못됐다고 주장했습니다[2]."
+    srcs2 = [_src(2, "박민규", "더불어민주당(당시 여당)")]
+    check("F2: '이들은 정부의…' 목적어 언급은 gov 분기 미발동",
+          speaker_role_consistency(ans2, srcs2) == [])
+
+    ans3 = "의회에서는 통일부의 역할 강화를 요구했습니다[4]."
+    srcs3 = [_src(4, "이연희", "더불어민주당(당시 여당)")]
+    check("F2: '의회에서는 통일부의…' 목적어 언급은 gov 분기 미발동",
+          speaker_role_consistency(ans3, srcs3) == [])
+
+
+def test_f2_inherited_gov_no_cross_sentence_contamination():
+    """화자명 문장의 목적어 기관 언급(통일부의)이 다음 문장으로 inherited_gov
+    승계되어 오염되지 않아야 한다 (복기왕 케이스 뿌리)."""
+    srcs = [_src(1, "조정식", "더불어민주당(당시 여당)")]
+    ans = ("조정식 위원은 통일부의 대응을 촉구했습니다[1]. "
+           "관련 법안의 신속한 처리도 촉구했습니다[1].")
+    flags = speaker_role_consistency(ans, srcs)
+    check("F2: 화자명 문장의 목적어 기관 언급은 다음 문장에 승계되지 않음",
+          flags == [], str(flags))
+
+
+def test_f2_true_positives_preserved():
+    """F2 수정 후에도 정탐(진짜 기관 주어 오귀속)은 유지되어야 한다."""
+    # eval_013 핀: 명시 기관 주어("외교부는") + 승계 문장 — flag 유지
+    srcs = [_src(5, "곽현준", None, role="수석전문위원")]
+    ans = ("외교부는 재외국민 보호 방안을 검토하고 있다고 밝혔습니다. "
+           "관련 법안도 제안되었습니다[5].")
+    flags = speaker_role_consistency(ans, srcs)
+    check("F2(정탐 보존): '외교부는' 명시 주어 + 승계 flag 유지", len(flags) == 1, str(flags))
+    check("F2(정탐 보존): inherited 표시 유지", "inherited" in flags[0], str(flags))
+
+    # eval_013 핀: 소유격 단독 문장 — gov 분기 유지 ("이재명 정부의"는 GENERIC_SUBJECT_HEAD 불일치)
+    srcs13 = [_src(4, "곽현준", None, role="수석전문위원")]
+    ans13 = "이재명 정부의 국정과제로 추진되고 있습니다[4]."
+    flags13 = speaker_role_consistency(ans13, srcs13)
+    check("F2(정탐 보존): '이재명 정부의' 소유격 단독 문장 gov 분기 유지",
+          len(flags13) == 1, str(flags13))
+
+
 # ── party_label_consistency (spec §0-1·§4-2, eval_057) ───────────────────────────────
 
 def test_party_label_consistency():
