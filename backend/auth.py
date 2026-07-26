@@ -95,4 +95,12 @@ def ensure_schema() -> None:
         cur.execute(
             "ALTER TABLE query_logs ADD COLUMN IF NOT EXISTS user_id INT REFERENCES users(user_id)"
         )
+        # 검증층 스프린트(2026-07-25)가 db/schema.sql 에만 verification 컬럼을 추가하고
+        # 런타임 자가 마이그레이션을 빠뜨렸다 — user_id 전례를 그대로 따라 여기 추가
+        # (최종 리뷰 F7, 2026-07-26). schema.sql 만 실행되는 jsonl_to_postgres.py·
+        # make_deploy_corpus.py 경로 밖(백엔드만 재배포된 기존 DB)에서도 컬럼이
+        # 보장되어야 main.py 의 무조건 INSERT(verification 포함)가 죽지 않는다.
+        cur.execute(
+            "ALTER TABLE query_logs ADD COLUMN IF NOT EXISTS verification JSONB"
+        )
         conn.commit()

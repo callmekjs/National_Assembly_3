@@ -74,10 +74,10 @@ export default function ActorView({ actor, onIssueClick, onShown }) {
           <input value={input} onChange={e => setInput(e.target.value)}
                  onKeyDown={e => { if (e.key === 'Enter') load(input); if (e.key === 'Escape') setSuggestions([]) }}
                  onBlur={() => setTimeout(() => setSuggestions([]), 150)}
-                 placeholder="의원 이름 (예: 김윤)"
-                 style={{ padding: '6px 8px', fontFamily: 'inherit', border: '1px solid var(--ink-300)', borderRadius: 'var(--radius)' }} />
+                 placeholder="의원 이름 (예: 김윤)" className="actor-search-input" />
           {suggestions.length > 0 && (
-            <ul style={{ position: 'absolute', top: '100%', left: 0, zIndex: 10, minWidth: 220,
+            <ul className="actor-suggest"
+                style={{ position: 'absolute', top: '100%', left: 0, zIndex: 10, minWidth: 220,
                          margin: '4px 0 0', padding: 4, listStyle: 'none', background: 'var(--surface)',
                          border: '1px solid var(--ink-300)', borderRadius: 'var(--radius)',
                          boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
@@ -93,7 +93,9 @@ export default function ActorView({ actor, onIssueClick, onShown }) {
             </ul>
           )}
         </span>
-        <button onClick={() => load(input)} disabled={loading}>{loading ? '조회 중…' : '조회'}</button>
+        <button className="actor-search-btn" onClick={() => load(input)} disabled={loading}>
+          {loading ? '조회 중…' : '조회'}
+        </button>
       </div>
       {err && <p style={{ color: 'var(--stance-none)' }}>{err}</p>}
       {profile && (
@@ -119,26 +121,28 @@ export default function ActorView({ actor, onIssueClick, onShown }) {
           <h4>이슈별 입장</h4>
           {profile.issue_stances.length > 0 ? (
             <>
-              <table style={{ maxWidth: 560, width: '100%', borderCollapse: 'collapse' }}>
-                <thead>
-                  <tr style={{ borderBottom: '1px solid var(--ink-300)' }}>
-                    <th style={{ textAlign: 'left', padding: '4px 8px 4px 0' }}>이슈</th>
-                    <th style={{ padding: '4px 8px' }}>입장</th>
-                    <th style={{ padding: '4px 0 4px 8px' }}>발언 수</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {profile.issue_stances.map(s => (
-                    <tr key={s.issue_id} onClick={() => onIssueClick(s.issue_id)} className="clickable-row"
-                        style={{ cursor: 'pointer', borderBottom: '1px solid var(--ink-200)' }}
-                        title="클릭하면 쟁점 분석으로 이동">
-                      <td style={{ padding: '6px 8px 6px 0' }}>{s.title}</td>
-                      <td style={{ textAlign: 'center', padding: '6px 8px', color: STANCE_COLOR[s.stance], fontWeight: 600 }}>{STANCE_KO[s.stance]}</td>
-                      <td style={{ textAlign: 'center', padding: '6px 0 6px 8px', fontSize: 13 }}>{s.total_turns}</td>
+              <div className="table-scroll">
+                <table className="actor-issues-table">
+                  <thead>
+                    <tr style={{ borderBottom: '1px solid var(--ink-300)' }}>
+                      <th style={{ textAlign: 'left' }}>이슈</th>
+                      <th>입장</th>
+                      <th>발언 수</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {profile.issue_stances.map(s => (
+                      <tr key={s.issue_id} onClick={() => onIssueClick(s.issue_id)} className="clickable-row"
+                          style={{ cursor: 'pointer', borderBottom: '1px solid var(--ink-200)' }}
+                          title="클릭하면 쟁점 분석으로 이동">
+                        <td>{s.title}</td>
+                        <td style={{ textAlign: 'center', color: STANCE_COLOR[s.stance], fontWeight: 600 }}>{STANCE_KO[s.stance]}</td>
+                        <td style={{ textAlign: 'center', fontSize: 13 }}>{s.total_turns}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
               <p style={{ fontSize: 12, color: 'var(--ink-500)' }}>입장은 LLM 자동 판정 — 방향 참고용 · 행 클릭 시 쟁점 분석으로 이동</p>
             </>
           ) : <p style={{ fontSize: 14, color: 'var(--ink-700)' }}>판정된 이슈 없음</p>}

@@ -25,7 +25,7 @@ export default function MyQueries({ user, onPick }) {
   if (!user) return null
   return (
     <div style={{ margin: '10px 0' }}>
-      <button type="button" onClick={() => setOpen(!open)}
+      <button type="button" className="myqueries-toggle" onClick={() => setOpen(!open)}
               style={{ fontSize: 13, padding: '4px 10px', cursor: 'pointer', fontFamily: 'inherit',
                        background: 'var(--surface)', color: 'var(--ink-700)',
                        border: '1px solid var(--ink-300)', borderRadius: 'var(--radius)' }}>

@@ -17,6 +17,8 @@ if __name__ == "__main__":  # pytest 캡처와 충돌 방지 — 직접 실행�
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 sys.path.insert(0, str(Path(__file__).parent.parent / "backend"))
 
+from contextlib import contextmanager  # noqa: E402
+
 import jwt as pyjwt  # noqa: E402
 
 import auth  # noqa: E402
@@ -65,10 +67,65 @@ def test_token_rejects():
     check("만료 거부", auth.decode_token(expired) is None)
 
 
+# ── F7 회귀: verification 컬럼 자가 마이그레이션 (최종 리뷰 Important) ─────────
+
+class _FakeCursor:
+    def __init__(self):
+        self.executed: list[str] = []
+
+    def execute(self, sql, params=None):
+        self.executed.append(sql)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        return False
+
+
+class _FakeConn:
+    def __init__(self, cursor):
+        self._cursor = cursor
+
+    def cursor(self):
+        return self._cursor
+
+    def commit(self):
+        pass
+
+
+def test_ensure_schema_migrates_verification_column():
+    """F7: ensure_schema() 가 user_id 전례와 같은 패턴으로 query_logs.verification
+    컬럼도 자가 마이그레이션해야 한다 — db/schema.sql 만 실행되는 ETL/1회성 이전
+    스크립트 경로 밖(백엔드만 재배포된 기존 DB)에서도 컬럼이 보장되어야 한다."""
+    import db as db_module
+
+    fake_cursor = _FakeCursor()
+    fake_conn = _FakeConn(fake_cursor)
+
+    @contextmanager
+    def fake_get_conn():
+        yield fake_conn
+
+    saved = db_module.get_conn
+    db_module.get_conn = fake_get_conn
+    try:
+        auth.ensure_schema()
+    finally:
+        db_module.get_conn = saved
+
+    executed = "\n".join(fake_cursor.executed)
+    check("F7: user_id ALTER 유지", "ADD COLUMN IF NOT EXISTS user_id" in executed, executed)
+    check("F7: verification ALTER 신규", "ADD COLUMN IF NOT EXISTS verification JSONB" in executed, executed)
+    check("F7: verification ALTER 대상 테이블 query_logs",
+          "ALTER TABLE query_logs ADD COLUMN IF NOT EXISTS verification JSONB" in executed, executed)
+
+
 if __name__ == "__main__":
     test_password_hash_roundtrip()
     test_username_rules()
     test_password_rules()
     test_token_roundtrip()
     test_token_rejects()
+    test_ensure_schema_migrates_verification_column()
     print("전체 통과")

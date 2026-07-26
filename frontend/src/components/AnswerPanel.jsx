@@ -17,6 +17,17 @@ const GROUNDING_LABEL = {
   NONE: '근거 연결 없음',
 }
 
+// 검증층 flag 한국어 라벨 (spec 결정 ② (a) — 텍스트 불변 + 강등 + 배지)
+const VERIFICATION_LABEL = {
+  comparison_one_sided: '한쪽 진영 근거만으로 비교됨',
+  speaker_both_sides: '같은 발언자가 양쪽 진영에 배치됨',
+  qa_pairing_date_mismatch: '질문·답변 인용이 서로 다른 회의',
+  speaker_role_mismatch: '발언자·기관 귀속 불일치',
+  party_label_mismatch: '정당 표기가 근거와 다름',
+  keyword_missing: '핵심 대상이 인용 근거에 없음',
+  ruling_period_mismatch: '발언 시점과 정권 시기 불일치',
+}
+
 // 텍스트 속 [n]을 클릭 가능한 인용 버튼으로 치환
 function withCitations(children, onCiteClick) {
   return (Array.isArray(children) ? children : [children]).flatMap((child, i) => {
@@ -77,6 +88,13 @@ function AnswerPanel({ result, onCiteClick }) {
 
       {result.ungrounded && (
         <div className="ungrounded-banner">⚠ 이 답변에는 출처가 연결되지 않은 내용이 있습니다</div>
+      )}
+
+      {result.verification?.flags?.length > 0 && (
+        <div className="verification-banner">
+          ⚠ 자동 검증 주의 {result.verification.flags.length}건:{' '}
+          {result.verification.flags.map((f) => VERIFICATION_LABEL[f] ?? f).join(' · ')}
+        </div>
       )}
 
       <div className="answer-markdown">

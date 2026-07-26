@@ -993,6 +993,117 @@ bcrypt 1회 수행해 응답 시간 균일화. ② MyQueries 계정 전환 시 �
 테스트: 백엔드 신규 11(test_auth 5 + test_auth_api 6) + guard 1, 프론트 vitest 5.
 배포 영향: Render 환경변수 `JWT_SECRET` 1줄 + requirements에 bcrypt·PyJWT 추가.
 
+### 답변-근거 자동 검증 층 1단계 + 회귀 스모크 (2026-07-25)
+
+스펙 `docs/superpowers/specs/2026-07-15-answer-verification-design.md` (§0 "미통과
+검수 → 회귀 아님 확정" 8건의 근본원인 매핑이 요구사항 근거). 9개 태스크 1바퀴로 완결.
+
+- **`backend/verification.py` 신규(규칙 7종, LLM 호출 0)**: 진영 커버리지
+  (`comparison_coverage` — "당시 여당/야당"은 시점 라벨이지 정당이 아니라는 함정 처리)
+  · 화자·진영 이중 프레이밍(`speaker_both_sides`) · 거짓 Q-A 짝짓기 날짜 정합성
+  (`qa_pairing_dates`) · 화자/기관 귀속(`speaker_role_consistency`, 문단 주어 승계는
+  `inherited` 표시) · 정당 라벨 일치(`party_label_consistency`, 위성정당 표기 원본
+  대조) · 키워드 포함률(`keyword_containment`, 표적 이탈 패딩) · 정권기 일치
+  (`ruling_period_consistency`, `party.py RULING_PERIODS` 재사용). 규칙별 예외 격리
+  (`verify()` 의 `run()` 래퍼) — 검증층 버그가 답변 생성 실패로 번지지 않는다.
+- **사전 지시 2종**: `answer.py` 의 `_coverage_guard`(비교 질문 진영 커버리지 사전
+  경고) + `QA_PAIR_GUIDE`(Q-A 짝 질문 날짜 명시 유도) — 생성 전 프롬프트 방어.
+- **`_COMPARE_RE` 후보 D 확장**(`query_parser.py`): "여당…야당" 근접 패턴 +
+  "더불어민주당…국민의힘" 정당명 쌍 패턴 추가. 75문항 실측 재현 2/8→6/8,
+  비교질문 외 오탐 0 — 기존에 이미 구현된 비교 질문 방어(`_TYPE_GUIDES`,
+  `issue_context_for`)가 057·068 에서 애초에 발동하지 않던 구멍을 정규식 1줄
+  수정으로 메움.
+- **강등 접합**: `verify()` 는 `generate_answer()` 내부에서 호출(200자 절단 전
+  전문 sources 필요), `verification_flags` 가 비어있지 않으면 `invalid_citations`
+  와 동일한 자리에서 FULL→PARTIAL 강등(`main.py`). 새 등급 신설 없음(마스터 4-9
+  4단계 계약 유지). `query_logs.verification`(JSONB) 원본 그대로 적재.
+  프론트 검증 배지(POL-8 근거 배지 패턴 재사용)로 flag 노출.
+- **회귀 스모크 (`scripts/verification_regress.py`, 신규 LLM 호출 = gpt-4o-mini
+  8회 ~$0.005)**: 확정 실패 8건(eval_011·013·019·029·035·055·057·068) 재실행 —
+  8/8 예외 없이 완주. flag 발생 4/8 (9fix 후, `data/eval/verification_regress_report.md`),
+  eval_011 은 §4-3 결정 ④에 따라 1단계 표적 밖(2단계 이월)이라 애초 미커버 대상.
+  flag 는 "생성이 오류를 재현했을 때"만 뜨는 신호라 개수 자체가 자동 합격선이
+  아니다 — 사람 대조용 재료로 리포트에 문항별 answer 전문·flags·detail 을 남김.
+- pytest 123 passed(신규 스모크 스크립트 포함 회귀 없음).
+- **2단계 백로그(결정 ④⑤에 따라 의도적 미포함)**: §4-3 다중 대상 부재공시(eval_011
+  표적) · §5-2 혼합 접근(규칙+LLM 재검토) · §5-3 은 75문항 전체 재측정(§7-4, LLM
+  judge 비용 발생 — 실행 여부는 사용자 승인 필요).
+
+### 최종 리뷰 확정 발견 일괄 수정 + replay 재측정 (2026-07-26)
+
+Fable 4렌즈 최종 리뷰 + 적대적 검증(2명/건)에서 확정 11건(기각 0) — 수정 단위 F1~F8
++ 동승 minor 4건. 오탐(정직한 답변의 부당 강등)이 미탐보다 해롭다는 원칙의 집행.
+
+- **F1[Critical] `_NAMED_SPEAKER` 유령 캡처**: "조현 외교부장관은…" 처럼 이름-직함
+  사이가 융합(공백 없음)되면 부처 접두("외교부")가 이름으로 잘못 캡처됐다. 이름-직함
+  공백 필수(`\s+`) + 선택적 기관 접두 허용 + 캡처 후보가 기관명·정당명 자체면 제외
+  (`_is_ghost_candidate`)로 구조적 차단. 소위원장·부위원장 직함군 보강,
+  `_NAME_PARTY` 어절 경계(`(?<![가-힣])`) + 의장·고문 접미 추가(M12 동승).
+- **F2[Critical] `_GOV_SUBJECT` 언급≠주어**: "야당 의원들은 외교부의 소극적인 대응을
+  비판했습니다" 처럼 목적어 위치의 기관 언급만으로 gov 분기가 발동했다. 문장 앞머리
+  비기관 일반 주어(…들은/이들은/…에서는 등) 매칭 시 스킵 + `inherited_gov` 설정을
+  names 빈 문장으로 한정(화자명 문장의 목적어 기관 언급이 다음 문장에 오염 승계되지
+  않게). **replay 재측정 중 2차 확장**(대명사·생략 주어가 인물을 승계하는 문형,
+  국회 상임위 긴 복합명·부분열 충돌, 후보자 예외 — 아래 replay 절 참고).
+- **F3[Critical+Important] `comparison_coverage` 진영 축 재설계**: spec §2-1 개정절
+  (정당명 개수 → 진영(side) 집합, 정부측도 진영으로 인정).
+- **F4[Important] `speaker_both_sides` 찬반↔여야 교차 등식 분리**: spec §2-2 개정절
+  (진영 축·찬반 축 독립, 같은 축 양극만 flag).
+- **F5[Important] `ruling_period_consistency` 공시 면제**: 문장이 인용 source 의
+  연월을 공시하면 통과(`_mentions_date` 재사용) — "이는 현 정부 출범 이전인 2024년
+  8월의 발언으로…" 같은 모범 교정 문장이 flag 되던 문제 해소.
+- **F6[Important] `_QA_ASKER` 직함 내부 매칭**: "방송통신위원장 후보자가…" 에서
+  '방송통신위원' 이 매칭돼 단일 대상 질문이 Q-A 짝으로 오분류(eval_070 오강등)됐다.
+  어절 경계 + `위원(?!장)` 부정 전방탐색으로 차단.
+  `_QA_ASKER = re.compile(r"(?<![가-힣])[가-힣]{2,4}\s*(?:위원(?!장)|의원)")`.
+- **F7[Important] `verification` 컬럼 자가 마이그레이션**: `auth.py ensure_schema()`
+  에 `user_id` 전례와 동일한 `ALTER TABLE query_logs ADD COLUMN IF NOT EXISTS
+  verification JSONB` 1줄 추가 — `db/schema.sql` 에만 있고 런타임 자가 마이그레이션이
+  빠져 있던 구멍(백엔드만 재배포된 기존 DB에서 로깅이 침묵 실패하던 경로) 차단.
+- **F8[Important] 진행 문서 정정**: 위 §"답변-근거 자동 검증 층 1단계" 절의
+  'flag 발생 6/8' → '4/8 (9fix 후)' 로 정정 + 미추적 파일(`.superpowers/sdd/
+  task-9-report.md`) 참조 제거(9fix 재스모크가 리포트만 갱신하고 진행 문서를
+  미동기화했던 자기모순 해소).
+- **동승 minor 4건**: `verification_regress.py` 의 "grounding 강등: 예" 단정(실제로는
+  확인 안 한 사실) → "flag 발생" 으로 정정 · `answer_eval_build.py` 에 `main.py` 와
+  동일한 검증층 강등 2줄 이식(§7-4 재측정 대비 grounding 정합) · `test_api.py` 에
+  pre-gate 응답 `verification:None` 키 존재 단언 2줄 · `answer.py _PARTY_QUESTION`
+  에 `여당|야당` 추가(연속 리터럴 "여야" 아닌 "여당과 야당" 분리형 질문 사각지대,
+  eval_057·068 실측).
+
+**측정 게이트(순서대로)**:
+
+1. `pytest tests/ -q` — 기존 125 + 신규 회귀 테스트 13개 = **138 passed**, 핀 테스트
+   전수 보존(F3·F4 의 스펙 개정에 따라 갱신이 불가피했던 기존 단정 2건은 새 스펙에
+   맞춰 업데이트 — `tests/test_answer.py test_coverage_guard`).
+2. **replay 재측정**(`scripts/verification_replay.py` 신규, LLM 0회·$0) — 기록된
+   pass 확정 답변 58건(citations 있음)에 `verify()` 오프라인 재생. 수정 전 기준선
+   30/58 → **F1~F8 원안 적용 후 18/58** → **replay 자체가 드러낸 추가 근본원인 5건
+   2차 수정 후 6/58**(대명사·활용형 유령 캡처, 국회 상임위 8자 초과 복합명 미대응,
+   `_GOV_SUBJECT` 어절 경계 부재로 인한 부분열 충돌, 후보자 예외 부재 — 전부 F1/F2
+   와 동일 근본원인의 새 표면형). 잔존 6건은 근거 원문과 문장을 직접 대조해 사람
+   소견을 남김(`data/eval/verification_replay_report.md`): 정탐 2건(eval_009·059,
+   인용 화자와 서술 주체 실제 불일치 확인), 불명 1건(eval_037, inherited 신호가
+   의도대로 작동한 것으로 판단), 오탐(잔존 한계) 3건(eval_033 비인칭 존재구문·
+   eval_062 문단 경계를 넘는 화자 승계·eval_069 참석자 열거 vs 발언 귀속 — 전부
+   문장성분 분석이 필요해 순수 정규식 범위를 벗어남, 2단계 LLM 재검토 후보로 기록).
+   전문(text) 없이 200자 snippet 으로 재생한 한계도 리포트에 명시.
+3. **8건 스모크 재실행**(`scripts/verification_regress.py`, gpt-4o-mini 8회 ~$0.005)
+   — flag 4/8, 전부 각 문항의 원래 표적과 정확히 일치하는 정탐(eval_013 소유격 gov
+   서술·eval_019 화자-정당 라벨 불일치·eval_035 미공시 정권기 인용·eval_068 같은
+   화자 시점차 양진영 라벨). eval_011(§4-3 결정 ④ 2단계 이월)·eval_029(사전 지시
+   순응, 날짜 차이 명시적 공시)·eval_055·eval_057(진영 축 재설계로 covered=True 정확
+   판정) 은 flag 없음 — 9fix 리포트의 4/8 과 동일 수치 유지(F1/F2 확장이 이 8건
+   표적 판정에 회귀 없음 확인).
+4. 스펙 §2-1·§2-2 개정절(F3·F4) + 본 절.
+
+- **잔존 한계(정직 기록)**: 위 replay 6건 외에, (a) F2 의 문단 경계 리셋은 여러 회의
+  날짜를 문단으로 나눠 정리하는 "단일 화자 다회차" 답변 형식과 근본적으로 충돌한다
+  (eval_062) — 문단 경계를 넘는 주어 승계는 질문 유형별 분기 등 별도 설계 결정 필요.
+  (b) 한국어 비인칭 존재구문("~라는 의견/우려/요구가 있었다") 은 현재 어떤 주어
+  승계 경로에도 걸리지 않는다(eval_033) — 열거형 패치는 정밀도 훼손 위험이 더 커
+  보류. 둘 다 §4-1 접근 C(혼합, LLM 재검토) 의 2단계 과제로 남긴다.
+
 ## 코드 전수 검토 + 1차 수정 (2026-07-06)
 
 > 전체 코드베이스 검토(병렬 리뷰 3축: 백엔드/ETL/프론트+테스트) + 외부 리뷰(친구) 지적을

@@ -59,6 +59,14 @@ def main() -> None:
         else:
             result = generate_answer(q, mode="qa", hits=hits)
             grounding, ungrounded = judge(result)
+            # main.py /query 와 동일한 검증층 강등 2줄 이식 (2026-07-26 최종 리뷰
+            # 동승 minor) — 없으면 이 스크립트가 기록하는 system_grounding 이 실제
+            # 서비스 판정과 어긋나(verification flag 가 있어도 FULL로 기록) §7-4
+            # 재측정 때 grounding 분포가 부정확해진다. 이 이식으로 위 주석의
+            # "/query 와 동일 흐름"이 실제로 정확해진다.
+            vflags = (result.get("verification") or {}).get("flags") or []
+            if vflags and grounding == "FULL":
+                grounding = "PARTIAL"
             answer_text = result["answer"]
             citations = result["citations"]
             source_block = result.get("source_block")
