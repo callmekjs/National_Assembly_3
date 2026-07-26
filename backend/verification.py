@@ -147,7 +147,11 @@ def speaker_both_sides(answer: str, cited_sources: list[dict]) -> bool:
 # ── 거짓 Q-A 짝짓기 (spec §3, eval_029) ──────────────────────────────────────
 
 _QA_VERB = re.compile(r"질(?:문|의)")
-_QA_ASKER = re.compile(r"[가-힣]{2,4}\s*(?:위원|의원)")
+# 어절 경계(?<![가-힣]) + 위원(?!장) — "방송통신위원장"·"금융위원장" 같은 답변자
+# 복합 직함 내부의 '위원'이 질문자 신호로 오매칭되지 않도록 (2026-07-26 F6,
+# eval_070: 단일 대상 질문이 Q-A 짝으로 오분류됐다). _NAMED_SPEAKER 의 위원(?!회)
+# 경계 가드와 같은 계열의 구조적 차단.
+_QA_ASKER = re.compile(r"(?<![가-힣])[가-힣]{2,4}\s*(?:위원(?!장)|의원)")
 _QA_ANSWERER = re.compile(r"장관|차관|총리|처장|청장|위원장|후보자|대통령")
 _VALID_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}")
 
@@ -503,7 +507,13 @@ _CURRENT_START = RULING_PERIODS[-1][0]  # 정권교체 경계 (party.py 재사�
 
 def ruling_period_consistency(answer: str, cited_sources: list[dict]) -> list[str]:
     """'현 정부/새 정부' 서술 문장이 이전 정권기 발언을 인용하면 flag (eval_035 —
-    2024-08 의 윤 정부 비판 발언이 현 정부 비판으로 오독). 날짜 결측 source는 판정 제외 (크래시 없음, 예외 격리)."""
+    2024-08 의 윤 정부 비판 발언이 현 정부 비판으로 오독). 날짜 결측 source는 판정 제외 (크래시 없음, 예외 격리).
+
+    2026-07-26 F5: 문장이 해당 인용의 연월을 공시하면 통과 — "이는 현 정부 출범
+    이전인 2024년 8월의 발언으로…"는 시점을 밝히고 교정하는 모범 문장이지 오류가
+    아니다. 자매 규칙 qa_pairing_dates 의 _mentions_date 를 그대로 재사용해 계약을
+    정합화한다(날짜를 공시하면 정직한 처리로 인정하는 동일 원칙).
+    """
     by_n = {s["n"]: s for s in cited_sources}
     flags = []
     for sent, _ in _paragraph_sentences(answer):
@@ -514,7 +524,7 @@ def ruling_period_consistency(answer: str, cited_sources: list[dict]) -> list[st
             if not _VALID_DATE.match(str(s.get("date"))[:10]):
                 continue
             d = date.fromisoformat(str(s.get("date"))[:10])
-            if d < _CURRENT_START:
+            if d < _CURRENT_START and not _mentions_date(sent, s["date"]):
                 flags.append(f"[{s['n']}] {s['date']} (이전 정권기) 발언을 현 정부 서술에 인용")
     return flags
 

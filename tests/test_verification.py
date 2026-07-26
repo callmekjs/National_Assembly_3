@@ -203,6 +203,23 @@ def test_qa_pair_question():
     check("QA패턴: 답변만 있으면 비매칭", qa_pair_question("조태열 장관의 답변 내용은?") is False)
 
 
+# ── F6 회귀: _QA_ASKER 직함 내부 매칭 (최종 리뷰 Important, eval_070) ───────────
+
+def test_f6_qa_asker_no_internal_title_match():
+    """'방송통신위원장' 처럼 복합 직함 내부의 '위원'이 질문자 신호로 오매칭되지
+    않아야 한다 — 단일 대상 질문이 Q-A 짝으로 오분류되면 안 된다."""
+    q070 = "방송통신위원장 후보자가 방송 독립성 관련 질의를 받았을 때 어떻게 답변했나요?"
+    check("F6: eval_070 — 단일 대상 질문은 QA짝 비매칭", qa_pair_question(q070) is False)
+
+    q_finance = "김병환 금융위원장이 가계부채 질의에 어떻게 답변했나요?"
+    check("F6: '금융위원장' 내부 매칭 없이 비매칭", qa_pair_question(q_finance) is False)
+
+    # 핀 보존: 진짜 Q-A 짝 질문(eval_029)은 여전히 True
+    q29 = ("홍기원 의원이 2024년 11월 우크라이나 무기 지원에 대해 조태열 장관에게 "
+           "질의했는데, 조태열 장관은 어떻게 답변했나요?")
+    check("F6(정탐 보존): eval_029 QA짝 감지 유지", qa_pair_question(q29) is True)
+
+
 def test_qa_pairing_dates():
     q29 = ("홍기원 의원이 2024년 11월 우크라이나 무기 지원에 대해 조태열 장관에게 "
            "질의했는데, 조태열 장관은 어떻게 답변했나요?")
@@ -606,6 +623,21 @@ def test_ruling_period_consistency():
           ruling_period_consistency("현 정부의 외교 기조에 대한 비판이 제기됐습니다[2].", with_none) == [])
 
 
+# ── F5 회귀: ruling_period 공시 면제 (최종 리뷰 Important) ─────────────────────
+
+def test_f5_ruling_period_disclosure_exemption():
+    """문장이 인용 source 의 연월을 공시하면(_mentions_date) 통과 — 모범 교정
+    문장("이는 현 정부 출범 이전인 2024년 8월의 발언으로…")이 flag 되지 않아야 한다."""
+    srcs = [_src(2, "위성락", None, "2024-08-27", role="증인")]
+    disclosed = "이는 현 정부 출범 이전인 2024년 8월의 발언으로, 당시 정부를 향한 비판이었습니다[2]."
+    check("F5: 연월 공시 문장 — flag 없음", ruling_period_consistency(disclosed, srcs) == [])
+
+    # 핀 보존: 미공시 문장은 flag 유지
+    undisclosed = "현 정부의 외교 기조에 대한 비판이 제기됐습니다[2]."
+    flags = ruling_period_consistency(undisclosed, srcs)
+    check("F5(정탐 보존): 미공시 문장 — flag 유지", len(flags) == 1, str(flags))
+
+
 # ── 회귀 테스트: 기관명 오탐 (어절 경계·4자 기관명) ─────────────────────
 
 def test_speaker_role_consistency_org_names():
@@ -687,15 +719,27 @@ def test_verify_rule_isolation(monkeypatch):
 if __name__ == "__main__":
     test_core_party()
     test_comparison_coverage()
+    test_f3_comparison_coverage_side_axis()
+    test_f3_coverage_guard_uses_sides()
     test_speaker_both_sides()
+    test_f4_speaker_both_sides_cross_axis_no_flag()
+    test_f4_speaker_both_sides_same_axis_flag_preserved()
     test_qa_pair_question()
+    test_f6_qa_asker_no_internal_title_match()
     test_qa_pairing_dates()
     test_speaker_role_consistency()
     test_speaker_role_consistency_false_positive_regressions()
     test_speaker_role_consistency_true_positives_preserved()
+    test_f2_ellipsis_subject_continues_person_regressions()
+    test_f1_f2_replay_second_pass_regressions()
+    test_f1_named_speaker_ghost_capture()
+    test_f2_gov_subject_not_mere_mention()
+    test_f2_inherited_gov_no_cross_sentence_contamination()
+    test_f2_true_positives_preserved()
     test_party_label_consistency()
     test_keyword_containment()
     test_ruling_period_consistency()
+    test_f5_ruling_period_disclosure_exemption()
     test_speaker_role_consistency_org_names()
     test_verify_integration()
     print("\n전체 통과")
