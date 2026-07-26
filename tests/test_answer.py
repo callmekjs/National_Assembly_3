@@ -356,16 +356,28 @@ from answer import _coverage_guard, QA_PAIR_GUIDE  # noqa: E402
 
 
 def test_coverage_guard():
+    # F3(2026-07-26): 같은 정당의 시점차 라벨(더불어민주당 여당·야당)은 side 로는
+    # 2개로 보여도 정체성이 1개뿐이라 covered=False 유지 — 가드 문구는 이제
+    # sides(여당/야당/정부측) 기준 ("근거에 등장하는 진영은 …").
     one_sided = [
         {"n": 1, "speaker": "김우영", "party": "더불어민주당(당시 여당)"},
         {"n": 2, "speaker": "박민규", "party": "더불어민주당(당시 야당)"},
     ]
     guard = _coverage_guard(one_sided, {"compare"})
-    check("가드: 한쪽 진영이면 지시문 생성", "더불어민주당" in guard and "확인할 수 없습니다" in guard)
+    check("가드: 한쪽 진영이면 지시문 생성",
+          "여당" in guard and "야당" in guard and "확인할 수 없습니다" in guard, guard)
 
     covered = one_sided + [{"n": 3, "speaker": "강민국", "party": "국민의힘(당시 야당)"}]
     check("가드: 양 진영이면 빈 문자열", _coverage_guard(covered, {"compare"}) == "")
     check("가드: 비교 질문 아니면 빈 문자열", _coverage_guard(one_sided, set()) == "")
+
+    # F3: 정부측+야당 비교는 정당한 2진영 비교 — 가드 문구가 붙지 않는다
+    gov_vs_oppo = [
+        {"n": 1, "speaker": "김병환", "party": "정부측", "role": "금융위원장"},
+        {"n": 2, "speaker": "강민국", "party": "국민의힘(당시 야당)"},
+    ]
+    check("가드(F3): 정부측+야당1 은 정당한 비교 — 빈 문자열",
+          _coverage_guard(gov_vs_oppo, {"compare"}) == "")
 
 
 def test_build_user_message_extra_guards():

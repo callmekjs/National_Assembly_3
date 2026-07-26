@@ -160,15 +160,18 @@ def _coverage_guard(sources: list[dict], question_types: set) -> str:
 
     retrieved 기준 (citation 확정 전) — 기존 LLM 호출의 프롬프트에 한 문단 추가라
     비용 0, 지연 0. 순응 실패는 사후 규칙(comparison_one_sided)이 잡는다.
+    2026-07-26 F3: 안내문을 정당명이 아니라 sides(여당/야당/정부측) 기준으로 —
+    "정부 입장 vs 야당 비판"은 정당한 2진영 비교이므로 정부측 근거가 있으면
+    가드가 붙지 않는다 (spec §2-1 개정절).
     """
     if "compare" not in question_types:
         return ""
     cov = comparison_coverage(sources)
     if cov["covered"]:
         return ""
-    parties = ", ".join(cov["core_parties"]) or "없음(정당 라벨이 있는 발언 없음)"
+    sides = ", ".join(cov["sides"]) or "없음(정당·정부측 라벨이 있는 발언 없음)"
     return (
-        f"\n\n(안내: 근거에 등장하는 정당은 {parties} 뿐입니다. 근거에 없는 "
+        f"\n\n(안내: 근거에 등장하는 진영은 {sides} 뿐입니다. 근거에 없는 "
         "정당·진영의 발언을 비교하거나 만들어내지 말고, 그 진영의 입장은 '이 "
         "회의록에서 확인할 수 없습니다'라고 명시하세요. 같은 발언자를 서로 다른 "
         "진영으로 서술하지 마세요.)"

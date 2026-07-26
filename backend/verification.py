@@ -41,20 +41,55 @@ def core_party(party_label: str | None) -> str | None:
     return name
 
 
-def comparison_coverage(sources: list[dict]) -> dict:
-    """비교 질문의 진영 커버리지 — 서로 다른 정당명이 2개 이상이어야 진짜 비교.
+# 진영(side) 접미 추출 — core_party() 와 자매 함수. '정부측'은 그 자체가 진영이다
+# (2026-07-26 F3 — 구 스펙 §2-1 "정부측 집계 제외"는 "정부 입장 vs 야당 비판" 같은
+# 국회 도메인 최빈출 비교형을 구조적으로 오탐시킨 결함으로 최종 리뷰가 확정).
+_SIDE_SUFFIX = re.compile(r"\(당시\s*(여당|야당)\)\s*$")
 
-    '당시 여당/야당' 라벨은 시점 기준이지 정당 기준이 아니다 (eval_019: 전부
-    더불어민주당인데 시점차로 여야가 갈려 '여야 대립'으로 오독).
+
+def _party_side(party_label: str | None) -> str | None:
+    """'더불어민주당(당시 여당)' → '여당' / '정부측' → '정부측' / 그 외(무소속·
+    None·접미 없음) → None (진영 미상 — 집계 제외)."""
+    if not party_label:
+        return None
+    if party_label == "정부측":
+        return "정부측"
+    m = _SIDE_SUFFIX.search(party_label)
+    return m.group(1) if m else None
+
+
+def comparison_coverage(sources: list[dict]) -> dict:
+    """비교 질문의 진영 커버리지 — 정당명 개수가 아니라 진영(side) 축으로 판정.
+
+    2026-07-26 F3 재설계(spec §2-1 개정절 참고). 두 조건을 모두 요구한다:
+    (1) side 종류 2개 이상 (여당/야당/정부측 중 서로 다른 것이 실제로 등장) —
+        위성정당+모정당(둘 다 '당시 여당')이나 야당 2당처럼 정당명은 여럿이어도
+        진영이 하나뿐이면 진짜 비교가 아니다 (같은 편끼리는 '비교'가 아니다).
+    (2) 서로 다른 정체성(정당명, 정부측은 그 자체로 1개 정체성) 2개 이상 —
+        '당시 여당/야당'라벨은 인용 발언 시점 기준이라, 같은 정당이 서로 다른
+        회의 날짜로 인용되면 라벨이 여당/야당 양쪽으로 갈릴 수 있다(eval_019:
+        더불어민주당 3건이 시점차로 여당 2건·야당 1건). side 조건만 보면 이
+        경우도 '2개 진영'으로 잘못 셀 수 있어, 정체성 조건을 함께 요구해 걸러낸다.
+    SATELLITE_PARENT 별도 병합은 불필요 — party.py party_label() 이 라벨 생성
+    시점에 이미 위성정당을 모정당 기준 여야로 인코딩해 접미에 반영한다.
     """
     parties = sorted({p for s in sources if (p := core_party(s.get("party")))})
-    return {"core_parties": parties, "covered": len(parties) >= 2}
+    gov_present = any(s.get("party") == "정부측" for s in sources)
+    sides = sorted({sd for s in sources if (sd := _party_side(s.get("party")))})
+    identity_count = len(parties) + (1 if gov_present else 0)
+    covered = len(sides) >= 2 and identity_count >= 2
+    return {"core_parties": parties, "sides": sides, "covered": covered}
 
 
 # ── 화자·진영 이중 사용 (spec §2-2, eval_068) ────────────────────────────────
 
-_SIDE_FRAME_RULING = re.compile(r"(여당|찬성)(\s*측)?(\s*(에서는|에서|소속|의원들?|입장|의|인))?\s*$")
-_SIDE_FRAME_OPPO = re.compile(r"(야당|반대)(\s*측)?(\s*(에서는|에서|소속|의원들?|입장|의|인))?\s*$")
+# 2026-07-26 F4: 진영 축(여당↔야당)과 찬반 축(찬성↔반대)은 서로 다른 두 축이다 —
+# "야당 의원이 안건에 찬성"은 정상 협치 서술이지 모순이 아니다. 이전 구현은
+# (여당|찬성) vs (야당|반대) 로 교차 등식화해 "여당=찬성, 야당=반대"를 코드에
+# 내장했었는데, 이는 정치적으로 편향된 독해다(spec §2-2 개정절 참고). 각 축을
+# 독립 정규식으로 분리하고, 같은 화자가 **같은 축**의 양극에 배치될 때만 flag.
+_SIDE_FRAME = re.compile(r"(여당|야당)(\s*측)?(\s*(에서는|에서|소속|의원들?|입장|의|인))?\s*$")
+_STANCE_FRAME = re.compile(r"(찬성|반대)(\s*측)?(\s*(에서는|에서|소속|의원들?|입장|의|인))?\s*$")
 
 
 def _speaker_keys(speaker: str | None) -> set[str]:
@@ -69,12 +104,15 @@ def _speaker_keys(speaker: str | None) -> set[str]:
 
 
 def speaker_both_sides(answer: str, cited_sources: list[dict]) -> bool:
-    """같은 화자가 답변 안에서 여당/야당/찬성/반대 양쪽 프레이밍에 배치됐는가.
+    """같은 화자가 답변 안에서 같은 축의 양극(여당↔야당 또는 찬성↔반대)에 배치됐는가.
 
     화자명 직전 수식(여당 측/찬성 측/야당 소속/반대 측 등)만 프레이밍으로 인정 — 주변 창 방식은
     상대 진영 반응 서술('야당 반대에도 불구하고')을 오탐해 폐기 (2026-07-25 리뷰).
-    찬성/반대는 여당/야당으로 정규화 (spec §2-2 "여당/야당/찬성/반대 대조 키워드").
-    직전 수식 방식은 괄호 정당명 등 개입 텍스트에 약함 — 정밀도 우선 (minor trade-off).
+    2026-07-26 F4: 진영 축(여당/야당)과 찬반 축(찬성/반대)은 **독립된 두 축**이다 —
+    "야당 의원의 안건 찬성"(야당+찬성 교차 조합)은 여야 협치의 정상 서술이지 진영
+    모순이 아니다. 같은 축의 양극(여당↔야당 또는 찬성↔반대)에만 flag, 교차 조합은
+    무flag. 등장 중 한 번이라도 프레이밍이 없으면(None) 그 화자는 판정 보류 —
+    직전 수식 방식은 괄호 정당명 등 개입 텍스트에 약해 정밀도 우선(minor trade-off).
     순수 정규식, LLM 불필요.
     """
     for s in cited_sources:
@@ -82,18 +120,26 @@ def speaker_both_sides(answer: str, cited_sources: list[dict]) -> bool:
             hits = [m.start() for m in re.finditer(re.escape(name), answer)]
             if len(hits) < 2:
                 continue
-            frames = {}  # {pos: '여당'|'야당'|None}
+            frames = {}  # {pos: ('진영'|'찬반', 값) | None}
             for pos in hits:
                 # 화자명 직전 12자에서 프레이밍 찾기
                 before = answer[max(0, pos - 12): pos]
-                if _SIDE_FRAME_RULING.search(before):
-                    frames[pos] = '여당'
-                elif _SIDE_FRAME_OPPO.search(before):
-                    frames[pos] = '야당'
+                m_side = _SIDE_FRAME.search(before)
+                m_stance = _STANCE_FRAME.search(before)
+                if m_side:
+                    frames[pos] = ("진영", m_side.group(1))
+                elif m_stance:
+                    frames[pos] = ("찬반", m_stance.group(1))
                 else:
                     frames[pos] = None
-            # 같은 화자의 서로 다른 등장이 여당·야당 양쪽으로 명시 프레이밍되면 True
-            if None not in frames.values() and len(set(frames.values())) > 1:
+            if None in frames.values():
+                continue
+            # 같은 축에서 서로 다른 값(양극)으로 명시 프레이밍되면 True — 축이 다르면
+            # (예: 진영='야당', 찬반='찬성') 교차 조합이라 모순이 아니다.
+            by_axis: dict[str, set[str]] = {}
+            for axis, value in frames.values():
+                by_axis.setdefault(axis, set()).add(value)
+            if any(len(values) > 1 for values in by_axis.values()):
                 return True
     return False
 

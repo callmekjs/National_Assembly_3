@@ -67,7 +67,8 @@ def test_comparison_coverage():
     covered = one_sided + [_src(4, "강민국", "국민의힘(당시 야당)")]
     check("커버리지: 정당 2개면 covered", comparison_coverage(covered)["covered"] is True)
 
-    # 정부측·무소속·라벨없음은 집계 제외 (거짓 covered 방지)
+    # F3(2026-07-26): 정부측도 진영 — "정부 vs 야당"은 정당한 2진영 비교이므로 covered=True
+    # (구 스펙 §2-1 "정부측 집계 제외"는 결함으로 확정 — 스펙 개정절 참고)
     mixed = [
         _src(1, "김우영", "더불어민주당(당시 여당)"),
         _src(2, "김병환", "정부측", role="금융위원장"),
@@ -75,9 +76,63 @@ def test_comparison_coverage():
         _src(4, "곽현준", None, role="수석전문위원"),
     ]
     cov = comparison_coverage(mixed)
-    check("커버리지: 정부측·무소속·무표기 제외", cov["covered"] is False and cov["core_parties"] == ["더불어민주당"])
+    check("커버리지(F3): 정부측 진영 인정 + 무소속·무표기 집계 제외",
+          cov["covered"] is True and cov["core_parties"] == ["더불어민주당"]
+          and cov["sides"] == ["여당", "정부측"], str(cov))
 
-    check("커버리지: 빈 목록", comparison_coverage([]) == {"core_parties": [], "covered": False})
+    check("커버리지: 빈 목록",
+          comparison_coverage([]) == {"core_parties": [], "sides": [], "covered": False})
+
+
+def test_f3_comparison_coverage_side_axis():
+    """F3(최종 리뷰 Critical+Important): 정당명 개수가 아니라 진영(side) 축 —
+    정부측도 진영으로 인정하고, 같은 진영 정당 2개(위성+모정당, 야당 2당)는
+    covered=False. 순수 정당명 카운트로는 eval_019 핀(같은 정당 시점차)과
+    이 두 미탐 케이스를 동시에 만족시킬 수 없어, side 집합 >=2 AND 서로 다른
+    정당/정부측 정체성 >=2 를 함께 요구하는 쪽으로 구현했다(리포트에 근거 기록)."""
+    gov_vs_oppo = [
+        _src(1, "김병환", "정부측", role="금융위원장"),
+        _src(2, "강민국", "국민의힘(당시 야당)"),
+    ]
+    cov = comparison_coverage(gov_vs_oppo)
+    check("F3: 정부측+야당1 → covered=True", cov["covered"] is True, str(cov))
+    check("F3: 정부측+야당1 → sides", cov["sides"] == ["야당", "정부측"], str(cov))
+
+    satellite_parent = [
+        _src(1, "한창민", "더불어민주연합(당시 여당)"),
+        _src(2, "민병덕", "더불어민주당(당시 여당)"),
+    ]
+    cov_sat = comparison_coverage(satellite_parent)
+    check("F3: 여당위성+여당모정당 → covered=False (같은 진영)",
+          cov_sat["covered"] is False, str(cov_sat))
+
+    oppo_two = [
+        _src(1, "김보라", "조국혁신당(당시 야당)"),
+        _src(2, "이동수", "진보당(당시 야당)"),
+    ]
+    cov_oppo2 = comparison_coverage(oppo_two)
+    check("F3: 야당 2당 → covered=False (같은 진영)",
+          cov_oppo2["covered"] is False, str(cov_oppo2))
+
+
+def test_f3_coverage_guard_uses_sides():
+    """F3: _coverage_guard(answer.py) 는 sides 기준으로 안내문을 갱신 —
+    정부측+야당 비교는 가드 문구가 붙지 않는다(진짜 2진영 비교로 인정)."""
+    from answer import _coverage_guard
+    gov_vs_oppo = [
+        {"n": 1, "speaker": "김병환", "party": "정부측", "role": "금융위원장"},
+        {"n": 2, "speaker": "강민국", "party": "국민의힘(당시 야당)", "role": "위원"},
+    ]
+    check("F3: 정부측+야당1 비교는 가드 문구 없음",
+          _coverage_guard(gov_vs_oppo, {"compare"}) == "")
+
+    one_sided_srcs = [
+        {"n": 1, "speaker": "한창민", "party": "더불어민주연합(당시 여당)", "role": "위원"},
+        {"n": 2, "speaker": "민병덕", "party": "더불어민주당(당시 여당)", "role": "위원"},
+    ]
+    guard = _coverage_guard(one_sided_srcs, {"compare"})
+    check("F3: 같은 진영뿐이면 가드 문구에 '진영' 표현 포함",
+          "진영" in guard and guard != "", guard)
 
 
 # ── speaker_both_sides (spec §2-2, eval_068) ─────────────────────────────────
@@ -108,6 +163,34 @@ def test_speaker_both_sides():
     stance_both = ("찬성 측에서는 김우영 위원이 특별법 보완을 주장했습니다[1]. "
                    "반면 반대 측 김우영 위원은 정부 대응을 비판했습니다[1].")
     check("양진영: 찬성·반대 측 프레이밍 감지 (스펙 §2-2 복원)", speaker_both_sides(stance_both, srcs) is True)
+
+
+# ── F4 회귀: 찬반↔여야 교차 등식 분리 (최종 리뷰 Important, spec §2-2 개정) ─────
+
+def test_f4_speaker_both_sides_cross_axis_no_flag():
+    """진영 축(여당↔야당)과 찬반 축(찬성↔반대)은 독립 — 교차 조합(야당+찬성 등)은
+    무flag. '야당 의원의 안건 찬성'은 정상 협치 서술이지 진영 모순이 아니다."""
+    srcs = [_src(1, "김우영", "더불어민주당(당시 야당)")]
+
+    oppo_then_favor = ("야당 측 김우영 위원은 정부 원안에 우려를 표했습니다[1]. "
+                        "이후 찬성 측 김우영 위원은 수정안에 동의했습니다[1].")
+    check("F4: 야당+찬성 교차 조합 — flag 없음", speaker_both_sides(oppo_then_favor, srcs) is False)
+
+    ruling_then_against = ("여당 측 김우영 위원은 정부 원안에 우려를 표했습니다[1]. "
+                            "이후 반대 측 김우영 위원은 수정안에 반대했습니다[1].")
+    check("F4: 여당+반대 교차 조합 — flag 없음", speaker_both_sides(ruling_then_against, srcs) is False)
+
+
+def test_f4_speaker_both_sides_same_axis_flag_preserved():
+    """같은 축의 양극 프레이밍(정탐)은 F4 수정 후에도 유지되어야 한다."""
+    srcs = [_src(1, "김우영", "더불어민주당(당시 여당)")]
+    same_side_axis = ("여당 측에서는 김우영 위원이 특별법 보완을 주장했습니다[1]. "
+                       "반면 야당 측 김우영 위원은 정부 대응을 비판했습니다[1].")
+    check("F4(정탐 보존): 여당+야당 — flag 유지", speaker_both_sides(same_side_axis, srcs) is True)
+
+    same_stance_axis = ("찬성 측에서는 김우영 위원이 특별법 보완을 주장했습니다[1]. "
+                         "반면 반대 측 김우영 위원은 정부 대응을 비판했습니다[1].")
+    check("F4(정탐 보존): 찬성+반대 — flag 유지", speaker_both_sides(same_stance_axis, srcs) is True)
 
 
 # ── Q-A 짝짓기 (spec §3, eval_029) ───────────────────────────────────────────
