@@ -17,14 +17,20 @@ function QueryForm({ question, setQuestion, mode, setMode, loading, onSubmit }) 
         onSubmit()
       }}
     >
-      <textarea
-        value={question}
-        onChange={(e) => setQuestion(e.target.value)}
-        onKeyDown={handleKeyDown}
-        placeholder="질문을 입력하세요. 예: AI 기본법 논의의 핵심 쟁점은 무엇인가?"
-        rows={3}
-      />
-      <div className="form-actions">
+      <div className="query-input-row">
+        <textarea
+          value={question}
+          onChange={(e) => setQuestion(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="질문을 입력하세요. 예: AI 기본법 논의의 핵심 쟁점은 무엇인가?"
+          rows={2}
+        />
+        <button type="submit" className="query-submit" disabled={loading || !question.trim()}>
+          {loading ? '생성 중…' : '질문하기'}
+        </button>
+      </div>
+
+      <div className="query-form-meta">
         <div className="mode-toggle" role="group" aria-label="답변 모드">
           <button
             type="button"
@@ -41,13 +47,14 @@ function QueryForm({ question, setQuestion, mode, setMode, loading, onSubmit }) 
             정책 브리핑
           </button>
         </div>
-        <button type="submit" disabled={loading || !question.trim()}>
-          {loading ? '생성 중…' : '질문하기'}
-        </button>
+        <span className="form-hint">Enter로 제출 · Shift+Enter로 줄바꿈</span>
+        {/* 대기 중에도 유지 — 소요 시간 고지는 기다리는 동안 가장 필요하다 */}
+        {mode === 'report' && (
+          <span className="form-hint">
+            정책 브리핑은 보통 10~20초 걸립니다 — 여러 근거를 구조화해 정리합니다.
+          </span>
+        )}
       </div>
-      {mode === 'report' && !loading && (
-        <p className="mode-hint">정책 브리핑은 보통 10~20초 걸립니다 — 여러 근거를 구조화해 정리합니다.</p>
-      )}
     </form>
   )
 }

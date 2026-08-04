@@ -109,124 +109,126 @@ function App() {
       ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
   }
 
+  // 모달에 번호 칩·인용 배지를 그리려면 해당 근거의 n/인용 여부가 필요 —
+  // 새 상태 없이 현재 결과에서 조회한다 (모달은 질의 결과 안에서만 열린다)
+  const modalSource = modalChunkId
+    ? result?.sources?.find((s) => s.chunk_id === modalChunkId)
+    : null
+
   return (
-    <div className="container">
-      <header>
-        <h1>국회 회의록 RAG</h1>
-        <p className="subtitle">
-          국회 회의록을 근거로 정책 의제, 행위자, 쟁점, 입장 차이, 시계열 흐름을 분석하는 GovTech RAG 서비스
-        </p>
-        <div className="auth-corner">
-          {user ? (
-            <>
-              <span>{user.username}님</span>
-              <button type="button" onClick={logout}>로그아웃</button>
-            </>
-          ) : (
-            <button type="button" onClick={() => setAuthOpen(true)}>로그인 / 가입</button>
-          )}
+    <div className="app">
+      <header className="appbar">
+        <div className="appbar-inner">
+          <div className="appbar-brand">
+            <div className="appbar-title">국회 회의록 RAG</div>
+            <div className="appbar-caption">RECORD-GROUNDED POLICY ANALYSIS</div>
+          </div>
+
+          <nav className="appbar-tabs" aria-label="주요 화면">
+            {[
+              ['query', '질의'],
+              ['issues', '쟁점 분석'],
+              ['actor', '의원 프로필'],
+            ].map(([id, label]) => (
+              <button
+                key={id}
+                type="button"
+                className={tab === id ? 'active' : ''}
+                aria-current={tab === id ? 'page' : undefined}
+                onClick={() => setTab(id)}
+              >
+                {label}
+              </button>
+            ))}
+          </nav>
+
+          <div className="appbar-right">
+            {/* 서버 상태 — 기존 상단 배너를 앱바 pill 로. SERVER OK 만 영문이라 mono */}
+            <span className={`status-pill is-${serverStatus}`} role="status">
+              <span className="status-dot" aria-hidden="true" />
+              {serverStatus === 'ok' && 'SERVER OK'}
+              {serverStatus === 'checking' && '무료 서버를 깨우는 중입니다 (최대 1분)…'}
+              {serverStatus === 'down' && '서버 연결 실패 — 잠시 후 새로고침해주세요.'}
+            </span>
+            {user ? (
+              <>
+                <span>{user.username}님</span>
+                <button type="button" className="appbar-btn" onClick={logout}>로그아웃</button>
+              </>
+            ) : (
+              <button type="button" className="appbar-btn" onClick={() => setAuthOpen(true)}>
+                로그인 / 가입
+              </button>
+            )}
+          </div>
         </div>
       </header>
 
-      {serverStatus === 'checking' && (
-        <div style={{ background: 'var(--warning-soft)', color: 'var(--warning)', padding: '8px 12px', borderRadius: 'var(--radius)', marginBottom: 12, fontSize: 14 }}>
-          무료 서버를 깨우는 중입니다 (최대 1분)…
-        </div>
-      )}
-      {serverStatus === 'down' && (
-        <div style={{ background: 'var(--danger-soft)', color: 'var(--danger)', padding: '8px 12px', borderRadius: 'var(--radius)', marginBottom: 12, fontSize: 14 }}>
-          서버 연결 실패 — 잠시 후 새로고침해주세요.
-        </div>
-      )}
-
-      <nav className="tab-nav" aria-label="주요 화면">
-        {[
-          ['query', '질의'],
-          ['issues', '쟁점 분석'],
-          ['actor', '의원 프로필'],
-        ].map(([id, label]) => (
-          <button
-            key={id}
-            className={tab === id ? 'active' : ''}
-            aria-current={tab === id ? 'page' : undefined}
-            onClick={() => setTab(id)}
-          >
-            {label}
-          </button>
-        ))}
-      </nav>
-
-      {tab === 'query' && (
-        <>
-          <main>
-            <QueryForm
-              question={question}
-              setQuestion={setQuestion}
-              mode={mode}
-              setMode={setMode}
-              loading={loading}
-              onSubmit={handleSubmit}
-            />
-
-            <MyQueries user={user} onPick={q => setQuestion(q)} />
-
-            {loading && <QueryProgress mode={mode} />}
-
-            {!result && !loading && (
-              <>
-                <Hero />
-                <div className="example-chips">
-                  <span className="chips-label">이런 질문을 해보세요</span>
-                  {EXAMPLES.map((q) => (
-                    <button key={q} type="button" onClick={() => askExample(q)}>
-                      {q}
-                    </button>
-                  ))}
-                </div>
-              </>
-            )}
-
-            {error && <div className="error">{error}</div>}
-
-            {result && (
-              <div className="result-grid">
-                <AnswerPanel key={result.query_id ?? 'no-log'} result={result} onCiteClick={handleCiteClick} />
-                <SourcePanel
-                  sources={result.sources}
-                  citedNumbers={result.cited_numbers}
-                  highlightN={highlightN}
-                  onOpenSource={setModalChunkId}
+      <div className="page">
+        <div className="page-inner">
+          {tab === 'query' && (
+            <main className="stack stack-lg">
+              <div className="stack stack-sm">
+                <QueryForm
+                  question={question}
+                  setQuestion={setQuestion}
+                  mode={mode}
+                  setMode={setMode}
+                  loading={loading}
+                  onSubmit={handleSubmit}
                 />
+                <MyQueries user={user} onPick={q => setQuestion(q)} />
               </div>
-            )}
-          </main>
 
-          {modalChunkId && (
-            <SourceModal chunkId={modalChunkId} onClose={() => setModalChunkId(null)} />
+              {loading && <QueryProgress mode={mode} />}
+
+              {!result && !loading && <Hero examples={EXAMPLES} onExample={askExample} />}
+
+              {error && <div className="error">{error}</div>}
+
+              {result && (
+                <div className="result-grid">
+                  <AnswerPanel key={result.query_id ?? 'no-log'} result={result} onCiteClick={handleCiteClick} />
+                  <SourcePanel
+                    sources={result.sources}
+                    citedNumbers={result.cited_numbers}
+                    highlightN={highlightN}
+                    onOpenSource={setModalChunkId}
+                  />
+                </div>
+              )}
+            </main>
           )}
-        </>
-      )}
 
-      {tab === 'issues' && (
-        <IssueView selectedIssue={selectedIssue} onActorClick={openActor} onSelChange={setSelectedIssue} />
-      )}
-      {tab === 'actor' && (
-        <ActorView actor={selectedActor} onIssueClick={openIssue} onShown={setSelectedActor} />
+          {tab === 'issues' && (
+            <IssueView selectedIssue={selectedIssue} onActorClick={openActor} onSelChange={setSelectedIssue} />
+          )}
+          {tab === 'actor' && (
+            <ActorView actor={selectedActor} onIssueClick={openIssue} onShown={setSelectedActor} />
+          )}
+
+          <footer className="site-footer">
+            22대 국회 상임위 회의록 767건 (2024-05 ~ 2026-06) &nbsp;|&nbsp;
+            근거가 부족한 내용은 확인 불가로 안내합니다.
+            <br />
+            데모 데이터: 24개 쟁점 관련 발언 모음 (전체 발언 기록 42만 건 중 일부) — 의원
+            프로필 통계도 이 기준입니다.
+          </footer>
+        </div>
+      </div>
+
+      {modalChunkId && (
+        <SourceModal
+          chunkId={modalChunkId}
+          n={modalSource?.n}
+          cited={modalSource ? result.cited_numbers.includes(modalSource.n) : false}
+          onClose={() => setModalChunkId(null)}
+        />
       )}
 
       {authOpen && (
         <AuthModal onClose={() => setAuthOpen(false)} onSuccess={name => setUser({ username: name })} />
       )}
-
-      <footer>
-        <small>
-          22대 국회 상임위 회의록 767건 (2024-05 ~ 2026-06) &nbsp;|&nbsp;
-          근거가 부족한 내용은 확인 불가로 안내합니다.
-          <br />
-          데모 데이터: 24개 쟁점 관련 발언 모음 (전체 발언 기록 42만 건 중 일부) — 의원
-          프로필 통계도 이 기준입니다.
-        </small>
-      </footer>
     </div>
   )
 }

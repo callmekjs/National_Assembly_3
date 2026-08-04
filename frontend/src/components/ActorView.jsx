@@ -68,97 +68,118 @@ export default function ActorView({ actor, onIssueClick, onShown }) {
   }, [input])
 
   return (
-    <div>
-      <div style={{ marginBottom: 12 }}>
-        <span style={{ position: 'relative', display: 'inline-block', marginRight: 8 }}>
-          <input value={input} onChange={e => setInput(e.target.value)}
+    <div className="stack stack-lg">
+      <div className="actor-search">
+        <div className="actor-search-field">
+          <label className="actor-search-label" htmlFor="actor-name">의원 이름</label>
+          <input id="actor-name" value={input} onChange={e => setInput(e.target.value)}
                  onKeyDown={e => { if (e.key === 'Enter') load(input); if (e.key === 'Escape') setSuggestions([]) }}
                  onBlur={() => setTimeout(() => setSuggestions([]), 150)}
-                 placeholder="의원 이름 (예: 김윤)" className="actor-search-input" />
+                 placeholder="예: 김윤" className="actor-search-input" />
           {suggestions.length > 0 && (
-            <ul className="actor-suggest"
-                style={{ position: 'absolute', top: '100%', left: 0, zIndex: 10, minWidth: 220,
-                         margin: '4px 0 0', padding: 4, listStyle: 'none', background: 'var(--surface)',
-                         border: '1px solid var(--ink-300)', borderRadius: 'var(--radius)',
-                         boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
+            <ul className="actor-suggest">
               {suggestions.map(m => (
                 <li key={m.name}>
-                  <button type="button" onMouseDown={() => { setInput(m.name); load(m.name) }}
-                          style={{ width: '100%', textAlign: 'left', padding: '6px 8px', background: 'none',
-                                   border: 'none', cursor: 'pointer', fontSize: 14, fontFamily: 'inherit' }}>
-                    {m.name} <span style={{ color: 'var(--ink-500)', fontSize: 12 }}>{m.party}</span>
+                  <button type="button" onMouseDown={() => { setInput(m.name); load(m.name) }}>
+                    {m.name}<span className="actor-suggest-party">{m.party}</span>
                   </button>
                 </li>
               ))}
             </ul>
           )}
-        </span>
-        <button className="actor-search-btn" onClick={() => load(input)} disabled={loading}>
+        </div>
+        <button type="button" className="actor-search-btn" onClick={() => load(input)} disabled={loading}>
           {loading ? '조회 중…' : '조회'}
         </button>
       </div>
-      {err && <p style={{ color: 'var(--stance-none)' }}>{err}</p>}
+
+      {err && <div className="error">{err}</div>}
+
       {profile && (
-        <div>
-          <h3 style={{ marginBottom: 4 }}>
-            {profile.display_name || profile.name}{' '}
-            {profile.party && <span style={{ fontSize: 13, color: 'var(--ink-700)', border: '1px solid var(--ink-400)', borderRadius: 'var(--radius-sm)', padding: '0 6px' }}>{profile.party}</span>}
-          </h3>
-          {profile.party_history.length > 0 && (
-            <p style={{ fontSize: 12, color: 'var(--ink-700)', margin: '2px 0 8px' }}>
-              {profile.party_history.map(h => `${h.period}: ${h.label || '—'}`).join(' / ')}
-            </p>
-          )}
-          <ul style={{ margin: '12px 0 20px', padding: '14px 18px 14px 34px', maxWidth: 640,
-                       background: 'var(--ink-100)', borderRadius: 'var(--radius)', fontSize: 15, lineHeight: 1.7 }}>
-            {buildSummary(profile).map((line, i) => <li key={i}>{line}</li>)}
-          </ul>
+        <div className="stack stack-lg">
+          <div className="actor-name-row">
+            <h1 className="actor-name">{profile.display_name || profile.name}</h1>
+            {profile.party && <span className="actor-party-badge">{profile.party}</span>}
+            {profile.party_history.length > 0 && (
+              <span className="actor-party-history">
+                {profile.party_history.map(h => `${h.period}: ${h.label || '—'}`).join(' / ')}
+              </span>
+            )}
+          </div>
 
-          <h4>월별 발언 추이</h4>
-          <MonthlyBars months={profile.by_month.map(m => ({ month: m.month, value: m.turns }))}
-                       unit="턴" ariaLabel="이 의원의 월별 발언 수 막대 차트" />
+          <div className="actor-summary">
+            <ul>
+              {buildSummary(profile).map((line, i) => <li key={i}>{line}</li>)}
+            </ul>
+          </div>
 
-          <h4>이슈별 입장</h4>
-          {profile.issue_stances.length > 0 ? (
-            <>
-              <div className="table-scroll">
-                <table className="actor-issues-table">
-                  <thead>
-                    <tr style={{ borderBottom: '1px solid var(--ink-300)' }}>
-                      <th style={{ textAlign: 'left' }}>이슈</th>
-                      <th>입장</th>
-                      <th>발언 수</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {profile.issue_stances.map(s => (
-                      <tr key={s.issue_id} onClick={() => onIssueClick(s.issue_id)} className="clickable-row"
-                          style={{ cursor: 'pointer', borderBottom: '1px solid var(--ink-200)' }}
-                          title="클릭하면 쟁점 분석으로 이동">
-                        <td>{s.title}</td>
-                        <td style={{ textAlign: 'center', color: STANCE_COLOR[s.stance], fontWeight: 600 }}>{STANCE_KO[s.stance]}</td>
-                        <td style={{ textAlign: 'center', fontSize: 13 }}>{s.total_turns}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+          <div className="actor-cols">
+            <div className="panel">
+              <h2 className="card-title">월별 발언 추이</h2>
+              <p className="card-note chart-lede">막대는 이 의원의 월별 발언 수입니다.</p>
+              <MonthlyBars months={profile.by_month.map(m => ({ month: m.month, value: m.turns }))}
+                           unit="턴" ariaLabel="이 의원의 월별 발언 수 막대 차트"
+                           height={140} barMax={28} gap={8} />
+            </div>
+
+            <div className="panel-flush">
+              <div className="panel-flush-head">
+                <h2 className="card-title">이슈별 입장</h2>
               </div>
-              <p style={{ fontSize: 12, color: 'var(--ink-500)' }}>입장은 LLM 자동 판정 — 방향 참고용 · 행 클릭 시 쟁점 분석으로 이동</p>
-            </>
-          ) : <p style={{ fontSize: 14, color: 'var(--ink-700)' }}>판정된 이슈 없음</p>}
+              {profile.issue_stances.length > 0 ? (
+                <>
+                  <div className="table-scroll">
+                    <table className="data-table">
+                      <thead>
+                        <tr>
+                          <th>이슈</th>
+                          <th className="col-stance">입장</th>
+                          <th className="col-num">발언 수</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {profile.issue_stances.map(s => (
+                          <tr key={s.issue_id} onClick={() => onIssueClick(s.issue_id)}
+                              className="clickable-row" title="누르면 쟁점 분석으로 이동합니다">
+                            <td>{s.title}</td>
+                            <td className="col-stance" style={{ color: STANCE_COLOR[s.stance] }}>
+                              {STANCE_KO[s.stance]}
+                            </td>
+                            <td className="col-num">{s.total_turns}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div className="card-footnote">
+                    입장은 LLM 자동 판정 — 방향 참고용 · 행을 누르면 쟁점 분석으로 이동합니다.
+                  </div>
+                </>
+              ) : (
+                <p className="card-note panel-pad">판정된 이슈 없음</p>
+              )}
+            </div>
+          </div>
 
-          <h4>최근 발언</h4>
-          <ul style={{ margin: '8px 0', padding: '0 0 0 20px', maxWidth: 720 }}>
-            {profile.recent_utterances.slice(0, 3).map(u => (
-              <li key={u.chunk_id} style={{ fontSize: 15, color: 'var(--ink-900)', margin: '8px 0', lineHeight: 1.6 }}>
-                {u.summary || `${u.snippet}…`}
-                <span style={{ color: 'var(--ink-500)', fontSize: 12, marginLeft: 8 }}>{u.date} · {u.committee}</span>
-              </li>
-            ))}
-          </ul>
-          {profile.recent_utterances.some(u => u.summary) && (
-            <p style={{ fontSize: 12, color: 'var(--ink-500)' }}>요약은 LLM 자동 생성 — 원문 확인은 질의 화면에서</p>
-          )}
+          <div className="panel">
+            <h2 className="card-title">최근 발언</h2>
+            <div className="utterance-list chart-lede">
+              {profile.recent_utterances.slice(0, 3).map(u => (
+                <div className="utterance-item" key={u.chunk_id}>
+                  <span className="utterance-date">{u.date}</span>
+                  <span className="utterance-text">
+                    {u.summary || `${u.snippet}…`}
+                    <span className="utterance-committee">{u.committee}</span>
+                  </span>
+                </div>
+              ))}
+            </div>
+            {profile.recent_utterances.some(u => u.summary) && (
+              <p className="card-note">
+                요약은 LLM 자동 생성 — 원문 확인은 질의 화면에서 하실 수 있습니다.
+              </p>
+            )}
+          </div>
         </div>
       )}
     </div>

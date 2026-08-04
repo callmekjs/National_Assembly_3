@@ -13,7 +13,10 @@ const DIFFERENTIATORS = [
   'eval 주도 개발 — 자동채점을 사람이 재검수한 기준선으로 품질을 관리합니다',
 ]
 
-function Hero() {
+// IBM Plex Mono 에는 한글 글리프가 없다 — 한글이 한 글자라도 섞이면 Pretendard 로
+const HANGUL = /[가-힣]/
+
+function Hero({ examples = [], onExample }) {
   return (
     <section className="hero" aria-label="서비스 소개">
       <p className="hero-lead">
@@ -25,22 +28,34 @@ function Hero() {
         {METRICS.map((m) => (
           <div className="hero-metric-card" key={m.label}>
             <div className="hero-metric-label">{m.label}</div>
-            <div className="hero-metric-value">{m.value}</div>
+            <div className={`hero-metric-value${HANGUL.test(m.value) ? '' : ' is-num'}`}>
+              {m.value}
+            </div>
             <div className="hero-metric-sub">{m.sub}</div>
           </div>
         ))}
       </div>
 
-      <div className="hero-diff">
-        <h2 className="hero-diff-title">무엇이 다른가</h2>
-        <ul className="hero-diff-list">
-          {DIFFERENTIATORS.map((d) => (
-            <li key={d}>{d}</li>
-          ))}
-        </ul>
+      <div className="hero-cols">
+        <div>
+          <h2 className="hero-col-title">무엇이 다른가</h2>
+          <ul className="hero-diff-list">
+            {DIFFERENTIATORS.map((d) => (
+              <li key={d}>{d}</li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <h2 className="hero-col-title">이런 질문을 해보세요</h2>
+          <div className="hero-examples">
+            {examples.map((q) => (
+              <button key={q} type="button" onClick={() => onExample(q)}>
+                {q}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
-
-      <p className="hero-cta-hint">직접 물어보세요 — 아래 예시 중 하나를 눌러보거나 위 입력창에 질문을 적어보세요.</p>
     </section>
   )
 }

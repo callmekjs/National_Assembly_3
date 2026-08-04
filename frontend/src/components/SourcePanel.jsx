@@ -4,7 +4,9 @@ function SourcePanel({ sources, citedNumbers, highlightN, onOpenSource }) {
   if (!sources.length) {
     return (
       <div className="source-panel">
-        <h2>출처</h2>
+        <div className="source-panel-head">
+          <h2>출처</h2>
+        </div>
         <p className="no-sources">관련 근거를 찾지 못했습니다.</p>
       </div>
     )
@@ -12,32 +14,45 @@ function SourcePanel({ sources, citedNumbers, highlightN, onOpenSource }) {
 
   return (
     <div className="source-panel">
-      <h2>출처 ({sources.length})</h2>
+      <div className="source-panel-head">
+        <h2>출처</h2>
+        <span className="source-panel-count">
+          <span className="num">{sources.length}</span>건 중{' '}
+          <span className="num">{citedNumbers.length}</span>건 인용
+        </span>
+      </div>
+
       <ul className="source-list">
-        {sources.map((s) => (
-          <li
-            key={s.n}
-            id={`source-${s.n}`}
-            className={`source-card${highlightN === s.n ? ' highlighted' : ''}`}
-          >
-            <button type="button" onClick={() => onOpenSource(s.chunk_id)}>
-              <div className="source-head">
-                <span className="source-n">[{s.n}]</span>
-                <span className="source-speaker">
-                  {s.speaker}
-                  {s.role ? ` ${s.role}` : ''}
+        {sources.map((s) => {
+          const cited = citedNumbers.includes(s.n)
+          return (
+            <li
+              key={s.n}
+              id={`source-${s.n}`}
+              className={`source-card${highlightN === s.n ? ' highlighted' : ''}`}
+            >
+              <button type="button" onClick={() => onOpenSource(s.chunk_id)}>
+                <span className="source-head">
+                  <span className={`source-n${cited ? '' : ' is-uncited'}`}>{s.n}</span>
+                  <span className="source-speaker">
+                    {s.speaker}
+                    {s.role ? ` ${s.role}` : ''}
+                  </span>
+                  <span className={`cited-badge${cited ? '' : ' is-uncited'}`}>
+                    {cited ? '인용됨' : '미인용'}
+                  </span>
                 </span>
-                {citedNumbers.includes(s.n) && <span className="cited-badge">인용됨</span>}
-              </div>
-              <div className="source-meta">
-                {s.party ? `${s.party} · ` : ''}
-                {s.committee} · {s.date} · p.{s.page_start}
-              </div>
-              <div className="source-snippet">{s.snippet}</div>
-              <div className="source-open">원문 보기 →</div>
-            </button>
-          </li>
-        ))}
+                <span className="source-meta">
+                  {s.party ? `${s.party} · ` : ''}
+                  {s.committee} · {s.date} · p.{s.page_start}
+                </span>
+                <span className="source-snippet">{s.snippet}</span>
+                <span className="source-open">원문 보기 →</span>
+              </button>
+            </li>
+          )
+        })}
+        <li className="source-note">전달된 근거 중 인용되지 않은 항목도 함께 표시합니다.</li>
       </ul>
     </div>
   )

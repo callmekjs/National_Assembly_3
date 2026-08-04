@@ -8,13 +8,13 @@ const STAGES = [
   { at: 6, label: '답변 작성 중…' },
 ]
 
-export default function QueryProgress({ mode }) {
+export default function QueryProgress() {
   const [elapsed, setElapsed] = useState(0)
 
   useEffect(() => {
     const t0 = Date.now()
-    // 500ms 폴링: 1s 인터벌은 탭 스로틀링 시 초 표시를 건너뛴다
-    const id = setInterval(() => setElapsed(Math.floor((Date.now() - t0) / 1000)), 500)
+    // 100ms 폴링: 소수 첫째 자리까지 표시하므로 500ms 면 .0/.5 로만 튄다
+    const id = setInterval(() => setElapsed((Date.now() - t0) / 1000), 100)
     return () => clearInterval(id)
   }, [])
 
@@ -24,8 +24,9 @@ export default function QueryProgress({ mode }) {
     <div className="query-progress" role="status" aria-live="polite">
       <span className="query-progress-spinner" aria-hidden="true" />
       <span className="query-progress-stage">{stage.label}</span>
+      {/* 숫자만 mono — 한글이 섞인 문자열에 mono 를 쓰면 자간이 벌어진다 */}
       <span className="query-progress-elapsed">
-        {elapsed}초 경과{mode === 'report' ? ' · 보통 10~20초' : ''}
+        경과 <span className="num">{elapsed.toFixed(1)}</span>초
       </span>
     </div>
   )
