@@ -120,7 +120,9 @@ def keyword_search(
         SELECT ch.chunk_id, ch.source_id, ch.speaker, ch.role,
                co.name AS committee, ch.meeting_date,
                ch.page_start, ch.is_short,
-               left(ch.text, 200) AS snippet,
+               -- 600자: reranker._MAX_DOC_CHARS 와 맞춘 값. 200자였을 때
+               -- 리랭커가 발언 앞머리만 보고 판정했다 (긴 질의응답의 답변부 저평가)
+               left(ch.text, 600) AS snippet,
                ({score_sql}) AS score
         FROM chunks ch
         JOIN committees co ON co.committee_id = ch.committee_id

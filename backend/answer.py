@@ -29,6 +29,7 @@ from db import get_conn
 from issue_context import issue_context_for
 from party import party_label
 from query_parser import classify_question, extract_filters
+from reranker import last_usage as reranker_usage
 from search_hybrid import hybrid_search
 from search_vector import _get_client
 from verification import comparison_coverage, qa_pair_question, verify
@@ -38,6 +39,11 @@ logger = logging.getLogger(__name__)
 MODEL = "gpt-4o-mini"
 TEMPERATURE = 0.2          # 사실 서술 위주 — 창의성 억제
 NEIGHBOR_TRUNC = 500       # 인접 턴 보조 맥락 절단 길이 (토큰 예산 보호)
+# qa 모드용 짧은 절단 (2026-08-04). 회의록은 질의응답 구조인데 qa 는 근거를
+# 맥락 없이 던지고 있었다 — 청크 중앙값 36자·81%가 150자 미만이라
+# "예, 그렇습니다" 만 가면 무엇에 대한 답인지 모델이 알 수 없다.
+# report(500자)보다 짧게 잡아 입력 토큰 증가를 ~20% 이내로 억제한다.
+NEIGHBOR_TRUNC_QA = 200
 EVIDENCE_TURN_MAX = 4000   # 근거 턴 전문 복원 상한 — 초과 시 검색 조각 중심 창(window)
 NO_EVIDENCE = "제공된 회의록에서 확인할 수 없습니다."
 
@@ -75,8 +81,12 @@ _COMMON_RULES = f"""당신은 대한민국 국회 회의록에만 근거해 답�
 - 근거 번호가 붙지 않는 총평·논평 문장("이러한 발언들은 …을 보여줍니다" 류)으로
   답변을 마무리하지 않는다. 해석이 섞인 문장도 반드시 그 해석의 근거 [n]을 단다.
 - 질문의 일부만 근거로 확인되면 확인되는 부분만 답하고, 나머지는
-  "이 부분은 {NO_EVIDENCE}"라고 문장 단위로 명시한다.
-- 근거가 전혀 없으면 "{NO_EVIDENCE}"라고만 답한다."""
+  "<확인 안 된 구체적 대상>은(는) {NO_EVIDENCE}"처럼 **대상을 문장 앞에 밝혀**
+  문장 단위로 명시한다. "이 부분은"·"이 외의"로 시작하는 대상 없는 문장은 쓰지 않는다.
+- 근거가 전혀 없으면 "{NO_EVIDENCE}"라고만 답한다.
+- '[n 주변 맥락]'의 previous/next 는 그 발언이 무엇에 대한 것인지 파악하는 보조
+  자료다. 인용 근거로는 [n] 본문만 쓰고, 주변 맥락의 내용을 [n]의 발언인 것처럼
+  서술하지 않는다."""
 
 QA_SYSTEM = _COMMON_RULES + """
 
@@ -103,13 +113,15 @@ REPORT_SYSTEM = _COMMON_RULES + """
 MODE_CONFIG = {
     "qa": {
         "limit": 5,
-        "neighbors": False,
+        "neighbors": True,
+        "neighbor_trunc": NEIGHBOR_TRUNC_QA,
         "max_tokens": 700,
         "system_prompt": QA_SYSTEM,
     },
     "report": {
         "limit": 10,
         "neighbors": True,
+        "neighbor_trunc": NEIGHBOR_TRUNC,
         "max_tokens": 2000,
         "system_prompt": REPORT_SYSTEM,
     },
@@ -122,7 +134,13 @@ _TURN_ID = re.compile(r"^(?P<src>.+_turn_)(?P<no>\d+)$")
 # 프롬프트로 금지해도 gpt-4o-mini 가 간헐적으로 내는 상투구 (2026-07-03 실측) —
 # 순응에 의존하지 않고 후처리로 제거한다. 구체적 대상이 있는 거절 문장
 # ("이준석 의원의 발언은 … 확인할 수 없습니다")은 프리픽스가 달라 제거되지 않는다.
-_DANGLING_TAIL = re.compile(r"(?:이\s?외의?|이\s?부분은)[^.\n]*확인할 수 없습니다\.?\s*$")
+# 2026-08-04: 문장 시작 앵커 추가. 앵커가 없어 "B에 대해서는 이 부분은 …
+# 확인할 수 없습니다" 처럼 **대상이 밝혀진** 정당한 부분거절까지 지웠고, 그 결과
+# grounding.judge() 가 거절 문구를 못 찾아 PARTIAL 을 FULL 로 부풀렸다.
+# 이제 대상 없이 "이 부분은"·"이 외의"로 시작하는 꼬리 문장만 제거한다.
+_DANGLING_TAIL = re.compile(
+    r"(?:(?<=^)|(?<=[.!?])\s|(?<=\n))\s*(?:이\s?외의?|이\s?부분은)[^.\n]*확인할 수 없습니다\.?\s*$"
+)
 _PARTY_DISCLAIMER = re.compile(r"[^.\n]*소속 정당[^.\n]*확인할 수 없습니다\.?\s*$")
 # '여당'과 '야당'이 따로 등장(연속된 '여야' 리터럴이 아님)하는 질문형은 기존
 # 목록의 사각지대였다 (eval_057·068 실측 질의 — _COMPARE_RE 후보 D 가 classify_question
@@ -398,10 +416,11 @@ def _fetch_texts(chunk_ids: list[str]) -> dict[str, str]:
     return texts
 
 
-def _fetch_neighbors(hits: list[dict]) -> dict[int, dict]:
-    """report 모드: 각 근거 턴의 이전/다음 턴 전문을 한 번의 쿼리로 조회.
+def _fetch_neighbors(hits: list[dict], trunc: int = NEIGHBOR_TRUNC) -> dict[int, dict]:
+    """각 근거 턴의 이전/다음 턴 전문을 한 번의 쿼리로 조회.
 
     검색 근거에 이미 포함된 턴은 중복 포함하지 않는다.
+    trunc 는 모드별 절단 길이 (qa 200 / report 500).
     """
     evidence_turns = {h["chunk_id"].rsplit("_chunk_", 1)[0] for h in hits}
     wanted: dict[str, list[tuple[int, str]]] = {}  # turn_id -> [(근거번호, "previous"|"next")]
@@ -434,7 +453,7 @@ def _fetch_neighbors(hits: list[dict]) -> dict[int, dict]:
     for tid, frags in by_turn.items():
         speaker = display_speaker(frags[0]["speaker"]) or ""
         role = f" {frags[0]['role']}" if frags[0].get("role") else ""
-        rendered = f"{speaker}{role}: {restore_turn_text(frags)}"
+        rendered = f"{speaker}{role}: {restore_turn_text(frags, trunc)}"
         for n, pos in wanted[tid]:
             neighbors.setdefault(n, {})[pos] = rendered
     return neighbors
@@ -481,15 +500,18 @@ def generate_answer(
             "chunk_id": h["chunk_id"],
             "speaker": display_speaker(h["speaker"]),
             "role": h.get("role"),
-            "party": party_label(h["speaker"], str(h["meeting_date"]), h.get("role")),
+            # str() 을 씌우지 않는다 — meeting_date 는 NULL 허용 컬럼이고
+            # str(None) == "None" 이 party_label 의 빈 값 방어를 통과해
+            # ruling_party 에서 ValueError → /query 500 이 되던 구멍 (2026-08-04)
+            "party": party_label(h["speaker"], h["meeting_date"], h.get("role")),
             "committee": h["committee"],
-            "date": str(h["meeting_date"]),
+            "date": str(h["meeting_date"]) if h["meeting_date"] else "날짜 미상",
             "page_start": h["page_start"],
             "text": texts.get(h["chunk_id"]) or h.get("snippet") or "",
         }
         for i, h in enumerate(hits, start=1)
     ]
-    neighbors = _fetch_neighbors(hits) if cfg["neighbors"] else None
+    neighbors = _fetch_neighbors(hits, cfg["neighbor_trunc"]) if cfg["neighbors"] else None
 
     # 질문이 복수 위원회를 명시하면 근거를 위원회별로 묶어 제시 (오배치 구조적 방지)
     _, q_committees, _, _ = extract_filters(question)
@@ -535,6 +557,41 @@ def generate_answer(
         verification = {"flags": [], "detail": {"errors": ["verify"]}}
 
     in_tok, out_tok = resp.usage.prompt_tokens, resp.usage.completion_tokens
+    return _result_payload(answer_text, mode, issue_ctx, sources, cited, invalid,
+                           verification, block, in_tok, out_tok)
+
+
+def reranker_only_usage() -> dict | None:
+    """답변 LLM 을 부르지 않은 경로(사전차단)에서 재순위 몫만 기록하기 위한 usage.
+
+    재순위가 안 돌았으면 None — query_logs 의 usage NULL 규약을 유지한다.
+    """
+    rr = reranker_usage()
+    if not rr:
+        return None
+    rr_in, rr_out = rr.get("input_tokens", 0), rr.get("output_tokens", 0)
+    return {
+        "model": MODEL,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "reranker_input_tokens": rr_in,
+        "reranker_output_tokens": rr_out,
+        "est_cost_usd": round(
+            (rr_in * PRICE_INPUT_PER_M + rr_out * PRICE_OUTPUT_PER_M) / 1e6, 6),
+    }
+
+
+def _result_payload(answer_text, mode, issue_ctx, sources, cited, invalid,
+                    verification, block, in_tok, out_tok) -> dict:
+    """응답 dict 조립 — 비용은 답변 LLM + 재순위 LLM 을 합산한다.
+
+    재순위 비용을 빼면 query_logs 의 est_cost_usd 가 실지출의 절반만 담고,
+    guard 의 일별 상한($1)이 그 절반짜리 장부를 보고 판단하게 된다 (2026-08-04).
+    """
+    rr = reranker_usage() or {}
+    rr_in, rr_out = rr.get("input_tokens", 0), rr.get("output_tokens", 0)
+    cost = ((in_tok + rr_in) * PRICE_INPUT_PER_M
+            + (out_tok + rr_out) * PRICE_OUTPUT_PER_M) / 1e6
     return {
         "answer": answer_text,
         "mode": mode,
@@ -550,8 +607,9 @@ def generate_answer(
             "model": MODEL,
             "input_tokens": in_tok,
             "output_tokens": out_tok,
-            "est_cost_usd": round(
-                in_tok * PRICE_INPUT_PER_M / 1e6 + out_tok * PRICE_OUTPUT_PER_M / 1e6, 6
-            ),
+            # 재순위 몫을 따로 보여 어디서 돈이 나갔는지 사후에 구분 가능하게
+            "reranker_input_tokens": rr_in,
+            "reranker_output_tokens": rr_out,
+            "est_cost_usd": round(cost, 6),
         },
     }

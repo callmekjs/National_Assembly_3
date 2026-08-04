@@ -19,12 +19,30 @@ speaker_confusion/multi_chunk — 여러 근거를 종합할 때 관련 낮은 �
 import json
 import os
 import re
+import threading
 
 _MODEL = "gpt-4o-mini"           # 재순위 판정 — 답변 생성과 동일 모델(추가 비용 최소)
 RERANK_CANDIDATES = 30           # 재순위에 넣을 후보 수 (RRF 상위)
 _MAX_DOC_CHARS = 600             # 후보당 스니펫 길이 (토큰·비용 보호)
 
 _client = None
+
+# 재순위 호출의 토큰 사용량 (2026-08-04) — 이걸 안 재면 query_logs 의
+# est_cost_usd 가 답변 LLM 비용만 담고, guard 의 일별 상한($1)이 실지출의
+# 절반만 보고 판단한다. 실측: 답변 $0.00078 / 재순위 $0.00146 per 질의.
+# 요청 스레드 단위 저장 — FastAPI 동기 핸들러는 hybrid_search·generate_answer 가
+# 같은 스레드에서 돌기 때문에 threading.local 로 충분하다.
+_local = threading.local()
+
+
+def last_usage() -> dict | None:
+    """직전 rerank 호출의 토큰 사용량. 호출 안 됐거나 실패면 None."""
+    return getattr(_local, "usage", None)
+
+
+def reset_usage() -> None:
+    """요청 시작 시 초기화 — 같은 스레드의 이전 요청 값이 새 나가지 않게."""
+    _local.usage = None
 
 
 def is_enabled() -> bool:
@@ -72,6 +90,9 @@ def rerank(query: str, hits: list[dict], limit: int) -> list[dict]:
             messages=[{"role": "system", "content": _SYSTEM},
                       {"role": "user", "content": f"질문: {query}\n\n근거 목록:\n{docs}"}],
         )
+        # 파싱보다 먼저 기록 — 파싱이 실패해 원순위로 폴백해도 호출 비용은 이미 나갔다
+        _local.usage = {"input_tokens": resp.usage.prompt_tokens,
+                        "output_tokens": resp.usage.completion_tokens}
         order = json.loads(resp.choices[0].message.content).get("order", [])
     except Exception as e:
         print(f"[reranker] 재순위 실패, 원순위 폴백: {type(e).__name__}: {e}")

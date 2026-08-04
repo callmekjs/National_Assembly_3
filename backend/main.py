@@ -19,7 +19,7 @@ from pydantic import BaseModel, Field, field_validator
 import auth
 from actors import actor_profile, search_members
 from issues import issue_party_stances, issue_stances, issue_timeline, list_issues
-from answer import MODE_CONFIG, NO_EVIDENCE, generate_answer
+from answer import MODE_CONFIG, NO_EVIDENCE, generate_answer, reranker_only_usage
 from db import init_pool, close_pool, get_conn
 from grounding import judge, pre_gate
 from guard import RateLimiter, client_ip, daily_cost_exceeded
@@ -247,11 +247,13 @@ def query(req: QueryRequest, authorization: str | None = Header(default=None)):
 
     gate = pre_gate(hits)
     if gate is not None:
-        # NONE(검색 0건) / REFUSED(유사도 미달 + 키워드 0건) — LLM 호출 없이 고정 문구
+        # NONE(검색 0건) / REFUSED(유사도 미달 + 키워드 0건) — 답변 LLM 호출 없이 고정 문구.
+        # 다만 재순위 LLM 은 검색 단계에서 이미 호출됐을 수 있다 — 그 비용을 여기서
+        # 버리면 일별 상한이 못 보는 지출이 된다 (2026-08-04)
         result = {
             "answer": NO_EVIDENCE, "mode": req.mode,
             "sources": [], "citations": [], "cited_numbers": [], "invalid_citations": [],
-            "usage": None, "issue_context": None, "verification": None,
+            "usage": reranker_only_usage(), "issue_context": None, "verification": None,
         }
         grounding, ungrounded = gate, False
     else:

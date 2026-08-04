@@ -23,7 +23,8 @@
 from concurrent.futures import ThreadPoolExecutor
 
 from query_parser import extract_filters
-from reranker import RERANK_CANDIDATES, is_enabled as reranker_enabled, rerank
+from reranker import (RERANK_CANDIDATES, is_enabled as reranker_enabled, rerank,
+                      reset_usage as reset_reranker_usage)
 from search_keyword import keyword_search
 from search_vector import vector_search
 
@@ -39,11 +40,18 @@ K_EACH = 30           # 각 축에서 가져올 후보 수
 
 
 def _balance_by_committee(ranked: list[dict], committees: list[str], limit: int) -> list[dict]:
-    """RRF 순위를 유지하되 위원회별 상한(quota)으로 근거를 나눠 담는다.
+    """들어온 순위를 유지하되 위원회별 상한(quota)으로 근거를 나눠 담는다.
 
     각 위원회가 quota 만큼 우선 확보하고, 남는 자리는 전체 순위대로 채운다
     (한 위원회에 근거가 부족하면 다른 위원회가 자리를 넘겨받음).
+
+    마지막 정렬 키는 **입력 순서**다. rrf 로 재정렬하면 상위에서 리랭커가 매긴
+    순서가 통째로 버려진다 — 리랭커 9위가 [2]번 자리에 오던 문제(2026-08-04 실측).
+    [n] 번호는 LLM 의 주의 배분에 직결되므로 무해하지 않고, 단일 주제 경로
+    (rerank 순 유지)와 동작이 갈리는 비일관성도 생긴다.
+    입력 순서를 쓰면 리랭커 ON=리랭커 순 / OFF=RRF 순이 자동으로 따라온다.
     """
+    rank_of = {e["chunk_id"]: i for i, e in enumerate(ranked)}
     quota = max(1, limit // len(committees))
     count = {c: 0 for c in committees}
     picked, leftover = [], []
@@ -58,7 +66,7 @@ def _balance_by_committee(ranked: list[dict], committees: list[str], limit: int)
         if len(picked) >= limit:
             break
         picked.append(e)
-    picked.sort(key=lambda e: e["rrf"], reverse=True)
+    picked.sort(key=lambda e: rank_of[e["chunk_id"]])
     return picked[:limit]
 
 
@@ -70,6 +78,9 @@ def hybrid_search(
     limit: int = 10,
 ) -> list[dict]:
     """키워드+벡터 RRF 융합 검색. RAG-6 답변 생성의 근거 공급원."""
+    # 재순위 비용 집계 초기화 — 이 검색에서 실제로 쓴 값만 이번 질의에 달리게
+    reset_reranker_usage()
+
     # 질문에서 날짜·위원회 추출 → 필터로 변환 (호출자가 명시하지 않은 경우만)
     # eval 실측: 날짜는 본문에 없어 필터 없이는 date_based 질문 Recall 0.00
     cleaned_q, auto_committees, auto_from, auto_to = extract_filters(q)

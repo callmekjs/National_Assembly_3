@@ -203,7 +203,11 @@ def test_no_evidence():
 def test_mode_config():
     qa, report = MODE_CONFIG["qa"], MODE_CONFIG["report"]
     check("모드: 근거 수 5 vs 10", qa["limit"] == 5 and report["limit"] == 10)
-    check("모드: 인접 턴 qa=off / report=on", qa["neighbors"] is False and report["neighbors"] is True)
+    # 2026-08-04: qa 도 인접 턴을 켠다. 회의록은 질의응답 구조인데 근거를 맥락
+    # 없이 던지고 있었다(청크 중앙값 36자·81%가 150자 미만) — 절단 길이로 차등한다.
+    check("모드: 인접 턴 양쪽 on", qa["neighbors"] is True and report["neighbors"] is True)
+    check("모드: 인접 턴 절단 qa < report",
+          qa["neighbor_trunc"] < report["neighbor_trunc"])
     check("모드: max_tokens 700 vs 2000", qa["max_tokens"] == 700 and report["max_tokens"] == 2000)
     check("모드: 프롬프트 분리", qa["system_prompt"] != report["system_prompt"])
     check("모드: report 프롬프트에 브리핑 구조", "개요" in report["system_prompt"] and "논의의 한계" in report["system_prompt"])
