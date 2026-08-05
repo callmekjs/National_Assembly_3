@@ -17,10 +17,12 @@ jobs:
   backend-tests:
     runs-on: ubuntu-latest
 
-    # pgvector 포함 이미지 — db/schema.sql 이 CREATE EXTENSION vector 를 요구한다
+    # pgvector 포함 이미지 — db/schema.sql 이 CREATE EXTENSION vector 를 요구한다.
+    # pg15 는 로컬 개발 컨테이너(national-assembly-db)와 같은 메이저 버전 — CI 만
+    # 다른 버전을 쓰면 "로컬은 되는데 CI 는 안 되는" 차이가 생긴다.
     services:
       postgres:
-        image: pgvector/pgvector:pg16
+        image: pgvector/pgvector:pg15
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
