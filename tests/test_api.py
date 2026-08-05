@@ -16,6 +16,8 @@ import sys
 import uuid
 from pathlib import Path
 
+import pytest
+
 if __name__ == "__main__":  # pytest 캡처와 충돌 방지 — 직접 실행할 때만 래핑
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 sys.path.insert(0, str(Path(__file__).parent.parent / "backend"))
@@ -46,6 +48,13 @@ if HAS_DB:
     client = TestClient(main.app)
 
 _SKIP_MSG = "  - DB 없음 — 건너뜀 (로컬 Docker 필요)"
+
+# pytest 에 건너뜀을 알리는 마커 (감사 2026-08-05). 각 함수 안의 `return` 만으로는
+# pytest 가 그 테스트를 PASSED 로 집계한다 — CI 러너에는 DB 가 없으므로 이 파일의
+# 9건 + test_auth_api 6건, 총 15건이 **한 번도 실행되지 않은 채 초록불**이었다.
+# 마커를 달면 같은 상황이 SKIPPED 로 보고돼 "안 돌았다"가 눈에 보인다.
+# 함수 안 가드는 직접 실행(python tests/test_api.py) 경로용이라 그대로 둔다.
+pytestmark = pytest.mark.skipif(not HAS_DB, reason="DB 없음 — 로컬 Docker 필요")
 
 
 def check(name: str, cond: bool, got=None):
