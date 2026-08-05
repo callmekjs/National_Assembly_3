@@ -5,7 +5,7 @@
 - 인물 별칭: 회의록 원문이 한자 표기를 쓰는 의원 (데이터는 원문 보존,
   검색에서 한글↔한자 연결 — 2026-07-02 설계 결정, progress.md 참조)
 
-사용: expand_aliases("방통위") → {"방통위", "방송통신위원회"}
+사용: expand_aliases("방통위") → ["방통위", "방송통신위원회"]  (원어 먼저, 나머지 사전순)
 """
 
 # 같은 그룹 안의 표기는 서로 동의어로 취급된다
@@ -69,6 +69,19 @@ for group in ALIAS_GROUPS:
         _INDEX[name] = merged
 
 
-def expand_aliases(term: str) -> set[str]:
-    """용어 하나를 별칭 집합으로 확장한다. 별칭이 없으면 자기 자신만."""
-    return set(_INDEX.get(term, {term}))
+def expand_aliases(term: str) -> list[str]:
+    """용어 하나를 별칭 목록으로 확장한다. 별칭이 없으면 자기 자신만.
+
+    순서 고정 — 원어 먼저, 나머지는 사전순 (감사 2026-08-05).
+    set 을 반환하던 시절에는 순회 순서가 프로세스마다 달라 아래가 전부 흔들렸다:
+      - search_keyword._terms_from_query 의 `[:MAX_TERMS]` 절단 → 재기동마다
+        다른 별칭이 탈락 = 같은 질문에 다른 검색 결과 (평가 재현성의 원인 ①)
+      - actors.canonical_org 의 `max(..., key=len)` → 최장 표기 동점 시 임의 선택
+      - answer.display_speaker 의 첫 한글 별칭 선택 → 한자 이름 병기 표기가 요동
+    원어를 맨 앞에 두는 이유: 절단이 일어나도 사용자가 실제로 쓴 표기는 살아남아야
+    한다 (별칭은 보조, 원어는 필수).
+    """
+    group = _INDEX.get(term)
+    if not group:
+        return [term]
+    return [term] + sorted(group - {term})
