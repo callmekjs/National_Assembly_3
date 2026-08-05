@@ -711,9 +711,44 @@ def test_verify_rule_isolation(monkeypatch):
         raise RuntimeError("규칙 버그")
     monkeypatch.setattr(verification, "speaker_both_sides", boom)
     srcs = [_src(1, "김우영", "더불어민주당(당시 여당)", text="본문")]
+    before = verification.rule_failure_count()
     v = verification.verify("발언 알려줘", "김우영 위원이 발언했습니다[1].", srcs, [1])
     check("격리: 예외에도 dict 반환", isinstance(v, dict) and "flags" in v)
     check("격리: errors 에 규칙명 기록", "speaker_both_sides" in v["detail"].get("errors", []), str(v))
+
+    # 격리 ≠ 은폐 (감사 2026-08-05) — 죽은 규칙은 flag 로 드러나야 한다.
+    # 이게 없으면 main.py 가 flags 만 보므로 "검사 통과"와 "검사 못 함"이 같아 보이고,
+    # 검증층이 통째로 죽어도 모든 답변이 FULL 로 나간다.
+    check("격리: INCOMPLETE_FLAG 를 세운다",
+          verification.INCOMPLETE_FLAG in v["flags"], str(v["flags"]))
+    check("격리: 실패 카운터 증가 (/health 노출용)",
+          verification.rule_failure_count() == before + 1,
+          (before, verification.rule_failure_count()))
+
+
+def test_verify_incomplete_flag_semantics(monkeypatch):
+    """INCOMPLETE_FLAG 는 규칙이 죽었을 때만, 여러 규칙이 죽어도 1개만."""
+    import verification
+    srcs = [_src(1, "김우영", "더불어민주당(당시 여당)", text="본문")]
+    q, a = "발언 알려줘", "김우영 위원이 발언했습니다[1]."
+
+    # 정상 경로에는 붙지 않는다 (오탐 방지 — 모든 답변이 PARTIAL 이 되면 신호가 죽는다)
+    check("정상 경로엔 INCOMPLETE_FLAG 없음",
+          verification.INCOMPLETE_FLAG not in verification.verify(q, a, srcs, [1])["flags"])
+
+    # 인용 0건 조기 반환 경로도 마찬가지 (규칙을 안 돌린 것이지 죽은 게 아니다)
+    check("인용 0건 경로엔 INCOMPLETE_FLAG 없음",
+          verification.INCOMPLETE_FLAG not in verification.verify(q, a, srcs, [])["flags"])
+
+    # 규칙 2개가 죽어도 flag 는 1개 (배지 숫자가 부풀지 않게)
+    def boom(*a, **kw):
+        raise RuntimeError("규칙 버그")
+    monkeypatch.setattr(verification, "speaker_both_sides", boom)
+    monkeypatch.setattr(verification, "party_label_consistency", boom)
+    v = verification.verify(q, a, srcs, [1])
+    check("규칙 2개 죽어도 flag 는 1개",
+          v["flags"].count(verification.INCOMPLETE_FLAG) == 1, str(v["flags"]))
+    check("errors 에는 2건 모두 기록", len(v["detail"].get("errors", [])) == 2, str(v["detail"]))
 
 
 if __name__ == "__main__":

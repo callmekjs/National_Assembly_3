@@ -531,6 +531,33 @@ def ruling_period_consistency(answer: str, cited_sources: list[dict]) -> list[st
 
 # ── 통합 진입점 (spec §6) ────────────────────────────────────────────────────
 
+# 규칙이 죽었음을 알리는 flag (감사 2026-08-05). 이전에는 규칙이 예외로 죽으면
+# detail["errors"] 에 이름만 남고 flags 는 비어 있었다 — main.py 는 flags 만 보므로
+# **"검사해서 문제없음"과 "검사가 죽어서 못 함"이 완전히 같아 보였다.** 검증층이
+# 통째로 썩어도 모든 답변이 FULL 로 나가는 구조였다.
+#
+# 이 flag 를 세우면 기존 강등 경로(main.py: flags 있으면 FULL→PARTIAL)를 그대로 타서
+# "확인 못 한 답변을 FULL 이라 부르지 않는다"가 성립한다. 규칙 버그로 전 답변이
+# PARTIAL 이 되는 부작용은 감수한다 — 조용히 FULL 을 내주는 쪽이 훨씬 나쁘고,
+# 시끄러운 실패는 곧 발견되지만 조용한 실패는 영영 안 보인다.
+INCOMPLETE_FLAG = "verification_incomplete"
+
+# 규칙 실행 실패 누적 — /health 로 노출한다 (main.py 의 _log_failures 와 같은 패턴).
+# 이 값이 0 이 아니면 검증층이 썩고 있다는 뜻이다.
+_rule_failures = 0
+
+
+def rule_failure_count() -> int:
+    """규칙 실행 실패 누적 횟수 (0 이 정상). /health 노출용."""
+    return _rule_failures
+
+
+def note_rule_failure() -> None:
+    """규칙 실패 1건 기록 — verify() 자체가 죽는 경로(answer.py 최후 방어)에서도 센다."""
+    global _rule_failures
+    _rule_failures += 1
+
+
 def verify(
     question: str,
     answer: str,
@@ -542,8 +569,10 @@ def verify(
 
     - cited_numbers 에 해당하는 sources 만 대상 (spec §2-1) — 인용 0건(거절 답변)은
       검증하지 않는다 (REFUSED 에 flag 노이즈를 얹지 않는다)
-    - 규칙별 예외 격리: 죽은 규칙은 detail["errors"] 에 이름만 남기고 계속
-      (검증층 버그가 답변 생성 실패로 번지지 않게 — issue_context 패턴)
+    - 규칙별 예외 격리: 죽은 규칙은 detail["errors"] 에 이름을 남기고 계속 진행한다
+      (검증층 버그가 답변 생성 실패로 번지지 않게 — issue_context 패턴).
+      **다만 격리는 은폐가 아니다** — INCOMPLETE_FLAG 를 함께 세워 "확인 못 했다"가
+      등급까지 전달되게 한다 (감사 2026-08-05).
     """
     detail: dict = {}
     flags: list[str] = []
@@ -557,8 +586,14 @@ def verify(
         try:
             return fn()
         except Exception:
-            logger.warning("verification 규칙 %s 실패 — 건너뜀", name, exc_info=True)
+            note_rule_failure()
+            logger.warning(
+                "verification 규칙 %s 실패 — 건너뜀 (누적 %d회, %s 로 강등)",
+                name, rule_failure_count(), INCOMPLETE_FLAG, exc_info=True,
+            )
             detail.setdefault("errors", []).append(name)
+            if INCOMPLETE_FLAG not in flags:
+                flags.append(INCOMPLETE_FLAG)
             return None
 
     if "compare" in types:

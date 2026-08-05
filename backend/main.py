@@ -26,6 +26,7 @@ from guard import RateLimiter, client_ip, daily_cost_exceeded
 from search_keyword import keyword_search
 from search_vector import vector_search
 from search_hybrid import hybrid_search
+from verification import rule_failure_count
 
 
 # 구조화 로깅 — print 는 레벨·시각이 없어 운영 중 추적 불가 (A+ 로드맵 기준 7)
@@ -191,6 +192,10 @@ def health():
             "chunks": chunks,
             "embeddings": embeddings,
             "log_failures": _log_failures,  # query_logs 저장 실패 누적 (0 이 정상)
+            # 검증 규칙 실행 실패 누적 (0 이 정상) — 0 이 아니면 검증층이 썩고 있다는
+            # 뜻이다. 예전에는 규칙이 죽어도 아무 신호가 없어 통과와 구별되지 않았다
+            # (감사 2026-08-05). log_failures 와 같은 가시화 패턴.
+            "verification_failures": rule_failure_count(),
         }
     except Exception as e:
         return {"status": "degraded", "db": "error", "detail": type(e).__name__}

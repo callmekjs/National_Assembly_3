@@ -20,6 +20,9 @@ const VERIFICATION_LABEL = {
   party_label_mismatch: '정당 표기가 근거와 다름',
   keyword_missing: '핵심 대상이 인용 근거에 없음',
   ruling_period_mismatch: '발언 시점과 정권 시기 불일치',
+  // 다른 flag 는 "이런 문제를 찾았다"지만 이것은 "검사를 못 끝냈다"는 뜻이다 —
+  // 답변의 결함이 아니라 검증층의 결함이므로 문구를 구분한다 (감사 2026-08-05)
+  verification_incomplete: '검증 규칙 일부가 실행되지 못함 (답변 결함 아님)',
 }
 
 // 근거 카드의 큰 수치 = (인용이 달린 문장 / 전체 문장). 마크다운 제목 줄은 문장이 아니다.

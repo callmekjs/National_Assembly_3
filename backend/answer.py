@@ -32,7 +32,8 @@ from query_parser import classify_question, extract_filters
 from reranker import last_usage as reranker_usage
 from search_hybrid import hybrid_search
 from search_vector import _get_client
-from verification import comparison_coverage, qa_pair_question, verify
+from verification import (INCOMPLETE_FLAG, comparison_coverage, note_rule_failure,
+                          qa_pair_question, verify)
 
 logger = logging.getLogger(__name__)
 
@@ -553,8 +554,12 @@ def generate_answer(
     try:
         verification = verify(question, answer_text, sources, cited, q_types)
     except Exception:
-        logger.warning("검증층 실패 — 검증 없이 답변 반환", exc_info=True)
-        verification = {"flags": [], "detail": {"errors": ["verify"]}}
+        # verify() 자체가 죽는 경로 — 규칙 단위 격리(run())보다 바깥이라 여기서도
+        # INCOMPLETE_FLAG 를 세워야 한다. 빈 flags 로 반환하면 "검증 통과"와
+        # 구별되지 않아 검증층이 통째로 죽어도 FULL 이 나간다 (감사 2026-08-05).
+        note_rule_failure()
+        logger.warning("검증층 실패 — %s 로 강등하고 답변 반환", INCOMPLETE_FLAG, exc_info=True)
+        verification = {"flags": [INCOMPLETE_FLAG], "detail": {"errors": ["verify"]}}
 
     in_tok, out_tok = resp.usage.prompt_tokens, resp.usage.completion_tokens
     return _result_payload(answer_text, mode, issue_ctx, sources, cited, invalid,
