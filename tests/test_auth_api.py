@@ -15,6 +15,8 @@ import sys
 import uuid
 from pathlib import Path
 
+import pytest
+
 if __name__ == "__main__":
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 sys.path.insert(0, str(Path(__file__).parent.parent / "backend"))
@@ -47,6 +49,10 @@ if HAS_DB:
     client = TestClient(main.app)
 
 _SKIP_MSG = "  - DB 없음 — 건너뜀 (로컬 Docker 필요)"
+
+# pytest 에 건너뜀을 알리는 마커 — 상세 근거는 test_api.py 의 같은 위치 주석 참조
+# (함수 안 `return` 은 PASSED 로 집계돼 DB 없는 CI 에서 거짓 초록불을 만들었다).
+pytestmark = pytest.mark.skipif(not HAS_DB, reason="DB 없음 — 로컬 Docker 필요")
 
 
 def check(name: str, cond: bool, got=None):

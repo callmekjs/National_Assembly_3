@@ -127,7 +127,13 @@ def keyword_search(
         FROM chunks ch
         JOIN committees co ON co.committee_id = ch.committee_id
         WHERE {" AND ".join(where)}
-        ORDER BY score DESC, ch.meeting_date DESC
+        -- chunk_id 타이브레이커 필수 (감사 2026-08-05): score 는 "토큰 하나 맞으면 +1"
+        -- 이라 1점 동점이 대량으로 생기는데, 동점 구간의 행 순서는 Postgres 가 보장하지
+        -- 않는다 → 같은 질문·같은 데이터인데 실행마다 상위 K 가 바뀌고, 그 순위가 그대로
+        -- RRF 입력이 되어 하이브리드 결과까지 흔들렸다 (평가 재현성의 원인 ②).
+        -- 별칭 순서 고정(aliases.expand_aliases)과 짝을 이루는 수정 — 둘 다 있어야
+        -- 검색이 결정적이 된다.
+        ORDER BY score DESC, ch.meeting_date DESC, ch.chunk_id DESC
         LIMIT %s
     """
     params.append(limit)

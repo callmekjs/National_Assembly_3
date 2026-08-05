@@ -16,6 +16,8 @@ import sys
 import uuid
 from pathlib import Path
 
+import pytest
+
 if __name__ == "__main__":  # pytest 캡처와 충돌 방지 — 직접 실행할 때만 래핑
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 sys.path.insert(0, str(Path(__file__).parent.parent / "backend"))
@@ -46,6 +48,13 @@ if HAS_DB:
     client = TestClient(main.app)
 
 _SKIP_MSG = "  - DB 없음 — 건너뜀 (로컬 Docker 필요)"
+
+# pytest 에 건너뜀을 알리는 마커 (감사 2026-08-05). 각 함수 안의 `return` 만으로는
+# pytest 가 그 테스트를 PASSED 로 집계한다 — CI 러너에는 DB 가 없으므로 이 파일의
+# 9건 + test_auth_api 6건, 총 15건이 **한 번도 실행되지 않은 채 초록불**이었다.
+# 마커를 달면 같은 상황이 SKIPPED 로 보고돼 "안 돌았다"가 눈에 보인다.
+# 함수 안 가드는 직접 실행(python tests/test_api.py) 경로용이라 그대로 둔다.
+pytestmark = pytest.mark.skipif(not HAS_DB, reason="DB 없음 — 로컬 Docker 필요")
 
 
 def check(name: str, cond: bool, got=None):
@@ -177,53 +186,66 @@ def test_guard_rate_limit_and_cost():
     if not HAS_DB:
         print(_SKIP_MSG); return
     import guard
-    # LLM 리미터를 2회/분으로 교체 — /query 는 사전차단 경로(검색 0건 질문)라 LLM 미호출
-    saved_limiter, saved_cost = main._llm_limiter, main.DAILY_COST_LIMIT_USD
-    main._llm_limiter = guard.RateLimiter(2)
-    main.DAILY_COST_LIMIT_USD = 0  # 비용 상한은 이 케이스에서 끔
+    # 검색을 0건으로 고정한다 — 이 테스트가 보는 것은 guard(리미터·비용 상한)뿐이다.
+    # 원래는 "검색 0건이 나올 법한 질문"으로 사전차단 경로를 노려 LLM 을 피했지만,
+    # 검색 자체가 vector_search → embed_query 로 OpenAI 임베딩을 호출하므로 여전히
+    # OPENAI_API_KEY 가 필요했다. 로컬은 .env 에 키가 있어 가려져 있었고, 키 없는 CI 의
+    # 첫 실행에서 500 으로 드러났다 (2026-08-05 — 이 테스트는 그전까지 CI 에서 아예
+    # 실행되지 않아 이 의존이 보이지 않았다).
+    # test_query_pre_gate_none 과 같은 방식으로 검색 축까지 고정해 외부 의존을 없앤다.
+    saved_search = main.hybrid_search
+    main.hybrid_search = lambda *a, **kw: []
     try:
-        body = {"question": "zzqqxx 존재하지않는 검색어 9999", "mode": "qa"}
-        r1 = client.post("/query", json=body)
-        r2 = client.post("/query", json=body)
-        r3 = client.post("/query", json=body, headers={"Origin": "http://localhost:5173"})
-        check("2회까지 정상", r1.status_code == 200 and r2.status_code == 200,
-              (r1.status_code, r2.status_code))
-        check("3번째 429", r3.status_code == 429, r3.status_code)
-        check("429 한국어 detail", "요청이 너무 잦습니다" in r3.json()["detail"], r3.json())
-        check("429 에 CORS 헤더",
-              r3.headers.get("access-control-allow-origin") == "http://localhost:5173",
-              dict(r3.headers))
-        check("일반 경로는 LLM 한도와 독립", client.get("/issues").status_code == 200)
-        check("/health 무제한", client.get("/health").status_code == 200)
-    finally:
-        main._llm_limiter = saved_limiter
-        main.DAILY_COST_LIMIT_USD = saved_cost
+        # LLM 리미터를 2회/분으로 교체 — 검색 0건이라 답변 LLM 도 호출되지 않는다
+        saved_limiter, saved_cost = main._llm_limiter, main.DAILY_COST_LIMIT_USD
+        main._llm_limiter = guard.RateLimiter(2)
+        main.DAILY_COST_LIMIT_USD = 0  # 비용 상한은 이 케이스에서 끔
+        try:
+            body = {"question": "zzqqxx 존재하지않는 검색어 9999", "mode": "qa"}
+            r1 = client.post("/query", json=body)
+            r2 = client.post("/query", json=body)
+            r3 = client.post("/query", json=body, headers={"Origin": "http://localhost:5173"})
+            check("2회까지 정상", r1.status_code == 200 and r2.status_code == 200,
+                  (r1.status_code, r2.status_code))
+            check("3번째 429", r3.status_code == 429, r3.status_code)
+            check("429 한국어 detail", "요청이 너무 잦습니다" in r3.json()["detail"], r3.json())
+            check("429 에 CORS 헤더",
+                  r3.headers.get("access-control-allow-origin") == "http://localhost:5173",
+                  dict(r3.headers))
+            check("일반 경로는 LLM 한도와 독립", client.get("/issues").status_code == 200)
+            check("/health 무제한", client.get("/health").status_code == 200)
+        finally:
+            main._llm_limiter = saved_limiter
+            main.DAILY_COST_LIMIT_USD = saved_cost
 
-    # 비용 상한 — fetch 주입 대신 캐시를 직접 심어 검증 (DB 값 무관 결정적)
-    saved_cost = main.DAILY_COST_LIMIT_USD
-    main.DAILY_COST_LIMIT_USD = 0.5
-    guard._cost_cache = (float("inf"), 9.99)   # 만료되지 않는 캐시에 초과값
-    try:
-        r = client.post("/query", json={"question": "비용 상한 테스트", "mode": "qa"})
-        check("비용 초과 429", r.status_code == 429, r.status_code)
-        check("소진 안내 문구", "무료 사용량" in r.json()["detail"], r.json())
-    finally:
-        main.DAILY_COST_LIMIT_USD = saved_cost
-        guard.reset_cost_cache()
+        # 비용 상한 — fetch 주입 대신 캐시를 직접 심어 검증 (DB 값 무관 결정적)
+        saved_cost = main.DAILY_COST_LIMIT_USD
+        main.DAILY_COST_LIMIT_USD = 0.5
+        guard._cost_cache = (float("inf"), 9.99)   # 만료되지 않는 캐시에 초과값
+        try:
+            r = client.post("/query", json={"question": "비용 상한 테스트", "mode": "qa"})
+            check("비용 초과 429", r.status_code == 429, r.status_code)
+            check("소진 안내 문구", "무료 사용량" in r.json()["detail"], r.json())
+        finally:
+            main.DAILY_COST_LIMIT_USD = saved_cost
+            guard.reset_cost_cache()
 
-    # 비용 조회가 죽어도 서비스는 산다 (fail-open)
-    saved_cost = main.DAILY_COST_LIMIT_USD
-    main.DAILY_COST_LIMIT_USD = 0.5
-    guard.reset_cost_cache()
-    saved_fetch = guard.daily_cost_today
-    guard.daily_cost_today = lambda: (_ for _ in ()).throw(RuntimeError("db down"))
-    try:
-        r = client.post("/query", json={"question": "zzqqxx 존재하지않는 검색어 9999", "mode": "qa"})
-        check("비용 조회 실패 시 fail-open 200", r.status_code == 200, r.status_code)
-    finally:
-        guard.daily_cost_today = saved_fetch
-        main.DAILY_COST_LIMIT_USD = saved_cost
+        # 비용 조회가 죽어도 서비스는 산다 (fail-open)
+        saved_cost = main.DAILY_COST_LIMIT_USD
+        main.DAILY_COST_LIMIT_USD = 0.5
         guard.reset_cost_cache()
+        saved_fetch = guard.daily_cost_today
+        guard.daily_cost_today = lambda: (_ for _ in ()).throw(RuntimeError("db down"))
+        try:
+            r = client.post("/query",
+                            json={"question": "zzqqxx 존재하지않는 검색어 9999", "mode": "qa"})
+            check("비용 조회 실패 시 fail-open 200", r.status_code == 200, r.status_code)
+        finally:
+            guard.daily_cost_today = saved_fetch
+            main.DAILY_COST_LIMIT_USD = saved_cost
+            guard.reset_cost_cache()
+    finally:
+        main.hybrid_search = saved_search
 
 
 # ── 검증층 강등 접합 (2026-07-25, spec §1) ───────────────────────────────────

@@ -62,7 +62,9 @@ def daily_cost_exceeded(limit: float, now: float | None = None, fetch=None) -> b
     """오늘 비용 >= limit 인가. 60초 캐시로 요청마다 DB 를 때리지 않는다.
 
     ±60초 오버슛은 허용 오차(분당 한도 × 질의당 ~$0.01 수준). now·fetch 는 테스트 주입용.
-    /answer 는 query_logs 미기록이라 집계 밖 — 배포 프론트는 /query 만 사용(스펙 한계 참조).
+    /answer 는 query_logs 미기록이라 이 집계 밖이다 — 그래서 2026-08-05 감사 이후
+    ENABLE_DEBUG_ENDPOINTS=1 일 때만 등록된다(기본 꺼짐). 배포에는 경로 자체가 없으므로
+    이 상한이 못 보는 지출 경로도 없다.
     """
     global _cost_cache
     if now is None:
