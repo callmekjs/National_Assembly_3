@@ -68,6 +68,12 @@ DAILY_COST_LIMIT_USD = float(os.environ.get("DAILY_COST_LIMIT_USD", "1.0"))
 _llm_limiter = RateLimiter(RATE_LIMIT_LLM_PER_MIN)
 _general_limiter = RateLimiter(RATE_LIMIT_PER_MIN)
 _LLM_PATHS = ("/query", "/answer")   # LLM 호출 경로 — 비용 상한 대상
+# /answer 노출 스위치 (기본 끔 — 감사 2026-08-05). 이 경로는 grounding·검증·query_logs
+# 를 전부 우회하는 원시 호출이라, 켜져 있으면 일별 비용 상한이 보는 장부(query_logs)에
+# 지출이 안 잡힌다 = 2차 방어선이 /answer 트래픽을 못 본다. 공개 저장소라 경로를
+# 숨기는 것도 무의미하므로 배포에서는 아예 등록하지 않는다. 로컬 디버그용으로만 켠다
+# (rag7_query_spec §81 "디버그용 유지" 결정은 유효 — 노출 범위만 로컬로 좁힌다).
+ENABLE_DEBUG_ENDPOINTS = os.environ.get("ENABLE_DEBUG_ENDPOINTS") == "1"
 # 강한 rate limit 대상 = LLM 경로 + 인증 경로 (무차별 대입 방어 — spec 2026-07-15)
 _STRICT_PATHS = _LLM_PATHS + ("/auth/login", "/auth/signup")
 
@@ -415,13 +421,21 @@ def search_hybrid_endpoint(
     return {"query": q, "count": len(results), "results": results}
 
 
-@app.post("/answer")
-def answer_endpoint(req: AnswerRequest):
-    """답변 생성 (RAG-6) — qa: 간결 답변 / report: 정책 브리핑. RAG-7 /query 가 이걸 감싼다."""
-    try:
-        return generate_answer(req.question, req.mode, req.committee, req.date_from, req.date_to)
-    except OpenAIError as e:
-        raise HTTPException(status_code=502, detail=f"LLM 호출 실패: {type(e).__name__}")
+if ENABLE_DEBUG_ENDPOINTS:
+    @app.post("/answer")
+    def answer_endpoint(req: AnswerRequest):
+        """답변 생성 원시 호출 (RAG-6) — 로컬 디버그 전용, 기본 비활성.
+
+        /query 와 달리 grounding 판정·검증층·query_logs 저장을 전부 건너뛴다.
+        그래서 이 경로의 지출은 guard 의 일별 비용 상한이 보는 장부에 남지 않는다 —
+        공개 배포에서 등록하지 않는 이유(ENABLE_DEBUG_ENDPOINTS 주석 참조).
+        일반 사용 경로는 /query 다.
+        """
+        try:
+            return generate_answer(req.question, req.mode, req.committee,
+                                   req.date_from, req.date_to)
+        except OpenAIError as e:
+            raise HTTPException(status_code=502, detail=f"LLM 호출 실패: {type(e).__name__}")
 
 
 @app.get("/actors")

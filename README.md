@@ -155,7 +155,7 @@ npm run dev    # → http://localhost:5173
 | GET | `/search/vector` | 벡터(의미) 검색 (HNSW + 필터) | ✅ |
 | GET | `/search/hybrid` | 하이브리드 검색 (RRF 융합) | ✅ |
 | GET | `/actors/{name}` | 행위자 프로필 — 발언 통계·여야 이력·주요 언급 기관 | ✅ |
-| POST | `/answer` | 답변 생성 (qa/report 모드 — 디버그용 원시 호출) | ✅ |
+| POST | `/answer` | 답변 생성 원시 호출 — **로컬 디버그 전용**, `ENABLE_DEBUG_ENDPOINTS=1` 일 때만 등록 | ⚙️ |
 | POST | `/query` | RAG 통합: 답변 + 출처 + Grounding 등급 + query_logs | ✅ |
 | POST | `/feedback` | 답변 평가 (query_id 로 rating 저장) | ✅ |
 

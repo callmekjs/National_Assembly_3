@@ -9,6 +9,7 @@
 import logging
 import os
 import re
+import secrets
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -26,8 +27,18 @@ load_dotenv(Path(__file__).parent.parent / ".env")
 
 JWT_SECRET = os.environ.get("JWT_SECRET", "")
 if not JWT_SECRET:
-    JWT_SECRET = "dev-secret-not-for-production"
-    logger.warning("JWT_SECRET 미설정 — dev 기본값 사용 (배포에서는 반드시 설정)")
+    # 고정 문자열 기본값("dev-secret-not-for-production")을 쓰던 자리 (감사 2026-08-05).
+    # 이 저장소는 공개라 그 값을 누구나 읽을 수 있었다 — 배포에서 JWT_SECRET 을 한 번만
+    # 빠뜨리면 임의 user_id 의 토큰을 위조해 /me/queries 로 남의 질의 이력을 열 수 있다.
+    # 경고 로그는 사람이 놓칠 수 있으므로 방어를 코드로 옮긴다: 프로세스마다 무작위 키를
+    # 생성하면 위조가 구조적으로 불가능하다. 대가는 재기동 시 기존 토큰 전부 무효(재로그인)
+    # — 보안 구멍을 UX 불편으로 바꾸는 교환이고, 배포에서 JWT_SECRET 을 설정하면
+    # 재기동 내구성까지 얻는다. fail-safe: 설정을 잊어도 안전한 쪽으로 실패한다.
+    JWT_SECRET = secrets.token_hex(32)
+    logger.warning(
+        "JWT_SECRET 미설정 — 이번 프로세스 한정 무작위 키 생성. "
+        "재기동 시 발급된 토큰이 모두 무효가 된다 (배포에서는 반드시 설정)"
+    )
 
 TOKEN_TTL_DAYS = 7
 _USERNAME_RE = re.compile(r"^[A-Za-z0-9가-힣]{2,20}$")
