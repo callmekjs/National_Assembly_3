@@ -25,6 +25,11 @@ incoming_data/
 data/v1/*
 !data/v1/reports/
 
+# qrels 후보 풀 (5.7MB — DB 본문 복사본). 검색이 결정적이라 qrels_pool.py 로 똑같이
+# 재생성된다(2026-08-05 비결정성 제거). 반면 qrels_judged.jsonl 은 LLM 심판 호출
+# 결과(비용·비재현)라 커밋한다 — 라벨 자산 자체이므로.
+data/eval/qrels_pool.jsonl
+
 # 개인 작업 파일
 claude.txt
 스크린샷/
