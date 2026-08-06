@@ -22,13 +22,16 @@
     안에 있는 후보. 하위 순위 쌍은 라벨이 틀려도 점수에 거의 영향이 없다.
 
 출력
-    data/eval/qrels_review_queue.md   — 사람이 읽고 판단하는 시트
-    data/eval/qrels_review_queue.json — 판단 결과를 적어 넣을 파일(human_grade)
+    data/eval/qrels_review_queue.md    — 사람이 읽고 판단하는 시트
+    data/eval/qrels_review_answers.txt — **사용자가 답을 적는 파일** (아래 참조)
+    data/eval/qrels_review_queue.json  — 기계용 원본(19개 키). 사람이 손댈 필요 없다
 
 검수 방법 (사용자)
-    시트를 위에서부터 보고, 심판 등급에 **동의하면 그냥 넘어가고** 틀렸다고 생각되면
-    json 의 human_grade 에 올바른 등급(0/1/2)을 적는다. 전부 볼 필요 없다 —
-    시간이 없으면 위에서부터 N건만 보고 멈춰도 된다(미검수는 그대로 기록된다).
+    시트(.md)를 위에서부터 읽고, 심판 등급에 **동의하면 그냥 넘어간다.**
+    틀렸다고 생각되는 것만 답안지(.txt)에 "번호 = 등급" 으로 적는다.
+    전부 볼 필요 없다 — 답안지 맨 위 `검수한_마지막_번호` 에 어디까지 봤는지만
+    적으면 그 뒤는 미검수로 정직하게 기록된다.
+    (JSON 을 직접 고치는 방식은 키가 19개라 부담이 커서 답안지로 대체했다)
 
 실행
     python scripts/qrels_review.py             # 큐 생성 (기본 상한 60건)
@@ -54,6 +57,7 @@ POOL = PROJECT_ROOT / "data" / "eval" / "qrels_pool.jsonl"
 JUDGED = PROJECT_ROOT / "data" / "eval" / "qrels_judged.jsonl"
 OUT_MD = PROJECT_ROOT / "data" / "eval" / "qrels_review_queue.md"
 OUT_JSON = PROJECT_ROOT / "data" / "eval" / "qrels_review_queue.json"
+OUT_ANS = PROJECT_ROOT / "data" / "eval" / "qrels_review_answers.txt"
 
 DEFAULT_CAP = 60
 RANK_IMPACT = 10   # 이 순위 안이면 지표에 영향 (R@10 기준)
@@ -229,12 +233,42 @@ def main():
         lines.append("")
     OUT_MD.write_text("\n".join(lines), encoding="utf-8")
 
+    # 답안지 — 19개 키가 든 107KB JSON 을 손으로 고치는 부담을 없앤다 (POL-7 에서
+    # 40건 라벨링도 인지 부담이 컸다는 사용자 피드백). 최소 입력 원칙:
+    #   ① 어디까지 봤는지 숫자 하나  ② 틀렸다고 본 것만 "번호=등급" 으로 적기
+    # 동의한 건 아무것도 안 적는다. 미검수와의 구별은 ①번 숫자로 한다.
+    ans = [
+        "# qrels 검수 답안지",
+        "#",
+        "# 읽을 시트: data/eval/qrels_review_queue.md  (같은 번호를 씁니다)",
+        "#",
+        "# [1] 어디까지 봤는지 숫자만 적으세요. 중간에 멈춰도 됩니다.",
+        "#     그 뒤 번호는 '미검수'로 정직하게 기록됩니다.",
+        "",
+        "검수한_마지막_번호 = ",
+        "",
+        "# [2] 심판이 틀렸다고 본 것만 적으세요. 동의한 건 안 적어도 됩니다.",
+        "#     형식:  번호 = 등급     (등급은 0 / 1 / 2)",
+        "#     예:    7 = 2           ← 7번은 2점이어야 한다",
+        "#",
+        "# 등급 기준: 2=이것만 읽어도 답을 안다 / 1=주제만 맞다 / 0=무관",
+        "# 자주 나오는 오판: 사건이 다른데 표현만 겹치는 것",
+        "#                  (예: 티메프 질문에 전세사기 발언)",
+        "",
+        "# ── 참고용 목록 (심판 판정) ─────────────────────────────",
+    ]
+    for n, it in enumerate(queued, start=1):
+        ans.append(f"#  {n:2d}. [{LABEL[it['judge_grade']]}] {it['question'][:34]}"
+                   f" | {it['speaker']}·{it['committee']}")
+    OUT_ANS.write_text("\n".join(ans) + "\n", encoding="utf-8")
+
     from collections import Counter
     cnt = Counter(r for it in items for r in it["queue_reasons"])
     print(f"의심 {total}건 중 상위 {len(queued)}건을 큐에 올림 (상한 {args.cap})")
     print("  사유별:", ", ".join(f"{REASON_KO.get(k, k)} {v}" for k, v in cnt.most_common()))
-    print(f"→ {OUT_MD.relative_to(PROJECT_ROOT)}  (읽기용)")
-    print(f"→ {OUT_JSON.relative_to(PROJECT_ROOT)}  (human_grade 기입용)")
+    print(f"→ {OUT_MD.relative_to(PROJECT_ROOT)}   (읽기용 시트)")
+    print(f"→ {OUT_ANS.relative_to(PROJECT_ROOT)}  ★ 여기에 답을 적으세요")
+    print(f"→ {OUT_JSON.relative_to(PROJECT_ROOT)} (기계용 — 손댈 필요 없음)")
 
 
 if __name__ == "__main__":
