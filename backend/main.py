@@ -340,7 +340,10 @@ def get_meetings(
             FROM meetings m
             JOIN committees c ON c.committee_id = m.committee_id
             {where}
-            ORDER BY m.meeting_date DESC
+            -- source_id 타이브레이커 필수: 같은 날 회의가 여럿이라 meeting_date 만으로는
+            -- 동점 구간의 순서가 미정이고, LIMIT/OFFSET 페이지네이션에서 그 순서는 매
+            -- 요청마다 달라질 수 있다 → 2페이지에 1페이지 행이 또 나오거나 아예 누락된다.
+            ORDER BY m.meeting_date DESC, m.source_id DESC
             LIMIT %s OFFSET %s
             """,
             params + [limit, offset],
@@ -372,7 +375,9 @@ def get_speakers(
             FROM speakers s
             LEFT JOIN committees c ON c.committee_id = s.committee_id
             {where}
-            ORDER BY s.utterance_count DESC
+            -- name 타이브레이커 필수 (위 /meetings 와 같은 이유). 발언 수는 동점이
+            -- 특히 흔하다 — 1~2회 발언자가 대량이라 그 구간 전체가 매번 뒤바뀐다.
+            ORDER BY s.utterance_count DESC, s.name DESC
             LIMIT %s OFFSET %s
             """,
             params + [limit, offset],

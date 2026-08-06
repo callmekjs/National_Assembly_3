@@ -17,9 +17,12 @@ speaker_confusion/multi_chunk — 여러 근거를 종합할 때 관련 낮은 �
 """
 
 import json
+import logging
 import os
 import re
 import threading
+
+logger = logging.getLogger(__name__)
 
 # 재순위 모델 (2026-08-07 실측으로 채택). 6종 비교에서 nDCG@5 최고:
 #   mini 0.697 / terra 0.720 / luna 0.751 / sol 0.768 / sol+low 0.778
@@ -119,11 +122,17 @@ def rerank(query: str, hits: list[dict], limit: int) -> list[dict]:
             **kw,
         )
         # 파싱보다 먼저 기록 — 파싱이 실패해 원순위로 폴백해도 호출 비용은 이미 나갔다
-        _local.usage = {"input_tokens": resp.usage.prompt_tokens,
+        # 모델명을 같이 남긴다 — 비용 계산(answer.PRICES)이 답변 모델 단가를 재순위에
+        # 잘못 적용하지 않게. 재순위만 다른 모델로 갈아끼울 수 있으므로 필수다.
+        _local.usage = {"model": _MODEL,
+                        "input_tokens": resp.usage.prompt_tokens,
                         "output_tokens": resp.usage.completion_tokens}
         order = json.loads(resp.choices[0].message.content).get("order", [])
     except Exception as e:
-        print(f"[reranker] 재순위 실패, 원순위 폴백: {type(e).__name__}: {e}")
+        # 폴백은 무해하지만 조용하면 안 된다 — 재순위가 계속 죽어도 검색은 돌아가므로
+        # (nDCG@5 0.778→0.326) 로그가 유일한 신호다. backend 의 다른 모듈과 같이
+        # logging 사용 (print 는 uvicorn 로그 레벨·포맷을 안 따른다).
+        logger.warning("재순위 실패, 원순위 폴백: %s: %s", type(e).__name__, e)
         return hits[:limit]
 
     # 유효 번호만, 중복 제거, 누락분은 원순위로 보충 (LLM 이 일부를 빠뜨려도 안전)

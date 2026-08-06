@@ -213,6 +213,30 @@ def test_mode_config():
     check("모드: report 프롬프트에 브리핑 구조", "개요" in report["system_prompt"] and "논의의 한계" in report["system_prompt"])
 
 
+def test_cost_per_model():
+    """비용은 모델별 단가로 계산돼야 한다 (2026-08-07).
+
+    est_cost_usd 는 guard 의 일별 상한($1)이 읽는 장부다. 단가가 하나뿐이던 때는
+    재순위 토큰에도 답변 모델(gpt-4o-mini) 단가를 곱해, 다른 모델로 갈아탄 재순위
+    비용이 실제보다 싸게 잡혔다 → 상한이 실지출의 일부만 보고 판단.
+    """
+    pin, pout = answer.PRICES["gpt-4o-mini"]
+    check("비용: 등록 모델은 표 단가", answer._price("gpt-4o-mini") == (pin, pout))
+    check("비용: 계산식", abs(answer._cost("gpt-4o-mini", 1_000_000, 0) - pin) < 1e-9,
+          answer._cost("gpt-4o-mini", 1_000_000, 0))
+
+    # 미등록 모델은 mini 단가로 조용히 떨어지면 안 된다 — 그게 이 결함의 형태였다
+    unknown = answer._price("gpt-5.6-sol")
+    check("비용: 미등록 모델은 폴백 단가", unknown == answer.PRICE_UNKNOWN, unknown)
+    check("비용: 폴백은 답변 모델보다 비싸다 (과소추정 금지)",
+          unknown[0] > pin and unknown[1] > pout, (unknown, (pin, pout)))
+
+    # 방향성이 핵심: 모르면 비싸게 — 과소추정은 상한을 무력화해 청구서로 돌아오지만
+    # 과대추정은 질의가 일찍 거절될 뿐이라 되돌릴 수 있다.
+    check("비용: 미등록이 등록보다 크게 계산됨",
+          answer._cost("gpt-5.6-sol", 1000, 1000) > answer._cost("gpt-4o-mini", 1000, 1000))
+
+
 # ── 8. 상투구 후처리 ──────────────────────────────────────────────────────────
 
 def test_strip_boilerplate():

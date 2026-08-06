@@ -48,9 +48,43 @@ NEIGHBOR_TRUNC_QA = 200
 EVIDENCE_TURN_MAX = 4000   # 근거 턴 전문 복원 상한 — 초과 시 검색 조각 중심 창(window)
 NO_EVIDENCE = "제공된 회의록에서 확인할 수 없습니다."
 
-# gpt-4o-mini 단가 (USD / 1M tokens) — usage.est_cost_usd 계산용
-PRICE_INPUT_PER_M = 0.15
-PRICE_OUTPUT_PER_M = 0.60
+# 모델별 단가 (USD / 1M tokens) — usage.est_cost_usd 계산용.
+#
+# 모델별로 나눠야 하는 이유 (2026-08-07): 답변은 gpt-4o-mini 지만 재순위는
+# gpt-5.6-sol 로 갈아탔다(nDCG@5 0.697→0.778). 단가가 하나뿐이던 때는 재순위
+# 토큰에도 mini 단가를 곱해, 추론형 모델의 사고 토큰(출력 ~5배)이 장부에서
+# 실제보다 싸게 잡혔다. 그 축소된 est_cost_usd 를 guard 의 일별 상한($1)이
+# 읽으므로, 상한이 실지출의 일부만 보고 판단하게 된다 — 2026-08-04 에 "재순위
+# 비용 누락"으로 한 번 고쳤던 결함이 모델 교체로 되살아난 형태.
+PRICES = {
+    "gpt-4o-mini": (0.15, 0.60),
+}
+
+# 단가를 모르는 모델의 폴백. 실지출보다 **크게** 잡는 쪽으로 튼다 —
+# 과소 추정은 상한을 무력화해 청구서로 돌아오고(되돌릴 수 없음),
+# 과대 추정은 상한에 일찍 걸려 질의가 거절될 뿐이다(되돌릴 수 있음).
+# gpt-5.6 계열 단가는 확인되면 PRICES 에 넣을 것.
+PRICE_UNKNOWN = (5.00, 20.00)
+
+
+_warned_models: set[str] = set()
+
+
+def _price(model: str) -> tuple[float, float]:
+    """(입력, 출력) 100만 토큰당 USD. 미등록 모델은 보수적 폴백."""
+    if model in PRICES:
+        return PRICES[model]
+    if model not in _warned_models:      # 질의마다 찍히면 로그가 묻힌다 — 모델당 1회
+        _warned_models.add(model)
+        logger.warning("단가 미등록 모델 %r — 보수적 단가 %s 적용. 실단가 확인 후 "
+                       "PRICES 에 추가할 것 (상한이 과하게 일찍 걸린다).",
+                       model, PRICE_UNKNOWN)
+    return PRICE_UNKNOWN
+
+
+def _cost(model: str, in_tok: int, out_tok: int) -> float:
+    pin, pout = _price(model)
+    return (in_tok * pin + out_tok * pout) / 1e6
 
 _COMMON_RULES = f"""당신은 대한민국 국회 회의록에만 근거해 답하는 조사 보조원이다.
 
@@ -581,8 +615,7 @@ def reranker_only_usage() -> dict | None:
         "output_tokens": 0,
         "reranker_input_tokens": rr_in,
         "reranker_output_tokens": rr_out,
-        "est_cost_usd": round(
-            (rr_in * PRICE_INPUT_PER_M + rr_out * PRICE_OUTPUT_PER_M) / 1e6, 6),
+        "est_cost_usd": round(_cost(rr.get("model", MODEL), rr_in, rr_out), 6),
     }
 
 
@@ -595,8 +628,8 @@ def _result_payload(answer_text, mode, issue_ctx, sources, cited, invalid,
     """
     rr = reranker_usage() or {}
     rr_in, rr_out = rr.get("input_tokens", 0), rr.get("output_tokens", 0)
-    cost = ((in_tok + rr_in) * PRICE_INPUT_PER_M
-            + (out_tok + rr_out) * PRICE_OUTPUT_PER_M) / 1e6
+    # 답변 모델과 재순위 모델이 다르므로 각자의 단가로 따로 계산해 더한다
+    cost = _cost(MODEL, in_tok, out_tok) + _cost(rr.get("model", MODEL), rr_in, rr_out)
     return {
         "answer": answer_text,
         "mode": mode,
