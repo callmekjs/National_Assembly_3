@@ -62,7 +62,7 @@ from search_keyword import keyword_search                # noqa: E402
 from search_vector import vector_search                  # noqa: E402
 import search_hybrid                                     # noqa: E402
 
-EVAL_SET_PATH = PROJECT_ROOT / "data" / "eval" / "retrieval_eval_set.json"
+EVAL_SET_PATH = PROJECT_ROOT / "data" / "eval" / "retrieval_eval_set_v2.json"
 OUT_PATH = PROJECT_ROOT / "data" / "eval" / "qrels_pool.jsonl"
 
 DEPTH = 20          # 축당 후보 수. 평가 깊이(R@5·R@10)보다 깊어야 "놓친 것"을 볼 수 있다

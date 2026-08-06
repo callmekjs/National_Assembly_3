@@ -54,6 +54,7 @@ sys.path.insert(0, str(PROJECT_ROOT / "backend"))
 from search_vector import _get_client                    # noqa: E402
 
 POOL_PATH = PROJECT_ROOT / "data" / "eval" / "qrels_pool.jsonl"
+EVAL_SET = PROJECT_ROOT / "data" / "eval" / "retrieval_eval_set_v2.json"
 OUT_PATH = PROJECT_ROOT / "data" / "eval" / "qrels_judged.jsonl"
 
 MODEL = "gpt-4o-mini"
@@ -64,31 +65,28 @@ MAX_TEXT = 700       # 후보 본문 절단 (앞뒤 맥락 300자씩과 합쳐 �
 # 단가 (USD / 1M tokens) — 비용 추정용
 PRICE_IN, PRICE_OUT = 0.15, 0.60
 
-SYSTEM = """당신은 검색 평가용 관련도 심판이다. 대한민국 국회 회의록에서 검색된 발언이
-사용자 질문에 얼마나 관련 있는지 3등급으로 판정한다.
+SYSTEM = """당신은 검색 평가용 관련도 심판이다. 국회 회의록에서 검색된 발언이
+질문에 얼마나 관련 있는지, **주어진 합격 기준에 비추어** 3등급으로 판정한다.
 
-등급 기준:
-- 2 = 이 발언이 질문에 **직접 답한다**. 이것만 읽어도 질문의 답(또는 답의 핵심 일부)을 알 수 있다.
-- 1 = 주제·대상은 관련 있으나 **답이 되지는 않는다**. 배경 언급, 지나가는 참조, 절차 발언 등.
+등급 기준 — 합격 기준을 몇 개 만족하는가로 정한다:
+- 2 = **합격 기준을 모두 만족**한다. 이 발언이 질문의 답(또는 답의 핵심 일부)이다.
+- 1 = 주제·대상은 관련 있으나 **합격 기준 중 일부를 만족하지 못한다**. 배경 언급, 지나가는 참조, 절차 발언.
 - 0 = 질문과 무관하다.
 
 판정 규칙:
-- '앞뒤 맥락'은 그 발언이 무엇에 대한 것인지 파악하는 **보조 자료**다. 등급은 '발언 본문'을
-  기준으로 매기되, 맥락 덕분에 본문이 질문에 답하는 것이 확인되면 그 점을 반영한다.
-- 질문이 특정 인물·기관·시점을 지목하면, 대상이 다른 발언은 주제가 같아도 1 이하다.
+- **합격 기준을 하나씩 대조하라.** 인상으로 판정하지 말고 기준별로 만족 여부를 따진다.
+- '앞뒤 맥락'은 그 발언이 무엇에 대한 것인지 파악하는 보조 자료다. 등급은 '발언 본문'을
+  기준으로 매기되, 맥락 덕분에 본문이 질문에 답하는 것이 확인되면 반영한다.
 - **★사건·사안이 다르면 표현이 아무리 비슷해도 0 또는 1이다.★** 이것이 가장 흔한 오판이다.
-  질문이 지목한 사건에 대한 발언인지를 먼저 확인하라. 같은 낱말이 쓰였다는 이유로 2를
-  주지 마라. 판단이 서지 않으면 앞뒤 맥락에서 어떤 사건을 다루는 회의인지 확인하라.
-  예: 질문이 "티메프 사태 피해자 구제"인데 발언이 전세사기 피해주택 매입을 말한다면,
-  '피해자 구제'라는 표현이 겹쳐도 **다른 사건**이므로 0이다.
-  예: 질문이 "의대 정원 확대"인데 발언이 간호인력 확충을 말한다면 관련 주제이나 사안이
-  다르므로 1 이하다.
+  예: "티메프 사태 피해자 구제" 질문에 전세사기 피해주택 매입 발언은 '피해자 구제'가
+  겹쳐도 다른 사건이므로 0이다.
+- 위원회 조건은 **그 회의에서 나온 발언인가**를 뜻한다. 발언자의 소속 위원회는 따지지 않는다.
 - "예, 그렇습니다" 같은 짧은 응답은 맥락상 질문의 답을 확정하는 경우에만 2다.
-- 발언의 정치적 입장이나 사실 여부를 평가하지 마라. 오직 **질문에 답하는가**만 본다.
-- 확신이 서지 않으면 confidence 를 "low" 로 표기하라. 억지로 확신하지 마라.
+- 발언의 정치적 입장이나 사실 여부는 평가하지 마라. 오직 **기준을 만족하는가**만 본다.
+- 확신이 서지 않으면 confidence 를 "low" 로 표기하라.
 
 반드시 아래 JSON 만 출력한다:
-{"results":[{"i":후보번호,"grade":0|1|2,"confidence":"high"|"low","reason":"한 줄 근거"}]}
+{"results":[{"i":후보번호,"grade":0|1|2,"confidence":"high"|"low","reason":"어느 기준이 충족/미충족인지 한 줄"}]}
 후보 번호(i)는 입력에 주어진 번호를 그대로 쓴다. 모든 후보에 대해 하나씩 출력한다."""
 
 
@@ -105,7 +103,8 @@ def render_candidate(i: int, c: dict) -> str:
     return "\n".join(parts)
 
 
-def judge_batch(question: str, batch: list[tuple[int, dict]]) -> tuple[list[dict], int, int]:
+def judge_batch(question: str, batch: list[tuple[int, dict]],
+                criteria: list[str] | None = None) -> tuple[list[dict], int, int]:
     """후보 묶음 1개 채점 → (결과 목록, 입력토큰, 출력토큰).
 
     index-keyed 출력을 강제한다 — 과거 POL-5 배치 판정에서 순서 기반 매칭이
@@ -118,7 +117,12 @@ def judge_batch(question: str, batch: list[tuple[int, dict]]) -> tuple[list[dict
         response_format={"type": "json_object"},
         messages=[
             {"role": "system", "content": SYSTEM},
-            {"role": "user", "content": f"질문: {question}\n\n{body}"},
+            # 합격 기준을 함께 넘긴다 — 이 평가셋을 다시 만든 이유가 "기준으로 판정"이다.
+            # 기준 없이 "관련 있나"만 물으면 심판이 인상으로 답하고 단어 겹침으로 흐른다.
+            {"role": "user", "content": f"질문: {question}\n\n합격 기준:\n"
+                                        + "\n".join(f"  {i}. {c}"
+                                                    for i, c in enumerate(criteria or [], 1))
+                                        + f"\n\n{body}"},
         ],
     )
     raw = json.loads(resp.choices[0].message.content or "{}").get("results", [])
@@ -185,6 +189,9 @@ def main():
         print(f"[FAIL] 풀 파일 없음: {POOL_PATH} — 먼저 qrels_pool.py 를 실행하세요")
         sys.exit(1)
 
+    global CRIT
+    CRIT = {q["id"]: q["pass_criteria"]
+            for q in json.loads(EVAL_SET.read_text(encoding="utf-8"))["questions"]}
     pool = load_pool(args.limit)
     done = load_done() if args.resume else set()
     if done:
@@ -196,7 +203,7 @@ def main():
         cands = [c for c in row["candidates"] if (row["qid"], c["chunk_id"]) not in done]
         for s in range(0, len(cands), BATCH):
             chunk = [(i, c) for i, c in enumerate(cands[s:s + BATCH], start=s)]
-            tasks.append((row["qid"], row["question"], chunk))
+            tasks.append((row["qid"], row["question"], chunk, CRIT.get(row["qid"], [])))
 
     if not tasks:
         print("채점할 후보가 없습니다 (모두 완료)")
@@ -214,7 +221,7 @@ def main():
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     with OUT_PATH.open(mode, encoding="utf-8") as f, \
             ThreadPoolExecutor(max_workers=WORKERS) as ex:
-        futs = {ex.submit(judge_batch, q, ch): (qid, ch) for qid, q, ch in tasks}
+        futs = {ex.submit(judge_batch, q, ch, cr): (qid, ch) for qid, q, ch, cr in tasks}
         for n, fut in enumerate(as_completed(futs), start=1):
             qid, ch = futs[fut]
             try:

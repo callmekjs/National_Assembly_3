@@ -120,8 +120,12 @@ def keyword_search(
         SELECT ch.chunk_id, ch.source_id, ch.speaker, ch.role,
                co.name AS committee, ch.meeting_date,
                ch.page_start, ch.is_short,
-               -- 600자: reranker._MAX_DOC_CHARS 와 맞춘 값. 200자였을 때
-               -- 리랭커가 발언 앞머리만 보고 판정했다 (긴 질의응답의 답변부 저평가)
+               -- 600자: 리랭커가 보는 길이(reranker._MAX_DOC_CHARS 와 같아야 함).
+               -- 1200자로 늘려봤으나 nDCG@5 가 0.710→0.653 으로 떨어지고 비용은 1.6배가 돼
+               -- 되돌렸다 (2026-08-06 실측). 후보 30개를 한 번에 주는 listwise 방식이라
+               -- 후보당 길이를 늘리면 총 입력이 커져 판단이 흐려지는 것으로 보인다.
+               -- 주의: 이 주석에 퍼센트 기호를 쓰지 말 것 — psycopg2 가 SQL 문자열 안의
+               -- 그 기호를 파라미터 자리표시자로 해석해 IndexError 가 난다 (여기서 겪음).
                left(ch.text, 600) AS snippet,
                ({score_sql}) AS score
         FROM chunks ch
