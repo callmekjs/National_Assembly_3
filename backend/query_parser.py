@@ -66,6 +66,23 @@ COMMITTEE_MAP = {
     "재정경제기획위원회": "기재위", "기획재정위원회": "기재위", "기획재정위": "기재위",
     "재경위": "기재위", "기재위": "기재위",
 }
+
+# 코퍼스에 없는 상임위 — 이름을 인식은 하되 존재하지 않는 위원회로 필터를 건다.
+# 그러면 검색이 0건이 되고 grounding.pre_gate 가 "NONE"(확인 불가)을 낸다.
+# 없을 때 생기던 문제: "법제사법위원회에서 검찰 개혁…" 이 필터 없이 검색돼
+# 행안위 발언을 답으로 내놨다. 코퍼스에 없는 위원회를 물어도 "없다"고 못 하던
+# 원인 (2026-08-07 실측, n019). 22대 상임위 중 이 프로젝트가 수집하지 않은 것들.
+ABSENT_COMMITTEES = {
+    "법제사법위원회": "법사위", "법사위원회": "법사위", "법사위": "법사위",
+    "교육위원회": "교육위", "교육위": "교육위",
+    "환경노동위원회": "환노위", "환노위": "환노위",
+    "농림축산식품해양수산위원회": "농해수위", "농해수위": "농해수위",
+    "여성가족위원회": "여가위", "여가위": "여가위",
+    "문화체육관광위원회": "문체위", "문체위": "문체위",
+    "국회운영위원회": "운영위", "운영위": "운영위",
+    "정보위원회": "정보위", "정보위": "정보위",
+}
+COMMITTEE_MAP = {**COMMITTEE_MAP, **ABSENT_COMMITTEES}
 _COMMITTEE_RE = re.compile(
     "(" + "|".join(sorted(COMMITTEE_MAP, key=len, reverse=True)) + ")"
 )
@@ -76,6 +93,12 @@ _COMMITTEE_RE = re.compile(
 _DATE_FULL_RE = re.compile(r"(\d{4})\s*년\s*(\d{1,2})\s*월\s*(\d{1,2})\s*일")
 _DATE_MONTH_RE = re.compile(r"(\d{4})\s*년\s*(\d{1,2})\s*월(?!\s*\d)")
 _DATE_ISO_RE = re.compile(r"(\d{4})-(\d{2})-(\d{2})")
+# 연도 단독 ("2024년") — 월·일이 안 붙은 경우. 뒤에 월이 오면 _DATE_MONTH_RE 가 먼저
+# 잡으므로 (?!\s*\d{1,2}\s*월) 로 배제한다.
+# 없을 때 생기던 문제: "2024년 기획재정위원회에서…" 가 날짜 필터 없이 검색돼
+# 기재위 코퍼스 전 구간(2026년)을 답으로 내놨다. 질문은 2024년을 물었는데 —
+# 코퍼스에 없는 시점을 물어도 "없다"고 못 하던 원인 (2026-08-07 실측, n020).
+_DATE_YEAR_RE = re.compile(r"(?<!\d)(20\d{2})\s*년도?(?!\s*\d{1,2}\s*월)")
 _DATE_MD_RE = re.compile(r"(\d{1,2})\s*월\s*(\d{1,2})\s*일")
 _DATE_M_RE = re.compile(r"(\d{1,2})\s*월(?!\s*\d)")
 
@@ -147,6 +170,13 @@ def _find_dates(text: str) -> list[dict]:
             if span:
                 found.append({"span": m.span(), "from": span[0], "to": span[1],
                               "year": int(m.group(1))})
+
+    # 연도 단독 — 위 형태들과 겹치지 않을 때만 (그 해 전체 범위)
+    for m in _DATE_YEAR_RE.finditer(text):
+        if not overlaps(*m.span()):
+            y = int(m.group(1))
+            found.append({"span": m.span(), "from": f"{y:04d}-01-01",
+                          "to": f"{y:04d}-12-31", "year": y})
 
     yearful = sorted(found, key=lambda f: f["span"][0])
 

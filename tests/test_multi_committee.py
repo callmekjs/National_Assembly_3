@@ -73,6 +73,36 @@ def test_invalid_dates():
     check("날짜: 정상 월은 월 범위", df == "2024-12-01" and dt == "2024-12-31", (df, dt))
 
 
+def test_bare_year():
+    # 연도 단독 ("2024년") 이 무시되던 문제 (2026-08-07 수정, 평가셋 n020).
+    # 코퍼스에 없는 시점을 물어도 다른 해 자료를 답으로 내놓던 원인.
+    _, _, df, dt = extract_filters("2024년 기획재정위원회에서 세제 개편 논의")
+    check("연도: 단독 연도는 그 해 전체", df == "2024-01-01" and dt == "2024-12-31", (df, dt))
+    _, _, df, dt = extract_filters("2025년도 예산안 심사")
+    check("연도: '년도' 표기도 인식", df == "2025-01-01" and dt == "2025-12-31", (df, dt))
+    # 월·일이 붙으면 더 좁은 기존 규칙이 이겨야 한다 (회귀 방지)
+    _, _, df, dt = extract_filters("2024년 12월 논의")
+    check("연도: 월이 붙으면 월 범위 유지", df == "2024-12-01" and dt == "2024-12-31", (df, dt))
+    _, _, df, dt = extract_filters("2025년 7월 14일 논의")
+    check("연도: 일자가 붙으면 exact 유지", df == "2025-07-14" and dt == "2025-07-14", (df, dt))
+    # 연도처럼 보이는 수치가 오탐되지 않아야 한다
+    _, _, df, dt = extract_filters("예산 2024억 원 증액")
+    check("연도: '년' 없는 4자리는 미적용", df is None and dt is None, (df, dt))
+
+
+def test_absent_committees():
+    # 코퍼스에 없는 상임위를 물으면 그 위원회로 필터가 걸려 검색 0건 →
+    # grounding.pre_gate 가 "NONE"(확인 불가). 없을 땐 필터가 안 걸려 엉뚱한
+    # 위원회 발언을 답으로 내놨다 (2026-08-07 수정, 평가셋 n019).
+    got = committees_of("법제사법위원회에서 검찰 개혁 논의")
+    check("없는 위원회: 법사위 인식", got == ["법사위"], got)
+    got = committees_of("환경노동위원회 산업재해 대책")
+    check("없는 위원회: 환노위 인식", got == ["환노위"], got)
+    # 있는 위원회는 그대로여야 한다 (회귀 방지)
+    got = committees_of("외교통일위원회 논의")
+    check("없는 위원회: 실존 위원회는 그대로", got == ["외통위"], got)
+
+
 def test_date_ranges():
     # "A부터 B까지" 기간 질문이 첫 날짜 하루로 축소되던 문제 (2026-07-07 수정)
     _, _, df, dt = extract_filters("2025년 7월 14일부터 9월 1일까지의 논의")
