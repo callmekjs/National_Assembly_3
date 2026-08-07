@@ -43,3 +43,7 @@ study/
 
 # 검토용 생성 HTML (575KB, scripts 로 재생성 가능) — 작업 산출물이지 프로젝트 문서가 아니다
 data/eval/문제검토.html
+
+# 검토용 생성 HTML (scripts 로 재생성 가능) — 작업 산출물이지 프로젝트 문서가 아니다
+data/eval/리포트검토.html
+data/eval/숨김문제검토.html

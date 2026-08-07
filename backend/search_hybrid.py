@@ -20,6 +20,7 @@
 디버그 필드: found_in, kw_rank, vec_rank, rrf_before_penalty, rrf(최종)
 """
 
+import re
 from concurrent.futures import ThreadPoolExecutor
 
 from query_parser import extract_filters
@@ -37,6 +38,50 @@ KEYWORD_WEIGHT = 1.2  # 키워드 축 가중치 (고유명사 중심 도메인 �
 VECTOR_WEIGHT = 1.0   # 벡터 축 가중치
 SHORT_PENALTY = 0.9   # is_short 청크의 최종 점수 배율
 K_EACH = 30           # 각 축에서 가져올 후보 수
+
+# 진영 균형이 필요한 질문. answer._PARTY_QUESTION 과 달리 "소속"은 넣지 않는다 —
+# "○○ 위원의 소속 위원회는?" 같은 단일 인물 질문까지 균형 배분에 걸리기 때문.
+_SIDE_QUESTION = re.compile(r"여야|여당|야당|진영|정당별|당별")
+
+
+def _balance_by_side(ranked: list[dict], limit: int) -> list[dict]:
+    """여야 비교 질문용 — 진영별 상한으로 근거를 나눠 담는다.
+
+    왜 필요한가 (2026-08-07 실측, 평가셋 n010):
+        "티메프 사태의 정부 책임을 두고 여야 시각이 어떻게 달랐나" 질문에서 정무위
+        결과 3건이 **전부 더불어민주당**이었다. 코퍼스에는 같은 위원회에 국민의힘
+        발언이 74건/7명 있었는데도 상위에 한 진영만 올라와, 비교 자체가 불가능한
+        근거를 받은 LLM 이 다른 위원회 발언을 끌어다 메웠다.
+        발언량이 많은 쪽이 상위를 독식하는 것은 위원회에서 이미 겪은 문제이고
+        (_balance_by_committee, 2026-07-03), 진영도 같은 구조다.
+
+    committee 균형과 같은 규칙: 순위는 유지하고 자리만 배분한다. 한쪽 진영에 근거가
+    부족하면 다른 쪽이 넘겨받으므로, 한 진영만 말한 사안에서 억지 균형을 만들지 않는다.
+    """
+    from party import party_bloc         # 순환 import 방지 — 이 경로에서만 필요
+
+    bloc_of = {e["chunk_id"]: party_bloc(e.get("speaker"), e.get("role")) for e in ranked}
+    blocs: set[str] = {b for b in bloc_of.values() if b}
+    if len(blocs) < 2:                    # 애초에 한쪽뿐이면 손대지 않는다
+        return ranked[:limit]
+
+    rank_of = {e["chunk_id"]: i for i, e in enumerate(ranked)}
+    quota = max(1, limit // (len(blocs) + 1))   # +1: 정부측·증인 몫을 남긴다
+    count = {b: 0 for b in blocs}
+    picked, leftover = [], []
+    for e in ranked:
+        b = bloc_of[e["chunk_id"]]
+        if b and count[b] < quota:
+            picked.append(e)
+            count[b] += 1
+        else:
+            leftover.append(e)
+    for e in leftover:
+        if len(picked) >= limit:
+            break
+        picked.append(e)
+    picked.sort(key=lambda e: rank_of[e["chunk_id"]])
+    return picked[:limit]
 
 
 def _balance_by_committee(ranked: list[dict], committees: list[str], limit: int) -> list[dict]:
@@ -138,6 +183,11 @@ def hybrid_search(
         # 재순위(켜져 있으면) 후 균형 배분 — 각 위원회 quota 는 유지하되 관련도 반영
         pool = rerank(cleaned_q, ranked, RERANK_CANDIDATES) if reranker_enabled() else ranked
         results = _balance_by_committee(pool, committees, limit)
+    elif _SIDE_QUESTION.search(q):
+        # 여야·정당 비교 질문 — 진영별 균형 배분 (위원회 균형과 같은 이유).
+        # 위원회를 지목하지 않은 질문은 위 분기를 안 타므로 여기서 처리한다.
+        pool = rerank(cleaned_q, ranked, RERANK_CANDIDATES) if reranker_enabled() else ranked
+        results = _balance_by_side(pool, limit)
     elif reranker_enabled():
         # 단일 주제: RRF 상위 후보를 재순위해 상위 limit 선택
         results = rerank(cleaned_q, ranked, limit)

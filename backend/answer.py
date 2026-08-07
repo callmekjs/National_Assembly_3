@@ -20,6 +20,7 @@
 """
 
 import logging
+import os
 import re
 
 from psycopg2.extras import RealDictCursor
@@ -37,8 +38,35 @@ from verification import (INCOMPLETE_FLAG, comparison_coverage, note_rule_failur
 
 logger = logging.getLogger(__name__)
 
-MODEL = "gpt-4o-mini"
-TEMPERATURE = 0.2          # 사실 서술 위주 — 창의성 억제
+# 답변 생성 모델 (2026-08-07 실측으로 채택). 20문항 평가셋 v2 의 답변 가능 18문항을
+# **정답지(모범답안.json) 대비** 채점한 결과 — 검색·재순위는 고정, 답변 모델만 교체:
+#   gpt-4o-mini  7/18 (38.9%)  환각 19건   평균  998자
+#   gpt-5.6-terra 13/18 (72.2%) 환각  5건   평균 1858자   ← 채택
+#   gpt-5.6-sol  12/18 (66.7%)  환각  8건   평균 2090자
+# terra 가 sol 보다 더 맞히고, 환각이 적고, 더 짧다(=싸다). 미통과 5건은 사람이
+# 검수해 심판 판정이 옳음을 확인했다.
+# 옛 모델이 특히 못하던 곳: 숫자·인용·날짜 질문이 0/2·0/2·1/2 → terra 는 전부 만점.
+# 수치를 틀리게 적고 인용문을 바꿔 쓰던 문제가 사라졌다.
+MODEL = os.environ.get("ANSWER_MODEL") or "gpt-5.6-terra"
+TEMPERATURE = 0.2          # 사실 서술 위주 — 창의성 억제 (gpt-4 계열에만 적용)
+# 추론형 모델(gpt-5.6 계열) 전용 노브. 이 계열은 temperature 지정을 거부하므로
+# (기본값 1만 허용 — 2026-08-06 실측 400 BadRequest) 아래 _gen_kwargs 가 갈라 붙인다.
+# 재순위와 같은 이유로 낮게 둔다 — 위 실측도 low 로 잰 값이다. 이 값을 올리면
+# 출력 토큰과 지연이 늘고, 재순위에서는 품질까지 떨어졌다.
+ANSWER_EFFORT = os.environ.get("ANSWER_EFFORT") or "low"
+ANSWER_TOKEN_MULT = int(os.environ.get("ANSWER_TOKEN_MULT") or "4")
+
+
+def _gen_kwargs(max_tokens: int) -> dict:
+    """모델 계열에 맞는 생성 파라미터. 지원 안 하는 키를 붙이면 호출 자체가 실패한다."""
+    if MODEL.startswith(("gpt-4", "gpt-3")):
+        return {"temperature": TEMPERATURE, "max_tokens": max_tokens}
+    # 추론형은 사고 토큰도 이 예산에서 빠져나간다 — max_tokens 를 그대로 주면
+    # 생각하다 예산이 떨어져 답이 잘리거나 빈 문자열이 온다. 넉넉히 잡는다.
+    kw: dict = {"max_completion_tokens": max_tokens * ANSWER_TOKEN_MULT}
+    if ANSWER_EFFORT:
+        kw["reasoning_effort"] = ANSWER_EFFORT
+    return kw
 NEIGHBOR_TRUNC = 500       # 인접 턴 보조 맥락 절단 길이 (토큰 예산 보호)
 # qa 모드용 짧은 절단 (2026-08-04). 회의록은 질의응답 구조인데 qa 는 근거를
 # 맥락 없이 던지고 있었다 — 청크 중앙값 36자·81%가 150자 미만이라
@@ -99,7 +127,17 @@ _COMMON_RULES = f"""당신은 대한민국 국회 회의록에만 근거해 답�
 - 근거 번호는 제공된 근거 블록의 번호만 사용한다.
 - 발언자 이름은 근거 블록의 표기 그대로 쓴다 (괄호 병기 포함).
 - 발언자 분류 규칙 (여야·정당별 정리 시):
-  · [정당(당시 여야)] 표기가 있는 국회의원만 여당/야당으로 분류한다.
+  · **묶는 기준은 정당이다.** [정당(당시 여야)] 의 정당명으로 묶어라.
+    '당시 여야'는 발언 날짜에 따라 달라지는 값이므로 묶는 기준으로 쓰지 않는다 —
+    이 회의록에는 정권교체(2025년 6월)가 들어 있어, **같은 사람·같은 정당이라도
+    2024년 발언은 '여당', 2025년 하반기 발언은 '야당'으로 표기된다.**
+    이걸 묶는 기준으로 삼으면 한 사람이 양쪽에 들어가 정리가 무너진다.
+  · 여야 지위는 묶은 뒤에 **날짜와 함께** 덧붙인다.
+    예: "국민의힘 (2024년 당시 여당, 2025년 6월 이후 야당)".
+    질문이 '여당과 야당'을 물었더라도 답은 정당으로 묶고, 각 정당이 언제 여당·야당
+    이었는지 밝힌다. 근거가 정권교체 전후에 걸쳐 있으면 그 사실을 명시한다.
+  · 위성정당은 모정당과 함께 묶는다 — 국민의미래는 국민의힘과, 더불어민주연합은
+    더불어민주당과 같은 진영이다. 별도 진영으로 세우지 않는다.
   · [정부측] 표기 발언자(장관·차관·청장·대통령실 등)는 여당/야당에 넣지 말고
     "정부측"으로 별도 분류한다.
   · 증인·참고인·진술인은 정당·여야로 묶지 말고 출석 지위 그대로 분류한다.
@@ -189,7 +227,10 @@ _PARTY_QUESTION = re.compile(r"여야|정당|진영|소속|여당|야당")
 
 _PARTY_GUARD = (
     "\n\n(안내: 발언자의 정당·여야는 근거 블록의 speaker 줄에 [정당(당시 여야)] 로 "
-    "표기된 국회의원만 사용하세요. 여야는 발언 시점 기준입니다. [정부측] 발언자는 "
+    "표기된 국회의원만 사용하세요. **묶는 기준은 정당명입니다** — '당시 여야'는 발언 "
+    "날짜에 따라 뒤집히므로(2025년 6월 정권교체) 묶는 축으로 쓰지 마세요. 여야 지위는 "
+    "묶은 뒤 날짜와 함께 밝히세요. 국민의미래는 국민의힘과, 더불어민주연합은 "
+    "더불어민주당과 같은 진영으로 묶으세요. [정부측] 발언자는 "
     "여당/야당이 아니라 정부측으로, 증인·참고인·진술인은 출석 지위로 분류하고, "
     "표기 없는 발언자의 정당·진영은 추측하지 마세요.)"
 )
@@ -577,8 +618,7 @@ def generate_answer(
 
     resp = _get_client().chat.completions.create(
         model=MODEL,
-        temperature=TEMPERATURE,
-        max_tokens=cfg["max_tokens"],
+        **_gen_kwargs(cfg["max_tokens"]),
         messages=[
             {"role": "system", "content": cfg["system_prompt"]},
             {"role": "user", "content": build_user_message(question, block, issue_block, extra_guards)},

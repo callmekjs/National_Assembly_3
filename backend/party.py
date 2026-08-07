@@ -141,6 +141,28 @@ def speaker_group(role: str | None) -> str:
     return "unknown"
 
 
+def party_bloc(speaker: str | None, role: str | None = None) -> str | None:
+    """발언자가 속한 **정치 블록**. 위성정당은 모정당으로 합친다. 판정 불가면 None.
+
+    여야("당시 여당/야당")가 아니라 정당명을 돌려주는 이유:
+        코퍼스 기간에 정권교체(2025-06-04)가 들어 있어 같은 사람·같은 정당이라도
+        발언 날짜에 따라 여당↔야당이 뒤집힌다 (최형두: 2024년 여당 → 2025년 하반기
+        야당). 여러 날짜에 걸친 질문에서 여야를 묶는 축으로 쓰면 한 사람이 양쪽에
+        들어가 정리가 무너진다. 정당은 이 기간 안에서 안정적이다.
+        답변 지시문(answer._COMMON_RULES)도 같은 원칙을 따른다 — 정당으로 묶고
+        여야 지위는 날짜와 함께 덧붙인다.
+
+    용도: 검색의 진영 균형 배분(search_hybrid._balance_by_side).
+    정부측·증인·참고인·자격 불명은 None — 균형 배분 대상이 아니다.
+    """
+    if not speaker or speaker_group(role) != "assembly":
+        return None
+    party = _load_map().get(_norm(speaker))
+    if party is None or party == _AMBIGUOUS or party == "무소속":
+        return None
+    return SATELLITE_PARENT.get(party, party)
+
+
 def party_label(
     speaker: str | None, meeting_date: str | None, role: str | None = None
 ) -> str | None:
