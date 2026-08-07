@@ -122,7 +122,7 @@ python scripts/extractor_v1.py 과방위 외통위
 
 ### 운영 방어선 (기본값)
 
-IP당 LLM 분당 5회·일반 60회, 일별 OpenAI 비용 상한 $1 (초과 시 한국어 안내).
+IP당 LLM 분당 5회·일반 60회, 일별 OpenAI 비용 상한 $3 (초과 시 한국어 안내).
 상세: `docs/superpowers/specs/2026-07-11-dep-a-guardrails-design.md`
 
 ---
