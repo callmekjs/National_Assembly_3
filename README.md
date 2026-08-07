@@ -109,10 +109,11 @@ python scripts/extractor_v1.py 과방위 외통위
      ```bash
      python -c "import secrets; print(secrets.token_hex(32))"
      ```
-   - **비용 상한 주의**: `DAILY_COST_LIMIT_USD` 기본값은 $1 이다. 재순위·답변에 쓰는
-     `gpt-5.6` 계열 단가가 확인되지 않아 코드가 **보수적(비싼) 추정 단가**를 적용하므로,
-     실제로는 하루 20여 질의에서 상한에 걸린다. 시연 전에 실단가를 확인해
-     `backend/answer.py` 의 `PRICES` 에 넣거나 `DAILY_COST_LIMIT_USD` 를 올릴 것.
+   - **비용 상한**: `DAILY_COST_LIMIT_USD` 기본값 $3 (넘으면 한국어 안내와 함께 거절).
+     실단가 기준 질의당 qa $0.014·report $0.035 이므로 하루 약 120질의에 해당한다.
+     시연에 여러 명이 붙을 예정이면 올리고, 개인 확인용이면 낮춰도 된다.
+     모델을 바꾸면 `backend/answer.py` 의 `PRICES` 에 단가를 **반드시** 등록할 것 —
+     미등록 모델은 보수적 폴백으로 계산돼 장부가 실지출과 어긋난다(테스트가 막는다).
 4. **Vercel**: Add New Project → 같은 저장소 → Root Directory `frontend` →
    환경변수 `VITE_API_URL`(Render URL) → Deploy → 도메인을 Render 의
    `BACKEND_CORS_ORIGINS` 에 반영(재배포)

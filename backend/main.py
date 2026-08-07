@@ -71,7 +71,11 @@ if not CORS_ORIGINS:
 # 배포 방어선 (4단계-A) — 0 이면 해당 방어 끔 (테스트는 conftest 가 끔)
 RATE_LIMIT_LLM_PER_MIN = int(os.environ.get("RATE_LIMIT_LLM_PER_MIN", "5"))
 RATE_LIMIT_PER_MIN = int(os.environ.get("RATE_LIMIT_PER_MIN", "60"))
-DAILY_COST_LIMIT_USD = float(os.environ.get("DAILY_COST_LIMIT_USD", "1.0"))
+# 일별 OpenAI 비용 상한. 2026-08-07 에 $1 → $3.
+# 근거: 실단가를 확인하고 재순위를 luna 로 바꾼 뒤 질의당 qa $0.014·report $0.035 다.
+# $1 이면 하루 40질의로, 시연·면접에서 여러 명이 만지면 금방 찬다. $3 이면 약 120질의.
+# 상한은 지출을 막는 장치이지 예산 목표가 아니다 — 실제 지출은 이보다 훨씬 적다.
+DAILY_COST_LIMIT_USD = float(os.environ.get("DAILY_COST_LIMIT_USD", "3.0"))
 _llm_limiter = RateLimiter(RATE_LIMIT_LLM_PER_MIN)
 _general_limiter = RateLimiter(RATE_LIMIT_PER_MIN)
 _LLM_PATHS = ("/query", "/answer")   # LLM 호출 경로 — 비용 상한 대상
