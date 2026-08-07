@@ -1,0 +1,837 @@
+{
+  "measured_at": "2026-08-07T09:15:34",
+  "n": 18,
+  "all_pass": 17,
+  "rows": [
+    {
+      "id": "n001",
+      "type": "person",
+      "chars": 1008,
+      "sources": 10,
+      "cited": 3,
+      "checks": {
+        "C1 필수섹션": {
+          "ok": true,
+          "note": "4개 모두"
+        },
+        "C2 섹션순서": {
+          "ok": true,
+          "note": ""
+        },
+        "C3 인용유효": {
+          "ok": true,
+          "note": ""
+        },
+        "C4 문단인용": {
+          "ok": true,
+          "note": ""
+        },
+        "_문장인용률": {
+          "ok": true,
+          "note": "82%"
+        },
+        "C5 총평금지": {
+          "ok": true,
+          "note": ""
+        },
+        "C6 발언발췌": {
+          "ok": true,
+          "note": ""
+        },
+        "C7 꼬리거절": {
+          "ok": true,
+          "note": ""
+        },
+        "C8 시간순": {
+          "ok": true,
+          "note": "해당 없음"
+        }
+      },
+      "failed": []
+    },
+    {
+      "id": "n002",
+      "type": "person",
+      "chars": 1033,
+      "sources": 10,
+      "cited": 4,
+      "checks": {
+        "C1 필수섹션": {
+          "ok": true,
+          "note": "4개 모두"
+        },
+        "C2 섹션순서": {
+          "ok": true,
+          "note": ""
+        },
+        "C3 인용유효": {
+          "ok": true,
+          "note": ""
+        },
+        "C4 문단인용": {
+          "ok": true,
+          "note": ""
+        },
+        "_문장인용률": {
+          "ok": true,
+          "note": "83%"
+        },
+        "C5 총평금지": {
+          "ok": true,
+          "note": ""
+        },
+        "C6 발언발췌": {
+          "ok": true,
+          "note": ""
+        },
+        "C7 꼬리거절": {
+          "ok": true,
+          "note": ""
+        },
+        "C8 시간순": {
+          "ok": true,
+          "note": "해당 없음"
+        }
+      },
+      "failed": []
+    },
+    {
+      "id": "n003",
+      "type": "person",
+      "chars": 919,
+      "sources": 10,
+      "cited": 2,
+      "checks": {
+        "C1 필수섹션": {
+          "ok": true,
+          "note": "4개 모두"
+        },
+        "C2 섹션순서": {
+          "ok": true,
+          "note": ""
+        },
+        "C3 인용유효": {
+          "ok": true,
+          "note": ""
+        },
+        "C4 문단인용": {
+          "ok": true,
+          "note": ""
+        },
+        "_문장인용률": {
+          "ok": true,
+          "note": "60%"
+        },
+        "C5 총평금지": {
+          "ok": true,
+          "note": ""
+        },
+        "C6 발언발췌": {
+          "ok": true,
+          "note": ""
+        },
+        "C7 꼬리거절": {
+          "ok": true,
+          "note": ""
+        },
+        "C8 시간순": {
+          "ok": true,
+          "note": "해당 없음"
+        }
+      },
+      "failed": []
+    },
+    {
+      "id": "n004",
+      "type": "person",
+      "chars": 545,
+      "sources": 10,
+      "cited": 1,
+      "checks": {
+        "C1 필수섹션": {
+          "ok": true,
+          "note": "4개 모두"
+        },
+        "C2 섹션순서": {
+          "ok": true,
+          "note": ""
+        },
+        "C3 인용유효": {
+          "ok": true,
+          "note": ""
+        },
+        "C4 문단인용": {
+          "ok": true,
+          "note": ""
+        },
+        "_문장인용률": {
+          "ok": true,
+          "note": "60%"
+        },
+        "C5 총평금지": {
+          "ok": true,
+          "note": ""
+        },
+        "C6 발언발췌": {
+          "ok": true,
+          "note": ""
+        },
+        "C7 꼬리거절": {
+          "ok": true,
+          "note": ""
+        },
+        "C8 시간순": {
+          "ok": true,
+          "note": "해당 없음"
+        }
+      },
+      "failed": []
+    },
+    {
+      "id": "n005",
+      "type": "person",
+      "chars": 668,
+      "sources": 10,
+      "cited": 2,
+      "checks": {
+        "C1 필수섹션": {
+          "ok": true,
+          "note": "4개 모두"
+        },
+        "C2 섹션순서": {
+          "ok": true,
+          "note": ""
+        },
+        "C3 인용유효": {
+          "ok": true,
+          "note": ""
+        },
+        "C4 문단인용": {
+          "ok": true,
+          "note": ""
+        },
+        "_문장인용률": {
+          "ok": true,
+          "note": "67%"
+        },
+        "C5 총평금지": {
+          "ok": true,
+          "note": ""
+        },
+        "C6 발언발췌": {
+          "ok": true,
+          "note": ""
+        },
+        "C7 꼬리거절": {
+          "ok": true,
+          "note": ""
+        },
+        "C8 시간순": {
+          "ok": true,
+          "note": "해당 없음"
+        }
+      },
+      "failed": []
+    },
+    {
+      "id": "n006",
+      "type": "topic",
+      "chars": 889,
+      "sources": 10,
+      "cited": 3,
+      "checks": {
+        "C1 필수섹션": {
+          "ok": true,
+          "note": "4개 모두"
+        },
+        "C2 섹션순서": {
+          "ok": true,
+          "note": ""
+        },
+        "C3 인용유효": {
+          "ok": true,
+          "note": ""
+        },
+        "C4 문단인용": {
+          "ok": true,
+          "note": ""
+        },
+        "_문장인용률": {
+          "ok": true,
+          "note": "78%"
+        },
+        "C5 총평금지": {
+          "ok": true,
+          "note": ""
+        },
+        "C6 발언발췌": {
+          "ok": true,
+          "note": ""
+        },
+        "C7 꼬리거절": {
+          "ok": true,
+          "note": ""
+        },
+        "C8 시간순": {
+          "ok": true,
+          "note": "해당 없음"
+        }
+      },
+      "failed": []
+    },
+    {
+      "id": "n007",
+      "type": "topic",
+      "chars": 1233,
+      "sources": 10,
+      "cited": 5,
+      "checks": {
+        "C1 필수섹션": {
+          "ok": true,
+          "note": "4개 모두"
+        },
+        "C2 섹션순서": {
+          "ok": true,
+          "note": ""
+        },
+        "C3 인용유효": {
+          "ok": true,
+          "note": ""
+        },
+        "C4 문단인용": {
+          "ok": true,
+          "note": ""
+        },
+        "_문장인용률": {
+          "ok": true,
+          "note": "69%"
+        },
+        "C5 총평금지": {
+          "ok": true,
+          "note": ""
+        },
+        "C6 발언발췌": {
+          "ok": true,
+          "note": ""
+        },
+        "C7 꼬리거절": {
+          "ok": true,
+          "note": ""
+        },
+        "C8 시간순": {
+          "ok": true,
+          "note": "해당 없음"
+        }
+      },
+      "failed": []
+    },
+    {
+      "id": "n008",
+      "type": "topic",
+      "chars": 910,
+      "sources": 10,
+      "cited": 3,
+      "checks": {
+        "C1 필수섹션": {
+          "ok": true,
+          "note": "4개 모두"
+        },
+        "C2 섹션순서": {
+          "ok": true,
+          "note": ""
+        },
+        "C3 인용유효": {
+          "ok": true,
+          "note": ""
+        },
+        "C4 문단인용": {
+          "ok": true,
+          "note": ""
+        },
+        "_문장인용률": {
+          "ok": true,
+          "note": "90%"
+        },
+        "C5 총평금지": {
+          "ok": true,
+          "note": ""
+        },
+        "C6 발언발췌": {
+          "ok": true,
+          "note": ""
+        },
+        "C7 꼬리거절": {
+          "ok": true,
+          "note": ""
+        },
+        "C8 시간순": {
+          "ok": true,
+          "note": "해당 없음"
+        }
+      },
+      "failed": []
+    },
+    {
+      "id": "n009",
+      "type": "topic",
+      "chars": 1035,
+      "sources": 10,
+      "cited": 6,
+      "checks": {
+        "C1 필수섹션": {
+          "ok": true,
+          "note": "4개 모두"
+        },
+        "C2 섹션순서": {
+          "ok": true,
+          "note": ""
+        },
+        "C3 인용유효": {
+          "ok": true,
+          "note": ""
+        },
+        "C4 문단인용": {
+          "ok": true,
+          "note": ""
+        },
+        "_문장인용률": {
+          "ok": true,
+          "note": "79%"
+        },
+        "C5 총평금지": {
+          "ok": true,
+          "note": ""
+        },
+        "C6 발언발췌": {
+          "ok": true,
+          "note": ""
+        },
+        "C7 꼬리거절": {
+          "ok": true,
+          "note": ""
+        },
+        "C8 시간순": {
+          "ok": true,
+          "note": "해당 없음"
+        }
+      },
+      "failed": []
+    },
+    {
+      "id": "n010",
+      "type": "comparison",
+      "chars": 999,
+      "sources": 10,
+      "cited": 3,
+      "checks": {
+        "C1 필수섹션": {
+          "ok": true,
+          "note": "4개 모두"
+        },
+        "C2 섹션순서": {
+          "ok": true,
+          "note": ""
+        },
+        "C3 인용유효": {
+          "ok": true,
+          "note": ""
+        },
+        "C4 문단인용": {
+          "ok": true,
+          "note": ""
+        },
+        "_문장인용률": {
+          "ok": true,
+          "note": "58%"
+        },
+        "C5 총평금지": {
+          "ok": true,
+          "note": ""
+        },
+        "C6 발언발췌": {
+          "ok": true,
+          "note": ""
+        },
+        "C7 꼬리거절": {
+          "ok": true,
+          "note": ""
+        },
+        "C8 시간순": {
+          "ok": true,
+          "note": "해당 없음"
+        }
+      },
+      "failed": []
+    },
+    {
+      "id": "n011",
+      "type": "comparison",
+      "chars": 1356,
+      "sources": 10,
+      "cited": 6,
+      "checks": {
+        "C1 필수섹션": {
+          "ok": true,
+          "note": "4개 모두"
+        },
+        "C2 섹션순서": {
+          "ok": true,
+          "note": ""
+        },
+        "C3 인용유효": {
+          "ok": true,
+          "note": ""
+        },
+        "C4 문단인용": {
+          "ok": true,
+          "note": ""
+        },
+        "_문장인용률": {
+          "ok": true,
+          "note": "86%"
+        },
+        "C5 총평금지": {
+          "ok": true,
+          "note": ""
+        },
+        "C6 발언발췌": {
+          "ok": true,
+          "note": ""
+        },
+        "C7 꼬리거절": {
+          "ok": true,
+          "note": ""
+        },
+        "C8 시간순": {
+          "ok": true,
+          "note": "해당 없음"
+        }
+      },
+      "failed": []
+    },
+    {
+      "id": "n012",
+      "type": "comparison",
+      "chars": 1429,
+      "sources": 10,
+      "cited": 5,
+      "checks": {
+        "C1 필수섹션": {
+          "ok": true,
+          "note": "4개 모두"
+        },
+        "C2 섹션순서": {
+          "ok": true,
+          "note": ""
+        },
+        "C3 인용유효": {
+          "ok": true,
+          "note": ""
+        },
+        "C4 문단인용": {
+          "ok": false,
+          "note": "1개 섹션 무인용: ## 개요"
+        },
+        "_문장인용률": {
+          "ok": true,
+          "note": "77%"
+        },
+        "C5 총평금지": {
+          "ok": true,
+          "note": ""
+        },
+        "C6 발언발췌": {
+          "ok": true,
+          "note": ""
+        },
+        "C7 꼬리거절": {
+          "ok": true,
+          "note": ""
+        },
+        "C8 시간순": {
+          "ok": true,
+          "note": "해당 없음"
+        }
+      },
+      "failed": [
+        "C4 문단인용"
+      ]
+    },
+    {
+      "id": "n013",
+      "type": "date_based",
+      "chars": 1133,
+      "sources": 10,
+      "cited": 8,
+      "checks": {
+        "C1 필수섹션": {
+          "ok": true,
+          "note": "4개 모두"
+        },
+        "C2 섹션순서": {
+          "ok": true,
+          "note": ""
+        },
+        "C3 인용유효": {
+          "ok": true,
+          "note": ""
+        },
+        "C4 문단인용": {
+          "ok": true,
+          "note": ""
+        },
+        "_문장인용률": {
+          "ok": true,
+          "note": "85%"
+        },
+        "C5 총평금지": {
+          "ok": true,
+          "note": ""
+        },
+        "C6 발언발췌": {
+          "ok": true,
+          "note": ""
+        },
+        "C7 꼬리거절": {
+          "ok": true,
+          "note": ""
+        },
+        "C8 시간순": {
+          "ok": true,
+          "note": "해당 없음"
+        }
+      },
+      "failed": []
+    },
+    {
+      "id": "n014",
+      "type": "date_based",
+      "chars": 1133,
+      "sources": 10,
+      "cited": 6,
+      "checks": {
+        "C1 필수섹션": {
+          "ok": true,
+          "note": "4개 모두"
+        },
+        "C2 섹션순서": {
+          "ok": true,
+          "note": ""
+        },
+        "C3 인용유효": {
+          "ok": true,
+          "note": ""
+        },
+        "C4 문단인용": {
+          "ok": true,
+          "note": ""
+        },
+        "_문장인용률": {
+          "ok": true,
+          "note": "79%"
+        },
+        "C5 총평금지": {
+          "ok": true,
+          "note": ""
+        },
+        "C6 발언발췌": {
+          "ok": true,
+          "note": ""
+        },
+        "C7 꼬리거절": {
+          "ok": true,
+          "note": ""
+        },
+        "C8 시간순": {
+          "ok": true,
+          "note": "해당 없음"
+        }
+      },
+      "failed": []
+    },
+    {
+      "id": "n015",
+      "type": "numerical",
+      "chars": 797,
+      "sources": 10,
+      "cited": 4,
+      "checks": {
+        "C1 필수섹션": {
+          "ok": true,
+          "note": "4개 모두"
+        },
+        "C2 섹션순서": {
+          "ok": true,
+          "note": ""
+        },
+        "C3 인용유효": {
+          "ok": true,
+          "note": ""
+        },
+        "C4 문단인용": {
+          "ok": true,
+          "note": ""
+        },
+        "_문장인용률": {
+          "ok": true,
+          "note": "90%"
+        },
+        "C5 총평금지": {
+          "ok": true,
+          "note": ""
+        },
+        "C6 발언발췌": {
+          "ok": true,
+          "note": ""
+        },
+        "C7 꼬리거절": {
+          "ok": true,
+          "note": ""
+        },
+        "C8 시간순": {
+          "ok": true,
+          "note": "해당 없음"
+        }
+      },
+      "failed": []
+    },
+    {
+      "id": "n016",
+      "type": "numerical",
+      "chars": 789,
+      "sources": 10,
+      "cited": 2,
+      "checks": {
+        "C1 필수섹션": {
+          "ok": true,
+          "note": "4개 모두"
+        },
+        "C2 섹션순서": {
+          "ok": true,
+          "note": ""
+        },
+        "C3 인용유효": {
+          "ok": true,
+          "note": ""
+        },
+        "C4 문단인용": {
+          "ok": true,
+          "note": ""
+        },
+        "_문장인용률": {
+          "ok": true,
+          "note": "67%"
+        },
+        "C5 총평금지": {
+          "ok": true,
+          "note": ""
+        },
+        "C6 발언발췌": {
+          "ok": true,
+          "note": ""
+        },
+        "C7 꼬리거절": {
+          "ok": true,
+          "note": ""
+        },
+        "C8 시간순": {
+          "ok": true,
+          "note": "해당 없음"
+        }
+      },
+      "failed": []
+    },
+    {
+      "id": "n017",
+      "type": "quote",
+      "chars": 940,
+      "sources": 10,
+      "cited": 5,
+      "checks": {
+        "C1 필수섹션": {
+          "ok": true,
+          "note": "4개 모두"
+        },
+        "C2 섹션순서": {
+          "ok": true,
+          "note": ""
+        },
+        "C3 인용유효": {
+          "ok": true,
+          "note": ""
+        },
+        "C4 문단인용": {
+          "ok": true,
+          "note": ""
+        },
+        "_문장인용률": {
+          "ok": true,
+          "note": "82%"
+        },
+        "C5 총평금지": {
+          "ok": true,
+          "note": ""
+        },
+        "C6 발언발췌": {
+          "ok": true,
+          "note": ""
+        },
+        "C7 꼬리거절": {
+          "ok": true,
+          "note": ""
+        },
+        "C8 시간순": {
+          "ok": true,
+          "note": "해당 없음"
+        }
+      },
+      "failed": []
+    },
+    {
+      "id": "n018",
+      "type": "quote",
+      "chars": 864,
+      "sources": 10,
+      "cited": 2,
+      "checks": {
+        "C1 필수섹션": {
+          "ok": true,
+          "note": "4개 모두"
+        },
+        "C2 섹션순서": {
+          "ok": true,
+          "note": ""
+        },
+        "C3 인용유효": {
+          "ok": true,
+          "note": ""
+        },
+        "C4 문단인용": {
+          "ok": true,
+          "note": ""
+        },
+        "_문장인용률": {
+          "ok": true,
+          "note": "60%"
+        },
+        "C5 총평금지": {
+          "ok": true,
+          "note": ""
+        },
+        "C6 발언발췌": {
+          "ok": true,
+          "note": ""
+        },
+        "C7 꼬리거절": {
+          "ok": true,
+          "note": ""
+        },
+        "C8 시간순": {
+          "ok": true,
+          "note": "해당 없음"
+        }
+      },
+      "failed": []
+    }
+  ]
+}
