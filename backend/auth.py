@@ -25,6 +25,9 @@ logger = logging.getLogger("uvicorn.error")
 # 조용히 무시되는 것을 막는다.
 load_dotenv(Path(__file__).parent.parent / ".env")
 
+# HS256 의 해시 블록 크기 — RFC 7518 §3.2 가 이보다 짧은 키를 쓰지 말라고 못박는다
+_MIN_SECRET_BYTES = 32
+
 JWT_SECRET = os.environ.get("JWT_SECRET", "")
 if not JWT_SECRET:
     # 고정 문자열 기본값("dev-secret-not-for-production")을 쓰던 자리 (감사 2026-08-05).
@@ -39,6 +42,20 @@ if not JWT_SECRET:
         "JWT_SECRET 미설정 — 이번 프로세스 한정 무작위 키 생성. "
         "재기동 시 발급된 토큰이 모두 무효가 된다 (배포에서는 반드시 설정)"
     )
+elif len(JWT_SECRET.encode()) < _MIN_SECRET_BYTES:
+    # 짧은 키를 조용히 받아들이면, 미설정보다 **나쁜** 상태가 된다 — 자동 생성 키는
+    # 64자라 안전한데 사람이 "mysecret" 같은 것을 넣으면 무차별 대입에 노출되면서도
+    # 아무 신호가 없다. HS256 은 키가 해시 블록(32바이트)보다 짧으면 강도가 그만큼
+    # 떨어진다 (RFC 7518 §3.2). PyJWT 2.13 이 이 경우 경고를 내기 시작해 드러났다.
+    # 거절하지 않고 생성 키로 대체한다 — 배포가 뜨긴 뜨되(가용성) 약한 키로는 돌지
+    # 않게 하는 fail-safe. 대가는 재기동 시 토큰 무효이며, 로그가 그 이유를 밝힌다.
+    logger.error(
+        "JWT_SECRET 이 %d바이트로 너무 짧습니다 (최소 %d). 무작위 키로 대체합니다 — "
+        "재기동 시 토큰이 무효가 됩니다. 생성: "
+        'python -c "import secrets; print(secrets.token_hex(32))"',
+        len(JWT_SECRET.encode()), _MIN_SECRET_BYTES,
+    )
+    JWT_SECRET = secrets.token_hex(32)
 
 TOKEN_TTL_DAYS = 7
 _USERNAME_RE = re.compile(r"^[A-Za-z0-9가-힣]{2,20}$")

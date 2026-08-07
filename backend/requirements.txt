@@ -1,9 +1,16 @@
-fastapi==0.115.0
-uvicorn[standard]==0.30.6
-pydantic==2.9.2
+# 2026-08-07 보안 갱신: pip-audit 이 starlette 0.38.6 에서 CVE 7건을 보고했다
+# (PYSEC-2026-161/248/249/1941/1943/2280/2281). starlette 는 fastapi 가 끌고 오므로
+# fastapi 를 올려야 한다. 로컬 설치본이 이 파일과 이미 어긋나 있었으므로
+# (uvicorn 0.40 vs 0.30.6, pydantic 2.12.5 vs 2.9.2) 함께 맞췄다 —
+# CI 는 이 파일로 새로 설치하니 어긋나면 로컬 테스트가 CI 를 대변하지 못한다.
+fastapi==0.141.1
+uvicorn[standard]==0.40.0
+pydantic==2.12.5
 python-dotenv==1.0.1
 psycopg2-binary==2.9.12   # PostgreSQL 연결 (RAG-0)
 openai==2.21.0            # 질문 임베딩·답변 생성 (RAG-3, RAG-6)
 # pgvector 는 DB 확장이라 파이썬 패키지 불필요 (SQL 로 사용)
 bcrypt==4.2.1             # 비밀번호 해시 (인증 — 해시·서명은 직접 구현 금지 영역)
-PyJWT==2.10.1             # JWT 서명/검증 (인증)
+# PyJWT 는 로그인 토큰의 서명·검증을 맡는다 — 인증의 핵심이라 취약점을 미룰 수 없다.
+# 2.10.1 에서 6종 보고 (PYSEC-2026-120/175/176/177/178/179, 2025-183). 2.13.0 이 최소선.
+PyJWT==2.13.0             # JWT 서명/검증 (인증)
