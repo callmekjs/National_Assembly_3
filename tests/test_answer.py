@@ -22,6 +22,7 @@ if __name__ == "__main__":  # pytest 캡처와 충돌 방지 — 직접 실행�
 sys.path.insert(0, str(Path(__file__).parent.parent / "backend"))
 
 import answer  # noqa: E402
+import reranker  # noqa: E402
 from answer import (  # noqa: E402
     MODE_CONFIG,
     NO_EVIDENCE,
@@ -225,8 +226,14 @@ def test_cost_per_model():
     check("비용: 계산식", abs(answer._cost("gpt-4o-mini", 1_000_000, 0) - pin) < 1e-9,
           answer._cost("gpt-4o-mini", 1_000_000, 0))
 
-    # 미등록 모델은 mini 단가로 조용히 떨어지면 안 된다 — 그게 이 결함의 형태였다
-    unknown = answer._price("gpt-5.6-sol")
+    # 실제로 쓰는 모델은 전부 표에 있어야 한다. 폴백에 기대면 청구서와 장부가 어긋난다
+    # (2026-08-07 실측: 폴백 5/20 로 잡은 값이 실단가보다 **싸서** 상한이 덜 막고 있었다).
+    for m in (answer.MODEL, reranker._MODEL):
+        check(f"비용: 실사용 모델 {m} 이 PRICES 에 등록됨", m in answer.PRICES, m)
+
+    # 표에 없는 모델은 mini 단가로 조용히 떨어지면 안 된다 — 그게 이 결함의 형태였다.
+    # (실재하지 않는 이름을 쓴다. 실재 모델을 쓰면 그 모델이 표에 추가되는 순간 깨진다.)
+    unknown = answer._price("gpt-없는모델-test")
     check("비용: 미등록 모델은 폴백 단가", unknown == answer.PRICE_UNKNOWN, unknown)
     check("비용: 폴백은 답변 모델보다 비싸다 (과소추정 금지)",
           unknown[0] > pin and unknown[1] > pout, (unknown, (pin, pout)))
@@ -234,7 +241,7 @@ def test_cost_per_model():
     # 방향성이 핵심: 모르면 비싸게 — 과소추정은 상한을 무력화해 청구서로 돌아오지만
     # 과대추정은 질의가 일찍 거절될 뿐이라 되돌릴 수 있다.
     check("비용: 미등록이 등록보다 크게 계산됨",
-          answer._cost("gpt-5.6-sol", 1000, 1000) > answer._cost("gpt-4o-mini", 1000, 1000))
+          answer._cost("gpt-없는모델-test", 1000, 1000) > answer._cost("gpt-4o-mini", 1000, 1000))
 
 
 # ── 8. 상투구 후처리 ──────────────────────────────────────────────────────────
