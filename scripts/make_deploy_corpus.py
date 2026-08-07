@@ -1,7 +1,7 @@
 """배포용 축소 코퍼스 생성·이전 (4단계-B).
 
 이슈 매핑 청크가 속한 turn 전체(+같은 회의 인접 ±N turn)를 골라 원격(Supabase)으로
-직접 복사한다. 실측 행단가(2026-07-11): 청크 2.3KB, 임베딩 21.0KB(HNSW 포함)/6.5KB(생략).
+직접 복사한다.
 
 **2026-08-07 실측으로 기본 전략을 바꿨다.** 배포본 검색 점수가 로컬보다 낮아
 (strict@5 15/18 vs 18/18) 원인을 재보니, 라벨된 근거의 절반이 축소본에 없었다.
@@ -11,24 +11,29 @@
     쟁점 turn 이 없는 회의            4.9%
 
 거리 분포는 넓게 퍼져 있다 — ±5 로 26%, ±20 으로 51%, ±60 까지 가야 100%.
-그래서 인접 창을 조금 넓히는 것으로는 회수가 안 된다. 규칙별 실측(보정계수 0.83):
+그래서 인접 창을 조금 넓히는 것으로는 회수가 안 된다. 규칙별 근거 회수율:
 
-    규칙            청크      HNSW 유    HNSW 무    근거 회수
-    씨앗만         6,692     139MB      60MB       47.2%
-    ±1            18,001     352MB     141MB       49.3%
-    ±5            50,726     970MB     374MB       60.3%
+    규칙        청크      근거 회수
+    씨앗만     6,692      47.2%
+    ±1        18,001      49.3%
+    ±3        36,010      56.6%
+    ±5        50,726      60.3%
 
-**인덱스를 유지하면 500MB 를 다 써도 회수율이 2%p 밖에 안 오른다.** 인덱스를 빼면
-7.6배 많은 내용에 +13%p 인데, 순차 스캔 비용은 실측 환산 0.06초(50,726행)로 무시할
-수준이다 — 벡터 검색 왕복이 이미 3.7초이고 그 대부분은 임베딩 API 호출이다.
-그래서 기본값을 **±5 · HNSW 생략**으로 둔다. HNSW 는 '있으면 좋은 것'이 아니라
-이 규모에서는 **용량을 근거와 맞바꾸는 선택**이었다.
+**HNSW 인덱스가 용량의 대부분을 먹는다.** 인덱스를 유지하면 500MB 를 다 써도
+±1(회수 49.3%)이 한계다. 인덱스를 빼면 같은 용량에 훨씬 많은 근거가 들어간다.
+순차 스캔 비용은 실측 환산 0.06초(50,726행)로 무시할 수준이다 — 벡터 검색 왕복이
+이미 3.7초이고 그 대부분은 임베딩 API 호출이다. 즉 이 규모에서 HNSW 는
+'있으면 좋은 것'이 아니라 **용량을 근거와 맞바꾸는 선택**이고, 근거 쪽이 크다.
+
+기본값이 ±5 가 아니라 ±3 인 이유: ±5 를 실제로 적재해 보니 504MB 로 무료 한도
+500MB 를 넘었다. 추정이 틀렸던 게 아니라 **인덱스 있는 경우에서 잰 보정계수를
+없는 경우에 적용한 것**이 원인이다(아래 상수 주석 참조). ±3 은 실측 기준 ~358MB.
 
 실행:
   python scripts/make_deploy_corpus.py --dry-run      # 대상 산출·사이즈 추정만 (원격 불필요)
   python scripts/make_deploy_corpus.py                # DEPLOY_DATABASE_URL 로 복사 (빈 DB 전제)
   python scripts/make_deploy_corpus.py --wipe-remote  # 원격 대상 테이블 TRUNCATE 후 재적재
-  옵션: --neighbors N (기본 5)  --index/--no-index (기본 --no-index)  --limit-mb (기본 450)
+  옵션: --neighbors N (기본 3)  --index/--no-index (기본 --no-index)  --limit-mb (기본 420)
 """
 import argparse
 import io
@@ -42,14 +47,17 @@ if __name__ == "__main__":
 sys.path.insert(0, str(Path(__file__).parent.parent / "backend"))
 
 ROOT = Path(__file__).parent.parent
-LIMIT_MB = 450.0            # Supabase 무료 500MB 에서 여유 50MB (query_logs·WAL)
-CHUNK_ROW_KB = 2.3          # 실측: chunks 935MB / 42만 행
+LIMIT_MB = 420.0            # Supabase 무료 500MB 에서 여유 80MB (query_logs·WAL·bloat)
+CHUNK_ROW_KB = 1.6          # 실측 2026-08-07: chunks 75MB / 50,726행 (인덱스 포함)
 EMB_ROW_KB_INDEXED = 21.0   # 실측: embeddings 8.6GB(HNSW 포함) / 42만 행
-EMB_ROW_KB_RAW = 6.5        # 1536 float + 행 오버헤드
-# 추정식은 실측보다 크게 나온다. 배포본 6,692행이 추정 167MB 인데 실측 139MB —
-# 계수 0.83. 추정만 믿고 한도를 잡으면 쓸 수 있는 용량을 20% 남기고 버리게 된다.
-SIZE_CALIBRATION = 0.83
-DEFAULT_NEIGHBORS = 5       # 근거 회수율 실측으로 정함 (모듈 docstring 표 참조)
+EMB_ROW_KB_RAW = 8.4        # 실측 2026-08-07: embeddings 413MB / 50,726행 (HNSW 없음)
+                            # 벡터는 TOAST 로 나가므로 1536×4B=6KB 보다 크다.
+# 보정계수는 **인덱스 있는 경우에서만** 잰 값이다 (6,692행 추정 167MB / 실측 139MB).
+# 2026-08-07 에 이걸 인덱스 없는 경우에 그대로 적용했다가 362MB 로 예상하고 실제
+# 504MB 를 만들어 무료 한도를 넘겼다. HNSW 유무는 저장 구조가 달라 같은 계수가
+# 통하지 않는다. 이제 인덱스 있는 경우에만 쓰고, 없는 경우는 실측 행단가를 직접 쓴다.
+SIZE_CALIBRATION_INDEXED = 0.83
+DEFAULT_NEIGHBORS = 3       # 근거 회수율 56.6% / 실측 ~358MB (모듈 docstring 표 참조)
 _TURN_ID = re.compile(r"^(?P<src>.+_turn_)(?P<no>\d+)$")
 
 # 전량 복사 소형 테이블 (FK 순서 — committees 가 meetings·chunks 의 부모)
@@ -77,14 +85,16 @@ def expand_neighbor_turn_ids(turn_ids: set, k: int = 1) -> set:
 
 
 def estimate_mb(n_chunks: int, with_index: bool, calibrated: bool = False) -> float:
-    """행단가 기반 추정. calibrated=True 면 실측 보정계수를 적용한다.
+    """행단가 기반 추정. calibrated=True 면 실측 보정을 적용한다.
 
-    보정 없이 쓰면 20% 과대 추정이라 한도 판단이 보수적으로 치우친다 — 실제로
-    쓸 수 있는 용량을 남기고 버리게 된다. 기본값을 False 로 둔 것은 기존
-    호출부(테스트 포함)의 계약을 바꾸지 않기 위해서다."""
+    보정은 **인덱스 있는 경우에만** 적용한다. 그 계수를 인덱스 없는 경우에 쓰면
+    과소 추정이 되어 한도를 넘긴다 (2026-08-07 실측: 362MB 예상 → 실제 504MB).
+    인덱스 없는 경우의 행단가는 이미 실측값이라 보정이 필요 없다."""
     emb = EMB_ROW_KB_INDEXED if with_index else EMB_ROW_KB_RAW
     mb = n_chunks * (CHUNK_ROW_KB + emb) / 1024
-    return mb * SIZE_CALIBRATION if calibrated else mb
+    if calibrated and with_index:
+        mb *= SIZE_CALIBRATION_INDEXED
+    return mb
 
 
 # choose_scope(폴백 캐스케이드: 인접+인덱스 → 인접 제외 → 인덱스 생략)는 제거했다.
@@ -162,7 +172,7 @@ def main():
         print(f"청크: core {n_core:,} / +인접 {n_nb:,}")
         print(f"선택: 인접 ±{args.neighbors}, HNSW={'생성' if scope['index'] else '생략'}, "
               f"청크 {scope['n_chunks']:,}개, 추정 {scope['est_mb']}MB "
-              f"(보정계수 {SIZE_CALIBRATION} 적용, 한도 {args.limit_mb}MB)")
+              f"({'보정 적용' if args.index else '실측 단가'}, 한도 {args.limit_mb}MB)")
         if scope["est_mb"] > args.limit_mb:
             print(f"[FAIL] 한도 초과 — --neighbors 를 줄이거나 --limit-mb 를 조정할 것")
             sys.exit(1)
@@ -204,6 +214,14 @@ def main():
                             CREATE INDEX IF NOT EXISTS idx_embeddings_openai_hnsw
                             ON embeddings_openai USING hnsw (embedding vector_cosine_ops)
                         """)
+                    else:
+                        # 생성을 '건너뛰는' 것만으로는 부족하다. schema.sql 이 인덱스를
+                        # 무조건 만들고 TRUNCATE 는 인덱스를 지우지 않으므로, 재적재하면
+                        # 행이 들어가면서 기존 인덱스가 그대로 다시 채워진다.
+                        # 2026-08-07 에 이걸 놓쳐 --no-index 로 돌린 결과가 879MB 였다
+                        # (무료 한도 500MB 의 176%). 명시적으로 지운다.
+                        print("HNSW 제거 (--no-index) — schema.sql 이 만든 것을 지운다")
+                        rcur.execute("DROP INDEX IF EXISTS idx_embeddings_openai_hnsw")
                     # 행수 검증 — 원격 count 와 대조
                     for t, n in report.items():
                         rcur.execute(f"SELECT count(*) FROM {t}")

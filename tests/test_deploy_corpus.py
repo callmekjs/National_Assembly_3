@@ -10,7 +10,8 @@ if __name__ == "__main__":
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 
 from make_deploy_corpus import (  # noqa: E402
-    SIZE_CALIBRATION, estimate_mb, expand_neighbor_turn_ids)
+    CHUNK_ROW_KB, EMB_ROW_KB_INDEXED, EMB_ROW_KB_RAW,
+    SIZE_CALIBRATION_INDEXED, estimate_mb, expand_neighbor_turn_ids)
 
 
 def check(name: str, cond: bool, got=None):
@@ -33,17 +34,27 @@ def test_expand_neighbor_turn_ids():
 
 
 def test_estimate_mb():
-    # 실측 상수: 청크 2.3KB + 임베딩(인덱스 포함) 21.0KB → 행당 23.3KB
-    check("인덱스 포함 추정", abs(estimate_mb(10_000, with_index=True) - 10_000 * 23.3 / 1024) < 0.01)
-    check("인덱스 생략 추정", abs(estimate_mb(10_000, with_index=False) - 10_000 * 8.8 / 1024) < 0.01)
+    # 행단가 상수는 재측정될 수 있다. 그래서 숫자를 박아 두지 않고 **조합 규칙**을
+    # 고정한다 — 상수를 갱신했을 때 깨져야 하는 것은 이 테스트가 아니라 한도 판단이다.
+    for n in (1, 10_000):
+        want_i = n * (CHUNK_ROW_KB + EMB_ROW_KB_INDEXED) / 1024
+        want_r = n * (CHUNK_ROW_KB + EMB_ROW_KB_RAW) / 1024
+        check(f"인덱스 포함 추정 (n={n})", abs(estimate_mb(n, True) - want_i) < 1e-9)
+        check(f"인덱스 생략 추정 (n={n})", abs(estimate_mb(n, False) - want_r) < 1e-9)
+    check("인덱스가 있으면 더 크다", estimate_mb(10_000, True) > estimate_mb(10_000, False))
 
-    # 보정계수 (2026-08-07): 추정식은 실측보다 20% 크게 나온다. 보정을 켜지 않으면
-    # 쓸 수 있는 용량을 남기고 버린다 — 실제로 그 때문에 인접 turn 이 통째로 빠졌다.
-    raw = estimate_mb(10_000, with_index=True)
-    cal = estimate_mb(10_000, with_index=True, calibrated=True)
-    check("보정계수는 추정을 줄인다", cal < raw, (cal, raw))
-    check("보정계수 값 일치", abs(cal - raw * SIZE_CALIBRATION) < 0.01, (cal, raw))
-    check("기본값은 보정 안 함 (기존 계약 유지)", estimate_mb(10_000, True) == raw)
+    # 보정은 인덱스 있는 경우에만 적용한다. 2026-08-07 에 이 계수를 인덱스 없는
+    # 경우에 그대로 써서 362MB 로 예상하고 실제 504MB 를 만들어 한도를 넘겼다.
+    raw_i = estimate_mb(10_000, with_index=True)
+    cal_i = estimate_mb(10_000, with_index=True, calibrated=True)
+    check("인덱스 O: 보정이 추정을 줄인다", cal_i < raw_i, (cal_i, raw_i))
+    check("인덱스 O: 보정 값 일치",
+          abs(cal_i - raw_i * SIZE_CALIBRATION_INDEXED) < 0.01, (cal_i, raw_i))
+
+    raw_n = estimate_mb(10_000, with_index=False)
+    cal_n = estimate_mb(10_000, with_index=False, calibrated=True)
+    check("인덱스 X: 보정해도 줄지 않는다 (이미 실측 단가)", cal_n == raw_n, (cal_n, raw_n))
+    check("기본값은 보정 안 함 (기존 계약 유지)", estimate_mb(10_000, True) == raw_i)
 
 
 def test_expand_neighbor_window():
