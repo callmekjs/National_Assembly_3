@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import './App.css'
 import { postQuery, pingHealth, fetchMe, getToken, clearToken } from './api'
 import QueryForm from './components/QueryForm'
@@ -11,6 +11,7 @@ import AuthModal from './components/AuthModal'
 import MyQueries from './components/MyQueries'
 import Hero from './components/Hero'
 import QueryProgress from './components/QueryProgress'
+import ErrorBoundary from './components/ErrorBoundary'
 
 // URL 쿼리 파라미터 ↔ 화면 상태 (공유 가능 링크: ?tab=issues&issue=medical-reform)
 const TABS = ['query', 'issues', 'actor']
@@ -49,13 +50,35 @@ function App() {
   const [user, setUser] = useState(null)         // {username} | null
   const [authOpen, setAuthOpen] = useState(false)
 
-  // 상태 → URL 반영 (replaceState — 히스토리 오염 없이 현재 화면을 공유 가능하게)
+  // 상태 → URL 반영. pushState 로 기록을 남긴다 (2026-08-07 수정).
+  // 예전에는 replaceState 만 써서 히스토리에 항목이 하나도 안 쌓였다 → 탭을 몇 번
+  // 옮긴 뒤 뒤로가기를 누르면 이전 탭이 아니라 **사이트 밖으로** 나갔다.
+  // fromPop 은 뒤로가기로 상태가 바뀐 경우를 표시한다 — 그때 다시 push 하면
+  // 기록이 무한히 쌓여 뒤로가기가 영영 안 끝난다.
+  const fromPop = useRef(false)
   useEffect(() => {
+    // 표시는 **가장 먼저** 내린다. 아래 "주소가 같으면 return" 보다 뒤에 두면,
+    // 뒤로가기 직후(주소가 이미 일치)에 표시가 남아 다음 탭 클릭이 통째로 무시된다.
+    const wasPop = fromPop.current
+    fromPop.current = false
     const url = urlFromState(tab, selectedIssue, selectedActor)
-    if (url !== window.location.pathname + window.location.search) {
-      window.history.replaceState(null, '', url)
-    }
+    if (wasPop) return
+    if (url === window.location.pathname + window.location.search) return
+    window.history.pushState(null, '', url)
   }, [tab, selectedIssue, selectedActor])
+
+  // 뒤로/앞으로 → 주소를 읽어 화면 상태 복원
+  useEffect(() => {
+    function onPop() {
+      const s = readUrlState()
+      fromPop.current = true
+      setTab(s.tab)
+      setSelectedIssue(s.issue)
+      setSelectedActor(s.actor)
+    }
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [])
 
   useEffect(() => {
     pingHealth().then(() => setServerStatus('ok')).catch(() => setServerStatus('down'))
@@ -165,6 +188,9 @@ function App() {
       </header>
 
       <div className="page">
+        {/* 본문만 감싼다 — 헤더·탭은 밖에 두어야 한 화면이 깨져도 다른 탭으로 이동할 수
+            있다. resetKey=tab 이라 탭을 옮기면 자동 복구된다. */}
+        <ErrorBoundary resetKey={tab}>
         <div className="page-inner">
           {tab === 'query' && (
             <main className="stack stack-lg">
@@ -215,6 +241,7 @@ function App() {
             프로필 통계도 이 기준입니다.
           </footer>
         </div>
+        </ErrorBoundary>
       </div>
 
       {modalChunkId && (

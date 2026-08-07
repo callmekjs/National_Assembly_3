@@ -57,10 +57,16 @@ app = FastAPI(title="국회 RAG API", version="0.2.0", lifespan=lifespan)
 # CORS 허용 출처 — 기본은 Vite dev server (localhost/127.0.0.1 어느 쪽으로 열어도
 # 동작하게 둘 다). 배포 시 .env 의 BACKEND_CORS_ORIGINS(쉼표 구분)로 교체.
 _cors_env = os.environ.get("BACKEND_CORS_ORIGINS", "")
-CORS_ORIGINS = (
-    [o.strip() for o in _cors_env.split(",") if o.strip()]
-    or ["http://localhost:5173", "http://127.0.0.1:5173"]
-)
+CORS_ORIGINS = [o.strip() for o in _cors_env.split(",") if o.strip()]
+if not CORS_ORIGINS:
+    # 미설정 시 개발 기본값으로 조용히 넘어가면, 배포에서 env 를 한 번 빠뜨렸을 때
+    # 프론트가 전부 CORS 오류가 나는데 서버 로그에는 아무 신호가 없다. 런북에 적혀
+    # 있어도 사람은 빠뜨린다 — 조용한 실패를 시끄러운 경고로 바꾼다 (감사 2026-08-05).
+    CORS_ORIGINS = ["http://localhost:5173", "http://127.0.0.1:5173"]
+    logger.warning(
+        "BACKEND_CORS_ORIGINS 미설정 — 개발 기본값(%s)을 사용합니다. "
+        "배포라면 프론트 도메인을 지정하세요 (끝 슬래시 없이, 쉼표 구분).",
+        ", ".join(CORS_ORIGINS))
 
 # 배포 방어선 (4단계-A) — 0 이면 해당 방어 끔 (테스트는 conftest 가 끔)
 RATE_LIMIT_LLM_PER_MIN = int(os.environ.get("RATE_LIMIT_LLM_PER_MIN", "5"))
@@ -182,10 +188,22 @@ def health():
     """서버 + DB 상태 확인. DB 장애 시에도 200 으로 상태를 알린다 (모니터링용)."""
     try:
         with get_conn() as conn, conn.cursor() as cur:
-            cur.execute("SELECT count(*) FROM chunks")
-            chunks = cur.fetchone()[0]
-            cur.execute("SELECT count(*) FROM embeddings_openai")
-            embeddings = cur.fetchone()[0]
+            # reltuples 근사 — 프론트가 페이지 로드마다 pingHealth() 를 부르는데
+            # count(*) 는 42만 행을 매번 전수 집계한다(2회). 배포본에는 인덱스도
+            # 없어 더 느리다. /health 는 "살아 있나"를 보는 곳이고 행 수는 참고값이라
+            # 근사로 충분하다. ANALYZE 이후 값이므로 -1(미분석)이면 실집계로 떨어진다.
+            cur.execute("""
+                SELECT c.relname, c.reltuples::bigint
+                FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
+                WHERE n.nspname = 'public' AND c.relname IN ('chunks', 'embeddings_openai')
+            """)
+            approx = dict(cur.fetchall())
+            chunks, embeddings = approx.get("chunks", -1), approx.get("embeddings_openai", -1)
+            if chunks < 0 or embeddings < 0:      # 통계 없음 — 한 번은 정확히 센다
+                cur.execute("SELECT count(*) FROM chunks")
+                chunks = cur.fetchone()[0]
+                cur.execute("SELECT count(*) FROM embeddings_openai")
+                embeddings = cur.fetchone()[0]
         return {
             "status": "ok",
             "db": "ok",
@@ -523,20 +541,35 @@ def get_citation(chunk_id: str):
 
 
 @app.post("/feedback")
-def post_feedback(req: FeedbackRequest):
-    """답변 평가 저장 (RAG-7) — query_logs 해당 행에 rating UPDATE."""
+def post_feedback(req: FeedbackRequest, authorization: str | None = Header(default=None)):
+    """답변 평가 저장 (RAG-7) — query_logs 해당 행에 rating UPDATE.
+
+    소유자 확인 (감사 2026-08-05, 수정 2026-08-07): 예전에는 `query_id` 만 알면
+    누구나 어느 평가든 덮어쓸 수 있었다. 표본이 3건뿐이라 한 번만 오염돼도 통계가
+    뒤집힌다. 두 겹으로 막는다 —
+      · 로그인 사용자의 질의는 **그 사용자만** 평가할 수 있다.
+      · 익명 질의는 익명이 평가하되 **최초 1회만** (덮어쓰기 불가).
+    실패는 404 로 통일한다. "그 query_id 는 남의 것"이라고 알려주면 그 자체가
+    존재 여부를 흘리기 때문이다.
+    """
     try:
         uuid.UUID(req.query_id)
     except ValueError:
         raise HTTPException(status_code=422, detail=f"query_id 형식이 UUID 가 아닙니다: {req.query_id}")
+    user = _bearer_user(authorization)
+    uid = user["user_id"] if user else None
     with get_conn() as conn, conn.cursor() as cur:
         cur.execute(
             """
             UPDATE query_logs
             SET rating = %s, feedback_comment = %s, feedback_at = now()
             WHERE query_id = %s::uuid
+              -- 소유자 일치 (양쪽 NULL 도 일치로 본다 — 익명 질의를 익명이 평가)
+              AND user_id IS NOT DISTINCT FROM %s
+              -- 익명 질의는 최초 1회만. 로그인 사용자는 자기 것이므로 수정 허용.
+              AND (%s IS NOT NULL OR rating IS NULL)
             """,
-            (req.rating, req.comment, req.query_id),
+            (req.rating, req.comment, req.query_id, uid, uid),
         )
         if cur.rowcount == 0:
             raise HTTPException(status_code=404, detail=f"query_id not found: {req.query_id}")

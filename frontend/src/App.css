@@ -1860,3 +1860,26 @@ body {
 
   .data-table td { padding: 14px 10px; } /* 클릭 가능한 행 — 행 높이로 44px 확보 */
 }
+
+/* 에러 바운더리 — 컴포넌트가 렌더 중 죽었을 때 백지 대신 보이는 화면 */
+.error-boundary {
+  border: 1px solid var(--line, #d9d9d9);
+  border-left: 3px solid #c0392b;
+  border-radius: 0 8px 8px 0;
+  padding: 20px 24px;
+  margin: 24px 0;
+}
+.error-boundary h2 { font-size: 17px; margin: 0 0 6px; }
+.error-boundary p { margin: 0 0 12px; opacity: .8; font-size: 14px; }
+.error-boundary button {
+  border: 1px solid var(--line, #d9d9d9);
+  background: transparent; color: inherit;
+  border-radius: 6px; padding: 6px 14px; cursor: pointer; font-size: 14px;
+}
+.error-boundary details { margin-top: 12px; }
+.error-boundary summary { cursor: pointer; font-size: 13px; opacity: .65; }
+.error-boundary pre {
+  margin: 8px 0 0; padding: 10px 12px; border-radius: 6px;
+  background: rgba(128,128,128,.12);
+  font-size: 12px; white-space: pre-wrap; word-break: break-word;
+}
