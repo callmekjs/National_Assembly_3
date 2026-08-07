@@ -85,6 +85,18 @@ def test_validation_422():
     r = client.post("/feedback", json={"query_id": str(uuid.uuid4()), "rating": 999})
     check("검증: rating 999 → 422", r.status_code == 422, r.status_code)
 
+    # 공백만 (2026-08-07 배포 스모크에서 실측한 결함): `min_length=2` 를 공백 2칸이
+    # 통과해 빈 질문이 임베딩 API 까지 흘러갔고, 사용자는 502 "임베딩 호출 실패:
+    # BadRequestError" 라는 내부 오류를 봤다. 길이 검사 전에 잘라내야 한다.
+    for blank in ("  ", "   ", "\t\t", " \n "):
+        r = client.post("/query", json={"question": blank})
+        check(f"검증: 공백만({blank!r}) → 422", r.status_code == 422, r.status_code)
+
+    # 잘라내되 내용이 남으면 통과해야 한다 — 과잉 차단 방지
+    r = client.post("/query", json={"question": "  인공지능  ", "date_from": "2025-13-01"})
+    check("검증: 앞뒤 공백은 잘라내고 통과 (날짜에서만 422)",
+          r.status_code == 422 and "question" not in r.text, r.text[:120])
+
 
 def test_query_pre_gate_none():
     """검색 0건 → LLM 미호출 고정 문구 + grounding NONE + query_id 발급."""

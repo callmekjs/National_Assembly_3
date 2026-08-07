@@ -86,6 +86,19 @@ python scripts/extractor_v1.py 과방위 외통위
 중 이슈 관련 turn만 ≤350MB). **아래 성능 수치는 모두 전체 코퍼스 로컬 측정 기준**이며
 축소본에서는 달라진다 — [측정 한계](#알려진-한계) 참조.
 
+### 실제 배포 주소 (2026-08-07)
+
+| 조각 | 주소 | 비고 |
+|------|------|------|
+| 프론트 | https://national-assembly-3.vercel.app | Vercel Hobby, Root `frontend` |
+| 백엔드 | https://assembly-rag-api.onrender.com | Render Free, 싱가포르, Root `backend` |
+| DB | Supabase `aws-1-ap-northeast-2` (서울) | 139MB / 500MB — 임베딩이 107MB |
+
+Render 리전을 **싱가포르**로 잡은 이유: 무료 요금제 선택지(Oregon/Ohio/Virginia/
+Frankfurt/Singapore) 중 서울 DB 에 가장 가깝다. 실측으로도 이득이 확인됐다 —
+`/actors/김윤` 이 로컬(4.9초)보다 배포본(2.5초)에서 빨랐다. **리전은 서비스 생성 후
+변경 불가**이므로 만들기 전에 정할 것.
+
 ### 순서 (사용자 체크리스트)
 
 1. **Supabase**: 프로젝트 생성 (리전 Northeast Asia) → Settings > Database 의
@@ -114,16 +127,50 @@ python scripts/extractor_v1.py 과방위 외통위
      시연에 여러 명이 붙을 예정이면 올리고, 개인 확인용이면 낮춰도 된다.
      모델을 바꾸면 `backend/answer.py` 의 `PRICES` 에 단가를 **반드시** 등록할 것 —
      미등록 모델은 보수적 폴백으로 계산돼 장부가 실지출과 어긋난다(테스트가 막는다).
+   - **Instance Type 기본값이 Starter($7/월)** 이다. Free 를 쓰려면 직접 바꿔야 한다.
+   - ⚠️ **환경변수를 저장한 뒤 값을 눈으로 확인할 것.** Render 편집 폼의 입력칸은
+     붙여넣기가 반영되지 않는 경우가 있다(2026-08-07 실측: `BACKEND_CORS_ORIGINS`
+     를 고치고 "Save, rebuild, and deploy" 를 눌렀는데 저장된 값은 이전 값 그대로였고,
+     **아무것도 바뀌지 않은 재배포**가 성공으로 끝났다). 값이 안 바뀌면 행을 통째로
+     지우고 새로 만든 뒤 **키보드로 직접 입력**하면 된다. 입력칸이 좁아 눈으로 읽기
+     어려우면 눈(👁) 아이콘으로 펼친다.
 4. **Vercel**: Add New Project → 같은 저장소 → Root Directory `frontend` →
    환경변수 `VITE_API_URL`(Render URL) → Deploy → 도메인을 Render 의
    `BACKEND_CORS_ORIGINS` 에 반영(재배포)
+   - ⚠️ **Application Preset 을 `Vite` 로 바꿀 것.** 기본값이 `Services` 라서
+     Vercel 이 `frontend`(Vite)와 `backend`(FastAPI)를 **둘 다** 감지해 멀티서비스
+     배포(`vercel.json` 요구)를 제안한다. 백엔드는 Render 에 있으므로 그대로 두면
+     FastAPI 가 중복 배포된다.
+   - 저장소가 목록에 없으면 GitHub 앱 권한 문제다. `Configure GitHub App` 에서
+     저장소를 추가한 뒤 **페이지를 새로고침**해야 목록에 반영된다.
 5. **스모크 6항목**: `/health` 200(행수=축소본) / report 질의 1건(issue_context 포함)
    / 쟁점 탭 24개 이슈 / 프로필 김윤 / 연속 6회 질의 → 429 / 15분 방치 후 콜드스타트 배너
+
+### 배포 후 실측 (2026-08-07, 축소본 기준)
+
+| 항목 | 값 |
+|------|-----|
+| `/health` | 0.6초 |
+| `/committees` · `/issues` | 0.7초 · 0.9초 |
+| `/actors/김윤` | 2.5초 |
+| `/search/hybrid` | 10.2초 |
+| `/query` report | 23~25초 · $0.04 |
+| 백엔드 메모리 | 112MB / 512MB |
+
+**콜드스타트**: 15분 유휴 시 인스턴스가 잠들어 다음 첫 요청이 50초 이상 걸린다
+(무료 요금제 특성, 화면에 안내 배너 있음). **Supabase 무료는 7일 무접속 시 프로젝트를
+재운다** — 시연 전날 한 번 깨워 둘 것.
 
 ### 운영 방어선 (기본값)
 
 IP당 LLM 분당 5회·일반 60회, 일별 OpenAI 비용 상한 $3 (초과 시 한국어 안내).
+IP 는 `X-Forwarded-For` 첫 값을 쓴다 — Render 같은 프록시 뒤에서도 사용자별로 센다.
 상세: `docs/superpowers/specs/2026-07-11-dep-a-guardrails-design.md`
+
+**재순위 출력 상한** `RERANKER_MAX_TOKENS` 기본값 2000. 추론형 모델은 같은 프롬프트에도
+사고량이 튄다 — 실측으로 출력 244 vs 29,132 토큰(질의 25초 vs 125초, 비용 2배)이 갈렸고
+`reasoning_effort=low` 로는 막히지 않았다. 상한에 걸리면 원순위로 폴백하며(재순위 품질만
+잃고 검색은 계속) 경고 로그를 남긴다. 로그에 이 경고가 잦으면 값을 올린다.
 
 ---
 

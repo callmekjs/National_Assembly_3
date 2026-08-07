@@ -5,7 +5,7 @@ import os
 import time
 import uuid
 from contextlib import asynccontextmanager
-from typing import Literal
+from typing import Annotated, Literal
 
 from fastapi import FastAPI, Header, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -14,7 +14,7 @@ from starlette.concurrency import run_in_threadpool
 from openai import OpenAIError
 import psycopg2
 from psycopg2.extras import RealDictCursor
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, StringConstraints, field_validator
 
 import auth
 from actors import actor_profile, search_members
@@ -146,8 +146,19 @@ app.add_middleware(
 
 # 날짜는 date 타입으로 받아 잘못된 값("2025-13-01" 등)을 422 로 거른다 — str 로 두면
 # SQL 까지 흘러가 500. question 길이 제한은 임베딩 API 한도(8,192토큰)·비용 방어.
+#
+# strip_whitespace 가 붙어야 하는 이유 (2026-08-07 배포 스모크에서 실측):
+# `min_length=2` 만으로는 공백 2칸(`"  "`)이 통과한다. 그러면 빈 질문이 검색까지
+# 흘러가 임베딩 API 가 400 을 내고, 사용자는 `502 임베딩 호출 실패: BadRequestError`
+# 라는 내부 오류를 본다. 빈 질문은 422 로 즉시 거절되는 게 맞다 — 길이 검사 전에
+# 잘라내면 공백만 남은 입력은 빈 문자열이 되어 자연히 걸린다.
+# (덤으로 앞뒤 공백이 제거돼 같은 질문이 캐시·로그에서 다르게 세지는 것도 막는다.)
+QuestionStr = Annotated[str, StringConstraints(
+    strip_whitespace=True, min_length=2, max_length=1000)]
+
+
 class QueryRequest(BaseModel):
-    question: str = Field(min_length=2, max_length=1000)
+    question: QuestionStr
     mode: Literal["qa", "report"] = "qa"
     committee: str | None = None
     date_from: datetime.date | None = None
@@ -155,7 +166,7 @@ class QueryRequest(BaseModel):
 
 
 class AnswerRequest(BaseModel):
-    question: str = Field(min_length=2, max_length=1000)
+    question: QuestionStr
     mode: Literal["qa", "report"] = "qa"
     committee: str | None = None
     date_from: datetime.date | None = None
