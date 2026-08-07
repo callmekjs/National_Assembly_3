@@ -1,8 +1,11 @@
 """
 벡터(의미) 검색 (RAG-3).
 
-흐름: 질문 → OpenAI 임베딩(text-embedding-3-small, 1536차원)
+흐름: 질문 → OpenAI 임베딩(text-embedding-3-small)
      → embeddings_openai HNSW 인덱스 코사인 유사도 검색 → 필터 적용
+
+차원은 저장된 벡터에서 읽어 맞춘다(embedding_dims). 배포본은 용량 제약으로
+512차원을 쓰고 로컬 전체 코퍼스는 1536차원이라, 상수로 박으면 한쪽이 깨진다.
 
 주의:
   - 필터(위원회 등)와 HNSW 를 함께 쓰면 인덱스가 후보를 좁게 잡아 결과가 부족할 수
@@ -25,6 +28,31 @@ load_dotenv(Path(__file__).parent.parent / ".env")
 EMBEDDING_MODEL = "text-embedding-3-small"
 EF_SEARCH = 100          # HNSW 탐색 폭 (기본 40 — 필터 병용 대비 상향)
 
+# 질의 벡터의 차원은 **저장된 벡터에 맞춰야** 한다. 어긋나면 pgvector 가 매 질의마다
+# 오류를 내 검색이 통째로 죽는다. 상수로 박아 두면 DB 를 바꿀 때 코드 배포와 데이터
+# 적재 사이에 반드시 깨지는 구간이 생긴다 — 어느 쪽을 먼저 해도 그렇다.
+# 그래서 **DB 에서 읽는다.** 코드가 데이터를 따라가므로 순서 문제가 사라진다.
+# 환경변수로 덮어쓸 수 있게 둔 것은 빈 테이블에 처음 적재할 때를 위해서다.
+_DEFAULT_DIMS = 1536
+
+
+@lru_cache(maxsize=1)
+def embedding_dims() -> int:
+    """저장된 임베딩의 차원. 테이블이 비었거나 조회 실패면 기본값."""
+    override = os.environ.get("EMBEDDING_DIMENSIONS")
+    if override:
+        return int(override)
+    try:
+        with get_conn() as conn, conn.cursor() as cur:
+            cur.execute("SELECT vector_dims(embedding) FROM embeddings_openai LIMIT 1")
+            row = cur.fetchone()
+            if row:
+                return int(row[0])
+    except Exception:
+        pass
+    return _DEFAULT_DIMS
+
+
 _client: OpenAI | None = None
 
 
@@ -46,7 +74,9 @@ def embed_query(q: str) -> str:
     같은 질문 재질의(재시도·데모 반복·eval)에 API 호출 생략 — lru_cache 는
     스레드 안전, 임베딩은 모델 고정이라 결과 불변 (2026-07-07, A+ 기준 6).
     """
-    resp = _get_client().embeddings.create(model=EMBEDDING_MODEL, input=[q])
+    dims = embedding_dims()
+    kw = {} if dims == _DEFAULT_DIMS else {"dimensions": dims}
+    resp = _get_client().embeddings.create(model=EMBEDDING_MODEL, input=[q], **kw)
     vec = resp.data[0].embedding
     return "[" + ",".join(f"{v:.7f}" for v in vec) + "]"
 
