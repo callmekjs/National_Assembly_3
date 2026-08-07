@@ -17,16 +17,24 @@ import { Component } from 'react'
  *    화면까지 잠그지 않게).
  */
 export default class ErrorBoundary extends Component {
-  state = { error: null }
+  state = { error: null, lastResetKey: this.props.resetKey }
 
   static getDerivedStateFromError(error) {
     return { error }
   }
 
-  componentDidUpdate(prevProps) {
-    if (this.state.error && prevProps.resetKey !== this.props.resetKey) {
-      this.setState({ error: null })
+  // resetKey 가 바뀌면 오류 상태를 버린다.
+  // getDerivedStateFromProps 로 하는 이유: componentDidUpdate 에서 setState 를
+  // 부르면 렌더가 한 번 더 돌고(오류 화면이 한 프레임 깜빡인다) 린트도 경고한다.
+  // 파생 상태는 렌더 전에 정해지므로 깜빡임 없이 바로 자식으로 돌아간다.
+  static getDerivedStateFromProps(props, state) {
+    if (state.error && props.resetKey !== state.lastResetKey) {
+      return { error: null, lastResetKey: props.resetKey }
     }
+    if (state.lastResetKey !== props.resetKey) {
+      return { lastResetKey: props.resetKey }
+    }
+    return null
   }
 
   componentDidCatch(error, info) {
