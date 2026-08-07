@@ -14,6 +14,7 @@ answer 모듈(RAG-6) 단위 테스트 — LLM·DB 호출 없이 순수 로직만
 """
 
 import io
+import os
 import sys
 from pathlib import Path
 
@@ -362,6 +363,7 @@ def main():
     test_compare_re_candidate_d()
     test_coverage_guard()
     test_build_user_message_extra_guards()
+    test_rerank_max_tokens()
     print("\nALL PASS")
 
 
@@ -434,6 +436,68 @@ def test_build_user_message_extra_guards():
     msg2 = build_user_message("질문", "[1] 근거")
     check("조립: extra_guards 기본값 하위호환", "테스트 가드" not in msg2)
     check("조립: QA_PAIR_GUIDE 상수 존재", "질의-답변" in QA_PAIR_GUIDE)
+
+
+# ── 9. 재순위 출력 상한 (2026-08-07) ──────────────────────────────────────────
+# 배포 검증 중 같은 프롬프트가 출력 244 vs 29,132 토큰으로 갈렸다 (25초 vs 125초).
+# reasoning_effort=low 로는 이 꼬리를 못 막는다 — 상한이 유일한 방어다.
+
+class _FakeResp:
+    def __init__(self, content, finish_reason, out_tokens):
+        self.choices = [type("C", (), {
+            "message": type("M", (), {"content": content})(),
+            "finish_reason": finish_reason})()]
+        self.usage = type("U", (), {"prompt_tokens": 8222,
+                                    "completion_tokens": out_tokens})()
+
+
+def _fake_client(captured: dict, resp):
+    class _Completions:
+        def create(self, **kw):
+            captured.update(kw)
+            return resp
+    return type("C", (), {"chat": type("Ch", (), {"completions": _Completions()})()})()
+
+
+def test_rerank_max_tokens():
+    hits = [{"snippet": f"발언 {i}", "speaker": "김의원"} for i in range(30)]
+    monkey = {"RERANKER_ENABLED": "1", "OPENAI_API_KEY": "sk-test"}
+    saved = {k: os.environ.get(k) for k in monkey}
+    os.environ.update(monkey)
+    saved_client = reranker._client
+    try:
+        # ① 정상 응답 — 상한 인자가 실제로 API 호출에 실린다
+        captured = {}
+        ok = _FakeResp('{"order":[2,1,0]}', "stop", 244)
+        reranker._client = _fake_client(captured, ok)
+        out = reranker.rerank("질문", hits, 3)
+        key = "max_tokens" if reranker._MODEL.startswith(("gpt-4", "gpt-3")) else "max_completion_tokens"
+        check("재순위: 상한 인자가 호출에 실린다",
+              captured.get(key) == reranker.RERANK_MAX_TOKENS, captured.get(key))
+        check("재순위: 정상 응답은 재정렬된다",
+              [h["snippet"] for h in out] == ["발언 2", "발언 1", "발언 0"],
+              [h.get("snippet") for h in out])
+
+        # ② 상한에 걸린 응답 — 잘린 JSON 을 파싱하려 들지 말고 원순위로 폴백
+        truncated = _FakeResp('{"order":[2,1', "length", reranker.RERANK_MAX_TOKENS)
+        reranker._client = _fake_client({}, truncated)
+        out = reranker.rerank("질문", hits, 3)
+        check("재순위: 상한 도달 시 원순위 폴백",
+              [h["snippet"] for h in out] == ["발언 0", "발언 1", "발언 2"],
+              [h.get("snippet") for h in out])
+        check("재순위: 폴백 결과에 rerank_rank 가 붙지 않는다",
+              all("rerank_rank" not in h for h in out))
+        # 폭주해도 비용은 이미 나갔다 — 장부에 남아야 guard 의 일별 상한이 제대로 센다
+        check("재순위: 상한 폴백에도 usage 는 기록된다",
+              (reranker.last_usage() or {}).get("output_tokens") == reranker.RERANK_MAX_TOKENS,
+              reranker.last_usage())
+    finally:
+        reranker._client = saved_client
+        for k, v in saved.items():
+            if v is None:
+                os.environ.pop(k, None)
+            else:
+                os.environ[k] = v
 
 
 if __name__ == "__main__":

@@ -47,6 +47,23 @@ _REASONING_EFFORT = os.environ.get("RERANKER_EFFORT") or "low"   # 추론형 모
 _MAX_DOC_CHARS = 600             # 후보당 스니펫 길이 — search_* 의 left(ch.text, N) 과 같아야 한다
                                  # (1200 시도 → nDCG@5 0.710→0.653, 비용 +59%. 되돌림)
 
+# 출력 토큰 상한 (2026-08-07 배포 검증 중 신설).
+#
+# 같은 프롬프트(입력 8,222 토큰 동일)로 두 번 호출했는데 출력이 244 vs 29,132 이었다.
+# 폭주한 쪽은 질의 전체가 25초 → 125초, 비용 $0.040 → $0.076 이 됐다. 환경 차이가
+# 아니다 — 배포본과 로컬이 같은 모델·같은 effort 였고 프롬프트도 같았다. **추론형
+# 모델의 사고량이 호출마다 튀는 것**이고, `reasoning_effort=low` 는 이 꼬리를 막지
+# 못한다. 상한만이 막는다.
+#
+# 2000 인 이유: 실측 정상 출력이 244·402 토큰이라 5배 여유다. 이 작업은 번호 30개를
+# 줄 세워 `{"order":[...]}` 하나를 뱉는 것이라 본질적으로 짧다.
+#
+# 상한에 걸리면 원순위 폴백이다. 그 질의는 재순위 품질을 잃지만(nDCG@5 0.76→0.33
+# 수준) **검색은 멈추지 않고**, 2분짜리 응답과 2배 청구서는 막는다. 시연 중에는
+# 느린 정답보다 빠른 차선이 낫다는 판단이다. 폴백은 반드시 로그를 남긴다 —
+# 조용하면 품질이 깎인 줄도 모른 채 지나간다.
+RERANK_MAX_TOKENS = int(os.environ.get("RERANKER_MAX_TOKENS") or "2000")
+
 _client = None
 
 # 재순위 호출의 토큰 사용량 (2026-08-04) — 이걸 안 재면 query_logs 의
@@ -120,11 +137,15 @@ def rerank(query: str, hits: list[dict], limit: int) -> list[dict]:
         # temperature=0 을 안 받는 모델이 있다 (gpt-5.6 계열은 기본값 1만 허용 —
         # 2026-08-06 실측 400 BadRequest). 지원 모델에만 붙여 결정성을 유지하고,
         # 그 외에는 생략해 호출 자체가 실패하지 않게 한다.
-        kw = {"temperature": 0} if _MODEL.startswith(("gpt-4", "gpt-3")) else {}
+        legacy = _MODEL.startswith(("gpt-4", "gpt-3"))
+        kw = {"temperature": 0} if legacy else {}
         # 추론형 모델은 사고 토큰이 지연·비용을 지배한다. 재순위는 30개를 줄 세우는
         # 단순 작업이라 깊은 추론이 필요 없다 — 실험용 노브로 열어 둔다.
-        if _REASONING_EFFORT and not _MODEL.startswith(("gpt-4", "gpt-3")):
+        if _REASONING_EFFORT and not legacy:
             kw["reasoning_effort"] = _REASONING_EFFORT
+        # 추론형은 사고 토큰도 이 예산에서 빠져나간다 (answer._gen_kwargs 와 같은 규칙).
+        # 그래서 이 한 줄이 사고 폭주의 상한이 된다.
+        kw["max_tokens" if legacy else "max_completion_tokens"] = RERANK_MAX_TOKENS
         resp = _get_client().chat.completions.create(
             model=_MODEL,
             response_format={"type": "json_object"},
@@ -138,6 +159,15 @@ def rerank(query: str, hits: list[dict], limit: int) -> list[dict]:
         _local.usage = {"model": _MODEL,
                         "input_tokens": resp.usage.prompt_tokens,
                         "output_tokens": resp.usage.completion_tokens}
+        # 상한에 걸린 응답은 JSON 이 잘려 어차피 파싱이 깨진다. 다만 그대로 두면
+        # 아래 except 가 JSONDecodeError 로만 찍혀 "왜 깨졌는지"가 안 보인다 —
+        # 사고 폭주를 막아 폴백한 것과 모델이 헛소리를 뱉은 것은 대응이 다르다.
+        if resp.choices[0].finish_reason == "length":
+            logger.warning(
+                "재순위 출력 상한(%d토큰) 도달 — 원순위 폴백. 사고량이 튄 호출이며 "
+                "지연·비용 폭주를 막은 것이다. 잦으면 RERANKER_MAX_TOKENS 를 올린다.",
+                RERANK_MAX_TOKENS)
+            return hits[:limit]
         order = json.loads(resp.choices[0].message.content).get("order", [])
     except Exception as e:
         # 폴백은 무해하지만 조용하면 안 된다 — 재순위가 계속 죽어도 검색은 돌아가므로
