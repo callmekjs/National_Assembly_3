@@ -9,7 +9,8 @@ if __name__ == "__main__":
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 
-from make_deploy_corpus import choose_scope, estimate_mb, expand_neighbor_turn_ids  # noqa: E402
+from make_deploy_corpus import (  # noqa: E402
+    SIZE_CALIBRATION, estimate_mb, expand_neighbor_turn_ids)
 
 
 def check(name: str, cond: bool, got=None):
@@ -36,23 +37,40 @@ def test_estimate_mb():
     check("인덱스 포함 추정", abs(estimate_mb(10_000, with_index=True) - 10_000 * 23.3 / 1024) < 0.01)
     check("인덱스 생략 추정", abs(estimate_mb(10_000, with_index=False) - 10_000 * 8.8 / 1024) < 0.01)
 
+    # 보정계수 (2026-08-07): 추정식은 실측보다 20% 크게 나온다. 보정을 켜지 않으면
+    # 쓸 수 있는 용량을 남기고 버린다 — 실제로 그 때문에 인접 turn 이 통째로 빠졌다.
+    raw = estimate_mb(10_000, with_index=True)
+    cal = estimate_mb(10_000, with_index=True, calibrated=True)
+    check("보정계수는 추정을 줄인다", cal < raw, (cal, raw))
+    check("보정계수 값 일치", abs(cal - raw * SIZE_CALIBRATION) < 0.01, (cal, raw))
+    check("기본값은 보정 안 함 (기존 계약 유지)", estimate_mb(10_000, True) == raw)
 
-def test_choose_scope():
-    # 인접 포함이 350MB 이내면 그대로 (인덱스 포함)
-    s = choose_scope(n_with_neighbors=10_000, n_core_only=6_000)
-    check("여유 시 인접+인덱스", s["neighbors"] and s["index"], s)
-    # 인접 포함이 초과, core-only 는 이내 → 인접 제외
-    s2 = choose_scope(n_with_neighbors=20_000, n_core_only=14_000)
-    check("초과 시 인접 제외", not s2["neighbors"] and s2["index"], s2)
-    check("n_chunks 는 선택 범위 기준", s2["n_chunks"] == 14_000, s2)
-    # core-only 도 인덱스 포함 초과 → 인덱스 생략 레버
-    s3 = choose_scope(n_with_neighbors=40_000, n_core_only=30_000)
-    check("최후 레버 인덱스 생략", not s3["neighbors"] and not s3["index"], s3)
-    check("est_mb 동봉", s3["est_mb"] > 0, s3)
+
+def test_expand_neighbor_window():
+    """±N 창 — 근거 회수율을 올리려면 창을 넓혀야 한다(2026-08-07 실측)."""
+    seed = {"A_turn_0010"}
+    r1 = expand_neighbor_turn_ids(seed, 1)
+    check("k=1 은 기존과 동일 (3개)", r1 == {"A_turn_0009", "A_turn_0010", "A_turn_0011"}, r1)
+
+    r3 = expand_neighbor_turn_ids(seed, 3)
+    check("k=3 은 7개 (±3)", len(r3) == 7, sorted(r3))
+    check("k=3 경계 포함", {"A_turn_0007", "A_turn_0013"} <= r3, sorted(r3))
+
+    # 경계: 창이 1번 turn 을 넘어가도 0 이하를 만들지 않는다
+    edge = expand_neighbor_turn_ids({"A_turn_0002"}, 5)
+    check("0 이하 turn 미생성", all(not t.endswith("_0000") for t in edge), sorted(edge))
+    check("1번 turn 은 포함", "A_turn_0001" in edge, sorted(edge))
+    check("경계에서 개수는 1..7", len(edge) == 7, sorted(edge))
+
+    check("k 기본값은 1 (호출부 계약 유지)",
+          expand_neighbor_turn_ids(seed) == r1)
+    check("패턴 밖 id 는 k 와 무관하게 그대로",
+          expand_neighbor_turn_ids({"weird"}, 5) == {"weird"})
+
 
 
 if __name__ == "__main__":
     test_expand_neighbor_turn_ids()
     test_estimate_mb()
-    test_choose_scope()
+    test_expand_neighbor_window()
     print("all passed")
