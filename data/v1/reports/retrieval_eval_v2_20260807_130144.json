@@ -1,0 +1,379 @@
+{
+  "generated_at": "20260807_130144",
+  "eval_set": "retrieval_eval_set_v2.json (20문항, 사람 검토 20/20)",
+  "qrels": {
+    "pairs": 1106,
+    "source": "LLM 심판 — 합격 기준 3개 대조"
+  },
+  "limitation": "pooled recall — 5개 검색 축이 찾은 후보에만 라벨이 있다. 라벨은 LLM 심판이 매긴 것이며 사람이 전수 검증하지 않았다.",
+  "results": [
+    {
+      "mode": "hybrid",
+      "n_answerable": 18,
+      "strict@5": 1.0,
+      "strict@10": 1.0,
+      "loose@5": 1.0,
+      "loose@10": 1.0,
+      "mrr@10": 0.8703703703703703,
+      "ndcg@5": 0.7616669223472433,
+      "ndcg@10": 0.7483292479007394,
+      "unanswerable_pass": 2,
+      "unanswerable_total": 2,
+      "elapsed_sec": 103.9,
+      "rows": [
+        {
+          "qid": "n001",
+          "type": "person",
+          "strict@5": true,
+          "strict@10": true,
+          "loose@5": true,
+          "loose@10": true,
+          "mrr": 1.0,
+          "ndcg@5": 0.9578347709816888,
+          "ndcg@10": 0.9040074315711437,
+          "n_labeled": 47,
+          "top_grades": [
+            2,
+            1,
+            2,
+            1,
+            1
+          ]
+        },
+        {
+          "qid": "n002",
+          "type": "person",
+          "strict@5": true,
+          "strict@10": true,
+          "loose@5": true,
+          "loose@10": true,
+          "mrr": 1.0,
+          "ndcg@5": 0.8932868997079265,
+          "ndcg@10": 0.9430116238606701,
+          "n_labeled": 55,
+          "top_grades": [
+            2,
+            2,
+            2,
+            1,
+            1
+          ]
+        },
+        {
+          "qid": "n003",
+          "type": "person",
+          "strict@5": true,
+          "strict@10": true,
+          "loose@5": true,
+          "loose@10": true,
+          "mrr": 1.0,
+          "ndcg@5": 0.6595245679994904,
+          "ndcg@10": 0.651931295237528,
+          "n_labeled": 54,
+          "top_grades": [
+            2,
+            2,
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "qid": "n004",
+          "type": "person",
+          "strict@5": true,
+          "strict@10": true,
+          "loose@5": true,
+          "loose@10": true,
+          "mrr": 1.0,
+          "ndcg@5": 0.9271183815384791,
+          "ndcg@10": 0.8570600626483447,
+          "n_labeled": 61,
+          "top_grades": [
+            2,
+            2,
+            1,
+            2,
+            0
+          ]
+        },
+        {
+          "qid": "n005",
+          "type": "person",
+          "strict@5": true,
+          "strict@10": true,
+          "loose@5": true,
+          "loose@10": true,
+          "mrr": 1.0,
+          "ndcg@5": 0.6108618778826078,
+          "ndcg@10": 0.6147045534951822,
+          "n_labeled": 51,
+          "top_grades": [
+            2,
+            0,
+            2,
+            1,
+            0
+          ]
+        },
+        {
+          "qid": "n006",
+          "type": "topic",
+          "strict@5": true,
+          "strict@10": true,
+          "loose@5": true,
+          "loose@10": true,
+          "mrr": 1.0,
+          "ndcg@5": 0.9026211001048624,
+          "ndcg@10": 0.8638270297860456,
+          "n_labeled": 47,
+          "top_grades": [
+            2,
+            2,
+            2,
+            1,
+            2
+          ]
+        },
+        {
+          "qid": "n007",
+          "type": "topic",
+          "strict@5": true,
+          "strict@10": true,
+          "loose@5": true,
+          "loose@10": true,
+          "mrr": 0.5,
+          "ndcg@5": 0.773893196484256,
+          "ndcg@10": 0.5960827987102518,
+          "n_labeled": 50,
+          "top_grades": [
+            1,
+            2,
+            2,
+            2,
+            2
+          ]
+        },
+        {
+          "qid": "n008",
+          "type": "topic",
+          "strict@5": true,
+          "strict@10": true,
+          "loose@5": true,
+          "loose@10": true,
+          "mrr": 1.0,
+          "ndcg@5": 0.7895676983469904,
+          "ndcg@10": 0.8770914975690763,
+          "n_labeled": 49,
+          "top_grades": [
+            2,
+            2,
+            1,
+            1,
+            2
+          ]
+        },
+        {
+          "qid": "n009",
+          "type": "topic",
+          "strict@5": true,
+          "strict@10": true,
+          "loose@5": true,
+          "loose@10": true,
+          "mrr": 1.0,
+          "ndcg@5": 0.8869465982421281,
+          "ndcg@10": 0.836179114306529,
+          "n_labeled": 49,
+          "top_grades": [
+            2,
+            2,
+            1,
+            2,
+            2
+          ]
+        },
+        {
+          "qid": "n010",
+          "type": "comparison",
+          "strict@5": true,
+          "strict@10": true,
+          "loose@5": true,
+          "loose@10": true,
+          "mrr": 0.3333333333333333,
+          "ndcg@5": 0.41383858190702194,
+          "ndcg@10": 0.5418508546642417,
+          "n_labeled": 57,
+          "top_grades": [
+            1,
+            0,
+            2,
+            0,
+            2
+          ]
+        },
+        {
+          "qid": "n011",
+          "type": "comparison",
+          "strict@5": true,
+          "strict@10": true,
+          "loose@5": true,
+          "loose@10": true,
+          "mrr": 1.0,
+          "ndcg@5": 0.7994765465672335,
+          "ndcg@10": 0.7451882492030324,
+          "n_labeled": 60,
+          "top_grades": [
+            2,
+            2,
+            1,
+            2,
+            1
+          ]
+        },
+        {
+          "qid": "n012",
+          "type": "comparison",
+          "strict@5": true,
+          "strict@10": true,
+          "loose@5": true,
+          "loose@10": true,
+          "mrr": 0.3333333333333333,
+          "ndcg@5": 0.33333333333333337,
+          "ndcg@10": 0.4714903751230663,
+          "n_labeled": 45,
+          "top_grades": [
+            0,
+            1,
+            2,
+            1,
+            1
+          ]
+        },
+        {
+          "qid": "n013",
+          "type": "date_based",
+          "strict@5": true,
+          "strict@10": true,
+          "loose@5": true,
+          "loose@10": true,
+          "mrr": 1.0,
+          "ndcg@5": 1.0,
+          "ndcg@10": 0.901447006056365,
+          "n_labeled": 85,
+          "top_grades": [
+            2,
+            2,
+            2,
+            2,
+            2
+          ]
+        },
+        {
+          "qid": "n014",
+          "type": "date_based",
+          "strict@5": true,
+          "strict@10": true,
+          "loose@5": true,
+          "loose@10": true,
+          "mrr": 0.5,
+          "ndcg@5": 0.5890442449142238,
+          "ndcg@10": 0.5858555591172903,
+          "n_labeled": 82,
+          "top_grades": [
+            1,
+            2,
+            2,
+            1,
+            1
+          ]
+        },
+        {
+          "qid": "n015",
+          "type": "numerical",
+          "strict@5": true,
+          "strict@10": true,
+          "loose@5": true,
+          "loose@10": true,
+          "mrr": 1.0,
+          "ndcg@5": 1.0,
+          "ndcg@10": 0.8057468265315169,
+          "n_labeled": 50,
+          "top_grades": [
+            2,
+            2,
+            2,
+            2,
+            2
+          ]
+        },
+        {
+          "qid": "n016",
+          "type": "numerical",
+          "strict@5": true,
+          "strict@10": true,
+          "loose@5": true,
+          "loose@10": true,
+          "mrr": 1.0,
+          "ndcg@5": 0.8539316501572936,
+          "ndcg@10": 0.9286835516931116,
+          "n_labeled": 49,
+          "top_grades": [
+            2,
+            2,
+            2,
+            0,
+            2
+          ]
+        },
+        {
+          "qid": "n017",
+          "type": "quote",
+          "strict@5": true,
+          "strict@10": true,
+          "loose@5": true,
+          "loose@10": true,
+          "mrr": 1.0,
+          "ndcg@5": 0.8151510484299679,
+          "ndcg@10": 0.855108239312611,
+          "n_labeled": 46,
+          "top_grades": [
+            2,
+            2,
+            2,
+            1,
+            1
+          ]
+        },
+        {
+          "qid": "n018",
+          "type": "quote",
+          "strict@5": true,
+          "strict@10": true,
+          "loose@5": true,
+          "loose@10": true,
+          "mrr": 1.0,
+          "ndcg@5": 0.5035741056528761,
+          "ndcg@10": 0.49066039332730255,
+          "n_labeled": 55,
+          "top_grades": [
+            2,
+            1,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "qid": "n019",
+          "type": "unanswerable",
+          "unanswerable_pass": true
+        },
+        {
+          "qid": "n020",
+          "type": "unanswerable",
+          "unanswerable_pass": true
+        }
+      ]
+    }
+  ]
+}
