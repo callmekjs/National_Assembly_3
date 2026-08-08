@@ -209,7 +209,7 @@ n010(4/8 → 7/8). 남은 n014 는 근거의 96%가 여전히 코퍼스 밖이�
 | 프론트엔드 | React + Vite |
 | 백엔드 | FastAPI (Python) |
 | 데이터베이스 | PostgreSQL + pgvector 0.8.1 (HNSW) |
-| 임베딩 | OpenAI text-embedding-3-small (1536차원) |
+| 임베딩 | OpenAI text-embedding-3-small — 생성 **1536차원**, 배포본은 앞부분을 잘라 **512차원**([이유](#알려진-한계)) |
 | 답변 생성 | gpt-5.6-terra — qa/report 모드, `[n]` 인용, Grounding 신뢰등급 |
 | 재순위 | gpt-5.6-luna (`reasoning_effort=low`, 출력 상한 2000토큰) |
 | 의원 데이터 | 열린국회정보 Open API (22대 의원-정당 매핑) |
