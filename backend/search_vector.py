@@ -36,20 +36,44 @@ EF_SEARCH = 100          # HNSW 탐색 폭 (기본 40 — 필터 병용 대비 �
 _DEFAULT_DIMS = 1536
 
 
-@lru_cache(maxsize=1)
+_dims_cache: int | None = None
+
+
 def embedding_dims() -> int:
-    """저장된 임베딩의 차원. 테이블이 비었거나 조회 실패면 기본값."""
+    """저장된 임베딩의 차원. **성공한 조회만 캐시한다.**
+
+    예전에는 @lru_cache(maxsize=1) 이 걸려 있었다. 그러면 조회 실패 시 돌려주는
+    기본값 1536 까지 캐시되어, 콜드스타트 중 DB 가 한 번만 삐끗해도 512차원 배포본에
+    1536차원 질의 벡터를 계속 만들었다 — 이후 전 질의가 pgvector 차원 불일치로 500 이
+    되고, DB 가 회복돼도 프로세스 재시작 전까지 풀리지 않았다. /health 는 DB 장애에도
+    200 을 주는 설계라 자동 재시작도 걸리지 않는다 (감사 2026-08-14).
+
+    실패는 캐시하지 않으므로 다음 호출에서 다시 조회한다.
+    """
+    global _dims_cache
+    if _dims_cache is not None:
+        return _dims_cache
+
     override = os.environ.get("EMBEDDING_DIMENSIONS")
     if override:
-        return int(override)
+        _dims_cache = int(override)
+        return _dims_cache
+
     try:
         with get_conn() as conn, conn.cursor() as cur:
             cur.execute("SELECT vector_dims(embedding) FROM embeddings_openai LIMIT 1")
             row = cur.fetchone()
             if row:
-                return int(row[0])
+                dims = int(row[0])
+                # 장애 구간에 기본값으로 만들어진 질의 벡터가 캐시에 남아 있으면
+                # 그 질문들만 계속 깨진다 — 차원이 확정되는 순간 버린다
+                embed_query.cache_clear()
+                _dims_cache = dims
+                return dims
     except Exception:
         pass
+
+    # 조회 실패 또는 빈 테이블 — 기본값을 쓰되 **캐시하지 않는다**
     return _DEFAULT_DIMS
 
 

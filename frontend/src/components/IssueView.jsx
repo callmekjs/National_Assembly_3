@@ -150,7 +150,9 @@ function IssueGrid({ issues, onPick }) {
 export default function IssueView({ selectedIssue, onActorClick, onSelChange }) {
   const [issues, setIssues] = useState([])
   const [sel, setSel] = useState(selectedIssue || null) // null = 쟁점 카드 목록
-  useEffect(() => { if (selectedIssue) setSel(selectedIssue) }, [selectedIssue])
+  // null 도 반영해야 한다 — 뒤로가기(popstate)가 selectedIssue 를 null 로 내리는데
+  // 여기서 무시하면 주소는 목록인데 화면은 상세에 머문다 (감사 2026-08-14)
+  useEffect(() => { setSel(selectedIssue || null) }, [selectedIssue])
   const [timeline, setTimeline] = useState(null)
   const [stances, setStances] = useState(null)
   const [partyStances, setPartyStances] = useState(null)
@@ -159,10 +161,18 @@ export default function IssueView({ selectedIssue, onActorClick, onSelChange }) 
   useEffect(() => { fetchIssues().then(d => setIssues(d.issues)).catch(e => setError(e.message)) }, [])
   useEffect(() => {
     if (!sel) return
+    // 쟁점을 빠르게 바꾸면 앞 쟁점의 늦은 응답이 새 화면을 덮어쓴다 —
+    // 제목은 최신 sel 로 그려지므로 '쟁점 B 제목 아래 쟁점 A 표'가 된다.
+    // MyQueries 가 쓰는 ignore 패턴을 여기에도 적용 (감사 2026-08-14)
+    let ignore = false
     setError(null); setTimeline(null); setStances(null); setPartyStances(null)
-    fetchTimeline(sel).then(setTimeline).catch(e => setError(e.message))
-    fetchStances(sel).then(setStances).catch(e => setError(e.message))
-    fetchPartyStances(sel).then(setPartyStances).catch(() => setPartyStances(null))
+    fetchTimeline(sel).then(d => { if (!ignore) setTimeline(d) })
+      .catch(e => { if (!ignore) setError(e.message) })
+    fetchStances(sel).then(d => { if (!ignore) setStances(d) })
+      .catch(e => { if (!ignore) setError(e.message) })
+    fetchPartyStances(sel).then(d => { if (!ignore) setPartyStances(d) })
+      .catch(() => { if (!ignore) setPartyStances(null) })
+    return () => { ignore = true }
   }, [sel])
 
   function pick(id) { setSel(id); onSelChange?.(id) }

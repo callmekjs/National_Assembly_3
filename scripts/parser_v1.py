@@ -20,7 +20,7 @@ from stage_io import report_failures, write_jsonl_atomic
 if __name__ == "__main__":  # import 시(테스트 등) 부작용 방지 — 직접 실행할 때만 래핑
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 
-PARSER_VERSION = "v1.2"
+PARSER_VERSION = "v1.3"
 
 # 발언자 추출 실패로 버려진 헤더 (run 종료 시 리포트 저장 — 조용한 폐기 방지)
 DROPPED_HEADERS: Counter = Counter()
@@ -36,7 +36,7 @@ MARKER_RE = re.compile(r"[◯◎]")
 
 # ── 비발언 헤더 패턴 — 이 패턴으로 시작하는 헤더는 턴에서 제외 ─────────────────
 _NON_SPEAKER_HDR = re.compile(
-    r"^(출석|정부측|기타\s*참석자?|위원\s*선임|의안\s*회부|예비심사기간|청원\s*회부|"
+    r"^(출석|정부측|기타\s*참석자?|위원\s*선임|의안\s*회부|관련\s*의안|예비심사기간|청원\s*회부|"
     r"계획서\s*송부|보고서\s*송부|행정입법\s*제출|수석전문위원\s*명단|"
     r"전문위원\s*(?:명단|현황)|처리된\s*의안|보고사항|부록|"
     r"출장\s*위원|위원\s*아닌\s*출석|소위원회\s*직접\s*회부|청가\s*위원|청가\s*의원)"
@@ -78,7 +78,8 @@ ROLE_FIRST_GENERAL_RE = re.compile(
     r"(?:위원장|부위원장|장관|차관|청장|차장|처장|원장|실장|국장|과장|계장"
     r"|본부장|부장|소장|총장|총재|의장|단장|대장|사장|은행장|회장|관장|팀장|센터장|서장"  # v1.3
     r"|사령관|정책관|조정관|심의관|기획관|관리관|담당관|협력관|조사관|검사관|감사관"
-    r"|교육관|정보관|분석관|기술관|행정관|[가-힣]{2}관"   # 의정관·복지관 등 (v1.3)\n    r"|대변인|비서관|보좌관|검사|교수"                     # 검사·교수 (v1.3)
+    r"|교육관|정보관|분석관|기술관|행정관|[가-힣]{2}관"   # 의정관·복지관 등 (v1.3)
+    r"|대변인|비서관|보좌관|검사|교수"                     # 검사·교수 (v1.3)
     r"|후보자|대표이사|대표|이사장|이사|감사|위원장대리|직무대리|직무대행|권한대행|대리|대행|위원|간사)"
     r"|증인|참고인|진술인|공술인|전문위원|수석전문위원|위원장대리|입법조사관"
     r")\s+([가-힣]{2,7}|[一-鿿豈-﫿]{2,5}|[가-힣]{1,3}[0-9○]{2})$"
@@ -91,6 +92,52 @@ ROLE_LAST_RE = re.compile(
 )
 # 이름만
 NAME_ONLY_RE = re.compile(r"^([가-힣]{2,5})$")
+
+# 마지막 산회 선언 뒤에는 증인 명단·관련의안 같은 부록이 이어질 수 있다.
+# 중간 산회 뒤 회의가 다시 이어진 문서도 있으므로 문서 전체의 "마지막" 선언만 경계로 쓴다.
+_FINAL_CLOSURE_RE = re.compile(
+    r"(?:산회를\s*선포합니다|산회를\s*선포하겠습니다|산회하겠습니다|산회합니다)[.!?…]*"
+    r"(?:\s*\([^()\n]{0,40}산회\))?"
+)
+
+# 한 PDF에 오전·오후 회의가 함께 실린 경우, 중간 산회 뒤 증인 명단이 같은
+# body 세그먼트에 붙고 다음 페이지에서 실제 회의가 재개되기도 한다.
+_WITNESS_APPENDIX_RE = re.compile(
+    r"^\s*(?:일반\s*)?(?:증인(?:\s*및\s*참고인)?|참고인)\s*명단"
+)
+
+
+def _final_closure_boundary(pages: list[dict]) -> tuple[int, int, int] | None:
+    """마지막 산회 선언의 (페이지 인덱스, body 세그먼트 인덱스, 끝 위치)."""
+    boundary: tuple[int, int, int] | None = None
+
+    for page_idx, page in enumerate(pages):
+        segs = page.get("segments", [])
+        if segs:
+            body_segs = (
+                (seg_idx, seg.get("text", ""))
+                for seg_idx, seg in enumerate(segs)
+                if seg.get("section_type") == "body"
+            )
+        elif page.get("section_type") == "body":
+            body_segs = ((0, page.get("text", "")),)
+        else:
+            body_segs = ()
+
+        for seg_idx, text in body_segs:
+            matches = list(_FINAL_CLOSURE_RE.finditer(text))
+            if matches:
+                boundary = (page_idx, seg_idx, matches[-1].end())
+
+    return boundary
+
+
+def _witness_appendix_boundary(text: str) -> int | None:
+    """산회 직후 같은 세그먼트에 붙은 증인·참고인 명단의 시작 경계."""
+    for match in _FINAL_CLOSURE_RE.finditer(text):
+        if _WITNESS_APPENDIX_RE.match(text[match.end():]):
+            return match.end()
+    return None
 
 
 def _fmt_date(raw: str) -> str:
@@ -181,8 +228,12 @@ def split_turns(pages: list[dict]) -> list[dict]:
 
     turns: list[dict] = []
     turn_counter = 0
+    final_closure = _final_closure_boundary(pages)
 
-    for page in pages:
+    for page_idx, page in enumerate(pages):
+        if final_closure and page_idx > final_closure[0]:
+            break
+
         page_num = page["page"]
         segs = page.get("segments", [])
 
@@ -204,6 +255,16 @@ def split_turns(pages: list[dict]) -> list[dict]:
                     pre_text = pre_seg.get("text", "").strip()
                     if not pre_text:
                         continue
+                    # 페이지 경계에서 산회 문장과 증인 명단이 cover continuation으로
+                    # 분류된 경우에도 명단만 잘라낸다.
+                    if (
+                        _WITNESS_APPENDIX_RE.match(pre_text)
+                        and _FINAL_CLOSURE_RE.search(turns[-1].get("text", ""))
+                    ):
+                        continue
+                    witness_boundary = _witness_appendix_boundary(pre_text)
+                    if witness_boundary is not None:
+                        pre_text = pre_text[:witness_boundary].strip()
                     pre_markers = [m.start() for m in MARKER_RE.finditer(pre_text)]
                     if not pre_markers:
                         turns[-1]["text"] = (turns[-1]["text"] + " " + pre_text).strip()
@@ -225,8 +286,23 @@ def split_turns(pages: list[dict]) -> list[dict]:
             else:
                 body_segs = []
 
+        if final_closure and page_idx == final_closure[0]:
+            body_segs = [
+                (idx, seg) for idx, seg in body_segs
+                if idx <= final_closure[1]
+            ]
+
         for seg_idx, seg in body_segs:
             seg_text = seg["text"].strip()
+            if (
+                final_closure
+                and page_idx == final_closure[0]
+                and seg_idx == final_closure[1]
+            ):
+                seg_text = seg_text[:final_closure[2]].strip()
+            witness_boundary = _witness_appendix_boundary(seg_text)
+            if witness_boundary is not None:
+                seg_text = seg_text[:witness_boundary].strip()
             if not seg_text:
                 continue
 

@@ -11,7 +11,8 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 
 from make_deploy_corpus import (  # noqa: E402
     CHUNK_ROW_KB, EMB_ROW_KB_INDEXED, EMB_ROW_KB_RAW,
-    SIZE_CALIBRATION_INDEXED, estimate_mb, expand_neighbor_turn_ids)
+    SIZE_CALIBRATION_INDEXED, build_target_turn_ids, estimate_mb,
+    expand_neighbor_turn_ids)
 
 
 def check(name: str, cond: bool, got=None):
@@ -79,9 +80,24 @@ def test_expand_neighbor_window():
           expand_neighbor_turn_ids({"weird"}, 5) == {"weird"})
 
 
+def test_priority_turns_are_included_without_extra_neighbors():
+    selected = build_target_turn_ids(
+        {"A_turn_0010"}, {"B_turn_0020"}, neighbors=1
+    )
+    check(
+        "이슈 turn은 ±1 포함",
+        {"A_turn_0009", "A_turn_0010", "A_turn_0011"} <= selected,
+        selected,
+    )
+    check("우선 직책 turn 직접 포함", "B_turn_0020" in selected, selected)
+    check("우선 직책 주변은 불필요하게 포함하지 않음",
+          "B_turn_0019" not in selected and "B_turn_0021" not in selected, selected)
+
+
 
 if __name__ == "__main__":
     test_expand_neighbor_turn_ids()
     test_estimate_mb()
     test_expand_neighbor_window()
+    test_priority_turns_are_included_without_extra_neighbors()
     print("all passed")
