@@ -1,7 +1,7 @@
 """배포용 축소 코퍼스 생성·이전 (4단계-B).
 
-이슈 매핑 청크가 속한 turn 전체(+같은 회의 인접 ±N turn)를 골라 원격(Supabase)으로
-직접 복사한다.
+이슈 매핑 청크가 속한 turn 전체(+같은 회의 인접 ±N turn)와 전문가·실무자 우선
+직책 turn을 골라 원격(Supabase)으로 직접 복사한다.
 
 **2026-08-07 실측으로 기본 전략을 바꿨다.** 배포본 검색 점수가 로컬보다 낮아
 (strict@5 15/18 vs 18/18) 원인을 재보니, 라벨된 근거의 절반이 축소본에 없었다.
@@ -85,6 +85,7 @@ SOURCE_DIMS = 1536          # 로컬 원본 차원 (text-embedding-3-small 기�
 DEFAULT_DIMS = 512
 DEFAULT_NEIGHBORS = 5       # 512차원 기준 실측 359MB / 근거 회수율 60.3%
 _TURN_ID = re.compile(r"^(?P<src>.+_turn_)(?P<no>\d+)$")
+PRIORITY_ROLE_SUFFIXES = ("대변인", "비서관", "보좌관", "검사", "교수")
 
 # 전량 복사 소형 테이블 (FK 순서 — committees 가 meetings·chunks 의 부모)
 FULL_TABLES = ("committees", "meetings", "speakers", "members", "issues", "issue_stances")
@@ -127,6 +128,14 @@ def estimate_mb(n_chunks: int, with_index: bool, calibrated: bool = False,
     return mb
 
 
+def build_target_turn_ids(core_turns: set, priority_turns: set, neighbors: int) -> set:
+    """이슈 인접 turn에 우선 직책 turn을 직접 포함한다.
+
+    우선 직책 주변까지 넓히면 배포 용량이 불필요하게 커지므로 해당 turn만 더한다.
+    """
+    return expand_neighbor_turn_ids(core_turns, neighbors) | set(priority_turns)
+
+
 # choose_scope(폴백 캐스케이드: 인접+인덱스 → 인접 제외 → 인덱스 생략)는 제거했다.
 #
 # 그 자동 폴백이 이번 문제의 원인이었다. 인접 ±1 이 옛 한도(350MB)를 넘자 조용히
@@ -140,18 +149,41 @@ def estimate_mb(n_chunks: int, with_index: bool, calibrated: bool = False,
 
 
 def fetch_targets(cur, neighbors: int = 1) -> tuple:
-    """(core turn 집합, 인접 포함 turn 집합, 각 chunk 수). 로컬 DB 기준."""
+    """(core, 우선직책, 최종 turn 집합, 각 chunk 수). 로컬 DB 기준."""
     cur.execute("""
         SELECT DISTINCT c.turn_id FROM issue_chunks ic JOIN chunks c USING (chunk_id)
     """)
     core_turns = {r[0] for r in cur.fetchall()}
-    with_neighbors = expand_neighbor_turn_ids(core_turns, neighbors)
+    cur.execute(
+        "SELECT DISTINCT turn_id FROM chunks "
+        "WHERE role LIKE ANY(%s) AND turn_id IS NOT NULL",
+        ([f"%{suffix}" for suffix in PRIORITY_ROLE_SUFFIXES],),
+    )
+    priority_turns = {r[0] for r in cur.fetchall()}
+    selected_turns = build_target_turn_ids(core_turns, priority_turns, neighbors)
 
     def count_chunks(turns: set) -> int:
         cur.execute("SELECT count(*) FROM chunks WHERE turn_id = ANY(%s)", (list(turns),))
         return cur.fetchone()[0]
 
-    return core_turns, with_neighbors, count_chunks(core_turns), count_chunks(with_neighbors)
+    return (
+        core_turns, priority_turns, selected_turns,
+        count_chunks(core_turns), count_chunks(selected_turns),
+    )
+
+
+def count_missing_embeddings(cur, turn_ids: set) -> int:
+    """배포 대상 중 임베딩이 없는 청크 수."""
+    cur.execute(
+        """
+        SELECT count(*)
+        FROM chunks c
+        LEFT JOIN embeddings_openai e USING (chunk_id)
+        WHERE c.turn_id = ANY(%s) AND e.chunk_id IS NULL
+        """,
+        (list(turn_ids),),
+    )
+    return cur.fetchone()[0]
 
 
 def copy_table(lcur, rcur, table: str, where: str = "", params: tuple = (),
@@ -208,11 +240,14 @@ def main():
 
     init_pool()
     with get_conn() as lconn, lconn.cursor() as lcur:
-        core_turns, nb_turns, n_core, n_nb = fetch_targets(lcur, args.neighbors)
+        core_turns, priority_turns, nb_turns, n_core, n_nb = fetch_targets(
+            lcur, args.neighbors
+        )
         est = estimate_mb(n_nb, with_index=args.index, calibrated=True, dims=args.dims)
         scope = {"neighbors": True, "index": args.index,
                  "n_chunks": n_nb, "est_mb": round(est, 1)}
         print(f"core turn {len(core_turns):,} / +인접(±{args.neighbors}) turn {len(nb_turns):,}")
+        print(f"우선 직책 turn 직접 포함: {len(priority_turns):,}")
         print(f"청크: core {n_core:,} / +인접 {n_nb:,}")
         print(f"선택: 인접 ±{args.neighbors}, {args.dims}차원, "
               f"HNSW={'생성' if scope['index'] else '생략'}, "
@@ -220,6 +255,11 @@ def main():
               f"({'보정 적용' if args.index else '실측 단가'}, 한도 {args.limit_mb}MB)")
         if scope["est_mb"] > args.limit_mb:
             print(f"[FAIL] 한도 초과 — --neighbors 를 줄이거나 --limit-mb 를 조정할 것")
+            sys.exit(1)
+        missing_embeddings = count_missing_embeddings(lcur, nb_turns)
+        print(f"배포 대상 미임베딩: {missing_embeddings:,}개")
+        if missing_embeddings:
+            print("[FAIL] 먼저 scripts/embeddings_v1.py 로 누락 임베딩을 채울 것")
             sys.exit(1)
         if args.dry_run:
             print("[DRY] 원격 복사 생략")
@@ -237,7 +277,7 @@ def main():
                     schema_sql = (ROOT / "db" / "schema.sql").read_text(encoding="utf-8")
                     rcur.execute(schema_sql)
                     if args.wipe_remote:
-                        for t in ("embeddings_openai", "chunks", "issue_chunks",
+                        for t in ("utterance_summaries", "embeddings_openai", "chunks", "issue_chunks",
                                   *reversed(FULL_TABLES)):
                             rcur.execute(f"TRUNCATE {t} CASCADE")
                     # schema.sql 은 로컬 기준(1536)이다. 배포 차원이 다르면 컬럼 타입을
@@ -261,6 +301,11 @@ def main():
                         lcur, rcur, "embeddings_openai",
                         "WHERE chunk_id IN (SELECT chunk_id FROM chunks WHERE turn_id = ANY(%s))",
                         (turns,), dims=args.dims)
+                    if report["embeddings_openai"] != report["chunks"]:
+                        raise RuntimeError(
+                            "배포 대상 chunks/embeddings 행수 불일치: "
+                            f"{report['chunks']:,}/{report['embeddings_openai']:,}"
+                        )
                     if scope["index"]:
                         print("HNSW 생성 중 (수만 행 — 수 분)…")
                         rcur.execute("""

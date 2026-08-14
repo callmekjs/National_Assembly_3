@@ -78,12 +78,10 @@ RATE_LIMIT_PER_MIN = int(os.environ.get("RATE_LIMIT_PER_MIN", "60"))
 DAILY_COST_LIMIT_USD = float(os.environ.get("DAILY_COST_LIMIT_USD", "3.0"))
 _llm_limiter = RateLimiter(RATE_LIMIT_LLM_PER_MIN)
 _general_limiter = RateLimiter(RATE_LIMIT_PER_MIN)
-_LLM_PATHS = ("/query", "/answer")   # LLM 호출 경로 — 비용 상한 대상
-# /answer 노출 스위치 (기본 끔 — 감사 2026-08-05). 이 경로는 grounding·검증·query_logs
-# 를 전부 우회하는 원시 호출이라, 켜져 있으면 일별 비용 상한이 보는 장부(query_logs)에
-# 지출이 안 잡힌다 = 2차 방어선이 /answer 트래픽을 못 본다. 공개 저장소라 경로를
-# 숨기는 것도 무의미하므로 배포에서는 아예 등록하지 않는다. 로컬 디버그용으로만 켠다
-# (rag7_query_spec §81 "디버그용 유지" 결정은 유효 — 노출 범위만 로컬로 좁힌다).
+_LLM_PATHS = ("/query", "/answer", "/search/vector", "/search/hybrid")
+# 과금이 생기는 원시 검색·답변 경로 노출 스위치 (기본 끔). 이 경로들은 프론트가
+# 사용하지 않고, /query 의 query_logs 비용 장부도 우회한다. 공개 배포에서는 경로
+# 자체를 등록하지 않고 로컬 디버그에서만 명시적으로 켠다.
 ENABLE_DEBUG_ENDPOINTS = os.environ.get("ENABLE_DEBUG_ENDPOINTS") == "1"
 # 강한 rate limit 대상 = LLM 경로 + 인증 경로 (무차별 대입 방어 — spec 2026-07-15)
 _STRICT_PATHS = _LLM_PATHS + ("/auth/login", "/auth/signup")
@@ -431,40 +429,38 @@ def search_keyword_endpoint(
     return {"query": q, "count": len(results), "results": results}
 
 
-@app.get("/search/vector")
-def search_vector_endpoint(
-    q: str = Query(..., min_length=2, description="검색어 (의미 검색)"),
-    committee: str | None = Query(None, description="위원회 약칭"),
-    date_from: datetime.date | None = None,
-    date_to: datetime.date | None = None,
-    speaker: str | None = Query(None, description="발언자 이름 (정확 일치)"),
-    limit: int = Query(20, ge=1, le=100),
-):
-    """벡터(의미) 검색 (RAG-3). 하이브리드 검색의 다른 한 축 — 디버그·검증용 노출."""
-    try:
-        results = vector_search(q, committee, date_from, date_to, speaker, limit)
-    except OpenAIError as e:
-        raise HTTPException(status_code=502, detail=f"임베딩 호출 실패: {type(e).__name__}")
-    return {"query": q, "count": len(results), "results": results}
-
-
-@app.get("/search/hybrid")
-def search_hybrid_endpoint(
-    q: str = Query(..., min_length=2, description="검색어"),
-    committee: str | None = Query(None, description="위원회 약칭"),
-    date_from: datetime.date | None = None,
-    date_to: datetime.date | None = None,
-    limit: int = Query(10, ge=1, le=50),
-):
-    """하이브리드 검색 (RAG-4) — 키워드+벡터 RRF 융합. /query 의 검색 엔진."""
-    try:
-        results = hybrid_search(q, committee, date_from, date_to, limit)
-    except OpenAIError as e:
-        raise HTTPException(status_code=502, detail=f"임베딩 호출 실패: {type(e).__name__}")
-    return {"query": q, "count": len(results), "results": results}
-
-
 if ENABLE_DEBUG_ENDPOINTS:
+    @app.get("/search/vector")
+    def search_vector_endpoint(
+        q: str = Query(..., min_length=2, description="검색어 (의미 검색)"),
+        committee: str | None = Query(None, description="위원회 약칭"),
+        date_from: datetime.date | None = None,
+        date_to: datetime.date | None = None,
+        speaker: str | None = Query(None, description="발언자 이름 (정확 일치)"),
+        limit: int = Query(20, ge=1, le=100),
+    ):
+        """벡터(의미) 검색 (RAG-3) — 로컬 디버그 전용, 기본 비활성."""
+        try:
+            results = vector_search(q, committee, date_from, date_to, speaker, limit)
+        except OpenAIError as e:
+            raise HTTPException(status_code=502, detail=f"임베딩 호출 실패: {type(e).__name__}")
+        return {"query": q, "count": len(results), "results": results}
+
+    @app.get("/search/hybrid")
+    def search_hybrid_endpoint(
+        q: str = Query(..., min_length=2, description="검색어"),
+        committee: str | None = Query(None, description="위원회 약칭"),
+        date_from: datetime.date | None = None,
+        date_to: datetime.date | None = None,
+        limit: int = Query(10, ge=1, le=50),
+    ):
+        """하이브리드 검색 (RAG-4) — 로컬 디버그 전용, 기본 비활성."""
+        try:
+            results = hybrid_search(q, committee, date_from, date_to, limit)
+        except OpenAIError as e:
+            raise HTTPException(status_code=502, detail=f"임베딩 호출 실패: {type(e).__name__}")
+        return {"query": q, "count": len(results), "results": results}
+
     @app.post("/answer")
     def answer_endpoint(req: AnswerRequest):
         """답변 생성 원시 호출 (RAG-6) — 로컬 디버그 전용, 기본 비활성.

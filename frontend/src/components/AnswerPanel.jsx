@@ -1,14 +1,26 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { postFeedback } from '../api'
 
-// 근거 상태 카드 — 작은 배지 대신 큰 수치로 신뢰도를 앞세운다.
-// 값 자체(FULL 등)는 API 계약이라 그대로 두고 표기만 바꾼다.
+// 근거 상태 카드. FULL 은 "인용이 존재하고 유효하다"는 백엔드 판정이지
+// 모든 문장을 하나씩 대조했다는 뜻은 아니다. 화면도 확인한 범위만 말한다.
 const GROUNDING_CARD = {
-  FULL: { tone: 'is-ok', title: '근거 확인 완료', desc: '답변 문장 전부가 인용 근거에 연결되었습니다' },
-  PARTIAL: { tone: 'is-warn', title: '일부만 근거 확인됨', desc: '인용 근거에 연결되지 않은 문장이 있습니다' },
-  REFUSED: { tone: 'is-danger', title: '기록에서 확인 불가', desc: '회의록에서 근거를 찾지 못해 답변을 보류했습니다' },
-  NONE: { tone: 'is-none', title: '근거 연결 없음', desc: '이 답변에 연결된 인용 근거가 없습니다' },
+  FULL: {
+    tone: 'is-ok', figure: '✓', title: '인용 근거 확인',
+    desc: '답변에 사용된 인용이 제공된 회의록 근거와 연결되어 있습니다',
+  },
+  PARTIAL: {
+    tone: 'is-warn', figure: '!', title: '근거 확인 주의',
+    desc: '일부 내용은 근거가 부족하거나 자동 검증에 주의가 필요합니다',
+  },
+  REFUSED: {
+    tone: 'is-danger', figure: '—', title: '기록에서 확인 불가',
+    desc: '회의록에서 근거를 찾지 못해 답변을 보류했습니다',
+  },
+  NONE: {
+    tone: 'is-none', figure: '—', title: '근거 연결 없음',
+    desc: '이 답변에 연결된 인용 근거가 없습니다',
+  },
 }
 
 // 검증층 flag 한국어 라벨 (spec 결정 ② (a) — 텍스트 불변 + 강등 + 배지)
@@ -23,29 +35,6 @@ const VERIFICATION_LABEL = {
   // 다른 flag 는 "이런 문제를 찾았다"지만 이것은 "검사를 못 끝냈다"는 뜻이다 —
   // 답변의 결함이 아니라 검증층의 결함이므로 문구를 구분한다 (감사 2026-08-05)
   verification_incomplete: '검증 규칙 일부가 실행되지 못함 (답변 결함 아님)',
-}
-
-// 근거 카드의 큰 수치 = (인용이 달린 문장 / 전체 문장). 마크다운 제목 줄은 문장이 아니다.
-function sentenceStats(answer) {
-  const body = (answer || '')
-    .split('\n')
-    .filter((l) => !/^\s*#{1,6}\s/.test(l))
-    .join('\n')
-  const sentences = body
-    .split(/(?<=[.!?])\s+|\n+/)
-    .map((s) => s.trim())
-    .filter((s) => s.length > 1)
-  return {
-    total: sentences.length,
-    cited: sentences.filter((s) => /\[\d+\]/.test(s)).length,
-  }
-}
-
-function groundingFigure(grounding, { total, cited }) {
-  if (!total || grounding === 'NONE') return '—'
-  if (grounding === 'FULL') return `${total}/${total}`
-  if (grounding === 'REFUSED') return `0/${total}`
-  return `${cited}/${total}`
 }
 
 // 텍스트 속 [n]을 클릭 가능한 인용 버튼으로 치환 (표시는 대괄호 없이 숫자만)
@@ -94,7 +83,6 @@ function AnswerPanel({ result, onCiteClick }) {
 
   const seconds = (result.latency_ms / 1000).toFixed(1)
   const card = GROUNDING_CARD[result.grounding] ?? GROUNDING_CARD.NONE
-  const stats = sentenceStats(result.answer)
   const flags = result.verification?.flags ?? []
   const citedCount = result.cited_numbers?.length ?? 0
   const sourceCount = result.sources?.length ?? 0
@@ -109,7 +97,7 @@ function AnswerPanel({ result, onCiteClick }) {
 
       <div className="status-cards">
         <div className={`status-card ${card.tone}`}>
-          <div className="status-card-figure">{groundingFigure(result.grounding, stats)}</div>
+          <div className="status-card-figure">{card.figure}</div>
           <div className="status-card-body">
             <div className="status-card-title">{card.title}</div>
             <div className="status-card-desc">{card.desc}</div>

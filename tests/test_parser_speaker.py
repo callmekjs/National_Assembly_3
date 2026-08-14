@@ -13,7 +13,12 @@ if __name__ == "__main__":  # pytest 캡처와 충돌 방지 — 직접 실행�
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 
-from parser_v1 import _extract_speaker, _NON_SPEAKER_HDR, _NON_SPEAKER_NAMES  # noqa: E402
+from parser_v1 import (  # noqa: E402
+    _extract_speaker,
+    _NON_SPEAKER_HDR,
+    _NON_SPEAKER_NAMES,
+    split_turns,
+)
 
 # (header_line, expected_name, expected_role) — v1.0에서 잘 되던 기존 패턴 (회귀 방지)
 REGRESSION_CASES = [
@@ -69,6 +74,11 @@ NEW_CASES = [
     ("드론작전사령관 김용대 예.", "김용대", "드론작전사령관"),
     ("한국방송공사감사 박찬욱 예.", "박찬욱", "한국방송공사감사"),
     ("독립기념관장 김형석 예.", "김형석", "독립기념관장"),
+    # 2026-08-14 점검: 정규식 소스의 잘못된 literal `\\n` 뒤가 주석 처리되어
+    # 배포 데이터에서 실제로 누락된 직책 대표 사례.
+    ("외교부부대변인 유창호 맞습니다.", "유창호", "외교부부대변인"),
+    ("대검찰청검사 조재익 예, 그렇습니다.", "조재익", "대검찰청검사"),
+    ("고려대학교정보보호대학원교수 김승주 예.", "김승주", "고려대학교정보보호대학원교수"),
     ("柳榮夏 위원 알겠습니다.", "柳榮夏", "위원"),
 ]
 
@@ -78,6 +88,7 @@ GARBAGE_HEADERS = [
     "위원 아닌 출석 의원(2인)",
     "소위원회 직접 회부계엄법 일부개정법률안",
     "청가 위원(1인) 이준석 (2024. 5. 31. 안철수 의원 대표발의)",
+    "관련의안 회부국가재정법 일부개정법률안",
 ]
 
 
@@ -122,13 +133,125 @@ def test_garbage_headers():
     assert not failures, failures
 
 
+def test_final_closure_trims_attached_appendix_and_later_pages():
+    """마지막 산회 뒤 명단·관련의안은 발언으로 만들거나 위원장 발언에 붙이지 않는다."""
+    pages = [
+        {
+            "source_id": "test_20260814_1_1",
+            "committee": "테스트위원회",
+            "folder": "테스트위",
+            "file_name": "test.pdf",
+            "date_hint": "20260814",
+            "page": 1,
+            "segments": [{
+                "section_type": "body",
+                "text": (
+                    "◯위원장 최민희 오늘 회의를 마치겠습니다.\n"
+                    "산회를 선포합니다.\n"
+                    "(12시00분 산회)\n"
+                    "증인 명단증인(2인) 박성민 김현\n"
+                    "◯박성민 의원 명단 표 조각"
+                ),
+            }],
+        },
+        {
+            "source_id": "test_20260814_1_1",
+            "committee": "테스트위원회",
+            "folder": "테스트위",
+            "file_name": "test.pdf",
+            "date_hint": "20260814",
+            "page": 2,
+            "segments": [{
+                "section_type": "body",
+                "text": "◯관련의안 회부국가재정법 일부개정법률안",
+            }],
+        },
+    ]
+
+    turns = split_turns(pages)
+
+    assert len(turns) == 1
+    assert turns[0]["speaker"] == "최민희"
+    assert turns[0]["text"].endswith("(12시00분 산회)")
+    assert "증인 명단" not in turns[0]["text"]
+    assert "박성민" not in {turn["speaker"] for turn in turns}
+    assert "관련의안" not in {turn["speaker"] for turn in turns}
+
+
+def test_only_last_closure_is_used_as_boundary():
+    """중간 산회 뒤 실제 회의가 이어진 문서의 진짜 발언은 보존한다."""
+    pages = [
+        {
+            "source_id": "test_20260814_2_2",
+            "committee": "테스트위원회",
+            "folder": "테스트위",
+            "file_name": "test.pdf",
+            "date_hint": "20260814",
+            "page": 1,
+            "segments": [{
+                "section_type": "body",
+                "text": "◯위원장 최민희 오전 회의를 마칩니다.",
+            }],
+        },
+        {
+            "source_id": "test_20260814_2_2",
+            "committee": "테스트위원회",
+            "folder": "테스트위",
+            "file_name": "test.pdf",
+            "date_hint": "20260814",
+            "page": 2,
+            "segments": [
+                {
+                    "section_type": "cover",
+                    "text": (
+                        "마지막 안내입니다.\n"
+                        "산회를 선포합니다.\n"
+                        "(10시00분 산회)\n"
+                        "일반증인 명단증인(2인) 이인호 김현"
+                    ),
+                },
+                {
+                    "section_type": "body",
+                    "text": "◯진술인 이인호 오후 회의의 실제 진술입니다.",
+                },
+            ],
+        },
+        {
+            "source_id": "test_20260814_2_2",
+            "committee": "테스트위원회",
+            "folder": "테스트위",
+            "file_name": "test.pdf",
+            "date_hint": "20260814",
+            "page": 3,
+            "segments": [{
+                "section_type": "body",
+                "text": (
+                    "◯위원장 최민희 오후 회의도 마칩니다.\n"
+                    "산회를 선포합니다.\n"
+                    "증인 명단증인(1인) 이인호"
+                ),
+            }],
+        },
+    ]
+
+    turns = split_turns(pages)
+
+    assert [turn["speaker"] for turn in turns] == ["최민희", "이인호", "최민희"]
+    assert turns[1]["role"] == "진술인"
+    assert turns[1]["text"] == "오후 회의의 실제 진술입니다."
+    assert turns[0]["text"].endswith("(10시00분 산회)")
+    assert "일반증인 명단" not in turns[0]["text"]
+    assert "증인 명단" not in turns[-1]["text"]
+
+
 def main() -> None:
     test_regression_cases()
     print()
     test_new_cases()
     print()
     test_garbage_headers()
-    total = len(REGRESSION_CASES) + len(NEW_CASES) + len(GARBAGE_HEADERS)
+    test_final_closure_trims_attached_appendix_and_later_pages()
+    total = len(REGRESSION_CASES) + len(NEW_CASES) + len(GARBAGE_HEADERS) + 2
     print(f"\n결과: {total}/{total} 통과")
 
 
