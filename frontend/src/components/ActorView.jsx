@@ -42,19 +42,36 @@ export default function ActorView({ actor, onIssueClick, onShown }) {
   const [suggestions, setSuggestions] = useState([])
   const lastLoadedRef = useRef('') // 방금 조회한 이름 — 자동완성 재팝업·이중 fetch 방지
 
+  const loadSeqRef = useRef(0) // 늦게 온 이전 조회가 최신 프로필을 덮어쓰지 않게
+
   async function load(name) {
     const q = (name || '').trim()
     if (!q) return
     lastLoadedRef.current = q
+    const seq = ++loadSeqRef.current
     setSuggestions([])
     setErr(null); setProfile(null); setLoading(true)
     try {
-      setProfile(await fetchActor(q))
+      const data = await fetchActor(q)
+      if (seq !== loadSeqRef.current) return // 더 최신 조회가 있다 — 이 응답은 버린다
+      setProfile(data)
       onShown?.(q)
-    } catch (e) { setErr(e.message) } finally { setLoading(false) }
+    } catch (e) {
+      if (seq === loadSeqRef.current) setErr(e.message)
+    } finally {
+      if (seq === loadSeqRef.current) setLoading(false)
+    }
   }
   useEffect(() => {
-    if (actor && actor !== lastLoadedRef.current) { setInput(actor); load(actor) }
+    if (!actor) {
+      // 뒤로가기로 프로필을 벗어났다 — 화면도 비워야 주소와 어긋나지 않는다.
+      // (검색어는 남긴다: 다시 조회하기 편하고, 데이터를 주장하지 않는다)
+      lastLoadedRef.current = ''
+      loadSeqRef.current += 1 // 진행 중인 조회의 응답을 무효화
+      setProfile(null); setErr(null); setLoading(false)
+      return
+    }
+    if (actor !== lastLoadedRef.current) { setInput(actor); load(actor) }
   }, [actor])
 
   // 자동완성 — 250ms 디바운스, 방금 조회한 이름 그대로면 띄우지 않는다

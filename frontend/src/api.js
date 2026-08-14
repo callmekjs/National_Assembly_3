@@ -6,6 +6,7 @@ const API_BASE = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
 // 요청별 타임아웃 (report 모드 실측 10~18초라 /query 는 여유 있게)
 const DEFAULT_TIMEOUT_MS = 20000
 const QUERY_TIMEOUT_MS = 90000
+const WAKE_TIMEOUT_MS = 90000   // 무료 서버 콜드스타트 실측 33.9초 (README)
 
 // 인증 토큰 (localStorage) — XSS 시 탈취 가능하나 걸린 자산이 질의 히스토리뿐인
 // 데모라 수용. HttpOnly 쿠키는 Vercel↔Render 교차 출처(제3자 쿠키 차단)에서 더 취약.
@@ -16,7 +17,22 @@ export function getToken() { return hasStorage ? localStorage.getItem(TOKEN_KEY)
 export function setToken(t) { if (hasStorage) localStorage.setItem(TOKEN_KEY, t) }
 export function clearToken() { if (hasStorage) localStorage.removeItem(TOKEN_KEY) }
 
-async function request(path, options = {}, timeoutMs = DEFAULT_TIMEOUT_MS) {
+// 콜드스타트 게이트 (감사 2026-08-14).
+// Render free 는 15분 유휴 후 깨어나는 데 30~50초가 걸린다. 그 사이 도착한 요청이
+// 20초에 포기하면, 공유 링크(?tab=issues&issue=X)로 들어온 첫 방문자는 쟁점 화면이
+// 통째로 실패한 걸 보고 — 서버가 깨어나도 아무도 다시 요청하지 않아 새로고침 전까지
+// 복구되지 않았다. 타임아웃을 일괄로 늘리면 진짜 장애일 때 90초를 기다리게 되므로,
+// **깨우기(/health, 90초)가 끝날 때까지만 다른 요청을 붙잡아 둔다.**
+// 깨우기가 실패해도 뒤 요청을 막지 않는다 — 각자 자기 타임아웃으로 진행한다.
+let wakePromise = null
+
+function wakeOnce() {
+  if (!wakePromise) wakePromise = request('/health', {}, WAKE_TIMEOUT_MS, true)
+  return wakePromise
+}
+
+async function request(path, options = {}, timeoutMs = DEFAULT_TIMEOUT_MS, isWake = false) {
+  if (!isWake) await wakeOnce().catch(() => {})
   const token = getToken()
   const headers = { ...(options.headers || {}), ...(token ? { Authorization: `Bearer ${token}` } : {}) }
   let res
@@ -70,8 +86,9 @@ export function searchActors(q) {
 }
 
 export function pingHealth() {
-  // 콜드스타트(Render free 슬립) 대비 — 최대 90초 대기
-  return request('/health', {}, 90000)
+  // 콜드스타트(Render free 슬립) 대비 — 최대 90초 대기.
+  // 다른 요청들도 이 약속(wakePromise)을 기다리므로 깨우기는 페이지당 1회다.
+  return wakeOnce()
 }
 
 export function postQuery(question, mode) {
