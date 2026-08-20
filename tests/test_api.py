@@ -68,6 +68,7 @@ def test_health():
         return
     r = client.get("/health")
     check("health: 200 + db ok", r.status_code == 200 and r.json()["db"] == "ok", r.json())
+    check("health: 행 수가 근사값인지 명시", isinstance(r.json().get("counts_approximate"), bool), r.json())
 
 
 def test_validation_422():
@@ -268,9 +269,16 @@ def test_query_verification_demotes_grounding():
         print(_SKIP_MSG)
         return
 
-    fake_hits = [{"chunk_id": "x_turn_0001_chunk_001", "speaker": "김우영", "role": "위원",
-                  "committee": "국토위", "meeting_date": "2025-09-01", "page_start": 1,
-                  "snippet": "특별법", "kw_rank": 1, "vec_score": 0.9}]
+    class FakeHits(list):
+        pass
+
+    fake_hits = FakeHits([{"chunk_id": "x_turn_0001_chunk_001", "speaker": "김우영", "role": "위원",
+                           "committee": "국토위", "meeting_date": "2025-09-01", "page_start": 1,
+                           "snippet": "특별법", "kw_rank": 1, "vec_score": 0.9}])
+    fake_hits.trace = {
+        "keyword_candidates": [], "vector_candidates": [],
+        "rrf_candidates": [], "final_results": [{"chunk_id": "x_turn_0001_chunk_001"}],
+    }
     flagged_result = {
         "answer": "여당은 찬성했고[1] 야당은 반대했습니다[1].",
         "mode": "qa", "issue_context": None,
@@ -294,6 +302,13 @@ def test_query_verification_demotes_grounding():
         check("검증강등: flags 있으면 FULL→PARTIAL", body["grounding"] == "PARTIAL", body["grounding"])
         check("검증강등: 응답에 verification 포함",
               body["verification"]["flags"] == ["comparison_one_sided"], body.get("verification"))
+        check("검색trace: 일반 요청에는 내부 trace 미노출", "retrieval_trace" not in body, body.keys())
+
+        traced = client.post("/query", json={
+            "question": "여당과 야당 입장은 어떻게 달랐나요?", "include_trace": True,
+        })
+        check("검색trace: 평가 opt-in 요청에는 단계 trace 포함",
+              traced.json().get("retrieval_trace") == fake_hits.trace, traced.json().get("retrieval_trace"))
 
         # flags 없으면 강등 없음
         clean = {**flagged_result, "verification": {"flags": [], "detail": {}}}

@@ -18,6 +18,7 @@
 import json
 import math
 import os
+import re
 from pathlib import Path
 
 from psycopg2.extras import RealDictCursor
@@ -27,6 +28,25 @@ from db import get_conn
 from query_parser import content_tokens
 
 MAX_TERMS = 8  # 토큰 폭발 방지
+
+_LAW_TOKEN = re.compile(r"(?:법|법안|법률안|개정안)$")
+
+
+def _legal_phrases(q: str) -> list[str]:
+    """질문에서 법률명으로 보이는 2~5어절 구문을 검색 앵커로 뽑는다."""
+    tokens = content_tokens(q)
+    phrases: list[str] = []
+    for index, token in enumerate(tokens):
+        if not _LAW_TOKEN.search(token):
+            continue
+        start = max(0, index - 4)
+        for size in range(min(5, index - start + 1), 1, -1):
+            phrase = " ".join(tokens[index - size + 1:index + 1])
+            if phrase not in phrases:
+                phrases.append(phrase)
+        if len(phrases) >= 2:
+            break
+    return phrases[:2]
 
 # ── IDF 가중치 (2026-08-07) ────────────────────────────────────────────────
 # 없을 때 생기던 문제: 점수가 "토큰 하나 맞으면 +1" 이라 모든 단어가 같은 값이었다.
@@ -99,8 +119,8 @@ def _terms_from_query(q: str) -> tuple[list[str], list[str]]:
     for tok in content_tokens(q):
         tokens.extend(expand_aliases(tok))
 
-    phrases: list[str] = []
-    if " " in q:                      # 여러 단어면 전체 구문도 후보
+    phrases = _legal_phrases(q)
+    if not phrases and " " in q:      # 법률명이 없을 때만 전체 구문을 후보로 사용
         phrases.extend(expand_aliases(q))
 
     # 중복 제거 + 상한

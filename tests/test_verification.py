@@ -18,11 +18,19 @@ from verification import (  # noqa: E402
     core_party,
     keyword_containment,
     party_label_consistency,
+    party_comparison_question,
     qa_pair_question,
     qa_pairing_dates,
     ruling_period_consistency,
     speaker_both_sides,
     speaker_role_consistency,
+    unsupported_numeric_claims,
+    unsupported_named_entities,
+    unsupported_organization_entities,
+    unsupported_evaluative_terms,
+    time_relation_mismatches,
+    missing_question_time_qualifiers,
+    requested_time_qualifiers,
     verify,
 )
 
@@ -53,6 +61,221 @@ def _src(n, speaker, party, date="2025-09-01", **kw):
     return base
 
 
+def test_unsupported_numeric_claims():
+    sources = [_src(
+        1, "이형훈", "정부측", date="2025-11-11", role="보건복지부제2차관",
+        text="24년도 6억 원에서 금년에 3억 원으로 줄었고 26년도에도 3억 원, 7억 원 증액이 필요합니다.",
+    )]
+    supported = "2024년 6억 원에서 2025년 3억 원으로 줄고 2026년에도 3억 원이라 7억 원 증액이 필요합니다.[1]"
+    check("숫자근거: 원문 수치는 통과", unsupported_numeric_claims(supported, sources) == [])
+
+    hallucinated = supported + " 취업지원센터 1억 5000만 원과 프로그램 2억 5000만 원을 포함합니다.[1]"
+    flags = unsupported_numeric_claims(hallucinated, sources)
+    check("숫자근거: 원문에 없는 복합 금액 차단", len(flags) == 2, str(flags))
+
+    result = verify("증액액과 배경은?", hallucinated, sources, [1])
+    check("숫자근거: verify에 critical flag 연결", "unsupported_number" in result["flags"], str(result))
+
+    dated = "2025년 11월 11일 이형훈 차관의 1명 발언입니다.[1]"
+    check("숫자근거: 메타데이터 날짜·인용 화자 수 통과", unsupported_numeric_claims(dated, sources) == [])
+
+    historical = [_src(
+        1, "윤한홍", "국민의힘(당시 여당)", date="2025-02-18",
+        text="97년 이후이며 2022년 대선은 71.6%, 상장회사 2400여 개가 대상이다.",
+    )]
+    preserved = "1997년 이후이고 2022년 대선은 71.6%, 상장회사 2,400여 개가 대상입니다.[1]"
+    check("숫자근거: 두 자리 연도·쉼표 표기 정답값 보존",
+          unsupported_numeric_claims(preserved, historical) == [])
+    approximate_hallucination = "상장회사 2,500여 개와 차량 13대, 약 4주가 필요합니다.[1]"
+    flags = unsupported_numeric_claims(approximate_hallucination, historical)
+    check("숫자근거: 여 개·대·주 단위 환각 차단",
+          len(flags) == 3 and all(value in " ".join(flags) for value in ("2,500여 개", "13대", "4주")),
+          str(flags))
+
+    native_counter = [_src(
+        1, "김희정", "국민의힘(당시 야당)",
+        text="규정을 위반해 운용되고 있는 세 대는 불필요한 차량입니다.",
+    )]
+    check("숫자근거: 세 대와 3대 표기 동치",
+          unsupported_numeric_claims("불필요한 차량은 3대였습니다.[1]", native_counter) == [])
+    check("숫자근거: 다른 수량은 계속 차단",
+          len(unsupported_numeric_claims("불필요한 차량은 4대였습니다.[1]", native_counter)) == 1)
+    cyber = [_src(
+        1, "강선영", "국민의힘(당시 여당)",
+        text="군 인터넷망 침해 사고는 2022년 9000건, 2023년 1만 3500건입니다.",
+    )]
+    check("숫자근거: 같은 단위의 명시값 차이는 허용",
+          unsupported_numeric_claims(
+              "2023년에는 2022년보다 약 4,500건 증가했습니다.[1]", cyber
+          ) == [])
+    check("숫자근거: 계산되지 않는 차이는 계속 차단",
+          len(unsupported_numeric_claims(
+              "2023년에는 2022년보다 약 5,500건 증가했습니다.[1]", cyber
+          )) == 1)
+    budget = [_src(
+        1, "민병덕", "더불어민주당(당시 여당)",
+        text="예산이 5조 8530억 원에서 6조 4800으로 늘었습니다.",
+    )]
+    check("숫자근거: 조 단위 뒤 생략된 억 원 동치",
+          unsupported_numeric_claims(
+              "예산은 5조 8530억 원에서 6조 4800억 원으로 늘었습니다.[1]", budget
+          ) == [])
+
+
+def test_relative_day_is_not_a_person_name():
+    sources = [_src(
+        1, "박범계", "더불어민주당(당시 야당)", role="위원",
+        text="전날 국방부차관이 엄중한 조치를 약속했습니다.",
+    )]
+    answer_text = "박범계 위원은 전날 국방부차관이 엄중한 조치를 약속했다고 말했습니다.[1]"
+    check("인물근거: 전날+기관직함은 실명이 아님",
+          unsupported_named_entities(answer_text, sources) == [])
+    count_words = [_src(1, "박대출", "국민의힘(당시 야당)", text="총 여섯 번 중 네 번은 직접 신청했다.")]
+    check("숫자근거: 여섯 번·네 번과 6회·4회 동치",
+          unsupported_numeric_claims("총 6회 중 직접 신청은 4회였습니다.[1]", count_words) == [])
+
+    agenda = [_src(
+        1, "김석기", "국민의힘(당시 야당)",
+        text="의사일정 제37항 의안번호는 2209537입니다.",
+    )]
+    check("숫자근거: 근거에 없는 장문 의안번호 차단",
+          len(unsupported_numeric_claims("제41항 의안번호는 2210866입니다.[1]", agenda)) == 1)
+
+
+def test_unsupported_named_entities():
+    sources = [_src(1, "박상혁", "더불어민주당(당시 야당)", text="보고서를 부적격 의견으로 채택해 주십시오.")]
+    supported = "박상혁 위원은 부적격 의견 채택을 요청했습니다.[1]"
+    check("인물근거: 실제 화자는 통과", unsupported_named_entities(supported, sources) == [])
+    unsupported = "박상혁 위원은 김병환 금융위원장후보자 보고서의 부적격 채택을 요청했습니다.[1]"
+    flags = unsupported_named_entities(unsupported, sources)
+    check("인물근거: 원문에 없는 후보자 차단", len(flags) == 1 and "김병환" in flags[0], str(flags))
+    result = verify("어떤 의견인가?", unsupported, sources, [1])
+    check("인물근거: verify에 critical flag 연결", "unsupported_named_entity" in result["flags"], str(result))
+
+    false_positives = (
+        "이재정 위원은 10여 개국의 의원들을 만났다고 발언했습니다.[1] "
+        "시정요구사항을 보고한 전문위원은 오세일 전문위원입니다.[1]"
+    )
+    fp_sources = [_src(
+        1, "이재정", "더불어민주당(당시 야당)",
+        text="이재정 위원은 10여 개국 의원들을 만났고 오세일 전문위원이 시정요구사항을 보고했다.",
+    )]
+    check("인물근거: 일반 서술어·개국의 오탐 없음", unsupported_named_entities(false_positives, fp_sources) == [])
+
+    round2_false_positives = (
+        "김용수 국무조정실국무2차장은 업무를 했던 위원과 행정학회에서 일했던 사람을 예로 들었습니다.[1] "
+        "최남호 산업통상자원부제2차관은 정부에 일임하면 위원 취지를 반영하겠다고 했습니다.[2]"
+    )
+    round2_sources = [
+        _src(1, "김용수", "정부측", role="국무조정실국무2차장",
+             text="업무를 했던 위원과 행정학회에서 일했던 사람을 예로 들었다."),
+        _src(2, "최남호", "정부측", role="산업통상자원부제2차관",
+             text="정부에 일임하면 위원 취지를 반영하겠다."),
+    ]
+    check("인물근거 2차: 했던·일했던·일임하면·차관은 오탐 없음",
+          unsupported_named_entities(round2_false_positives, round2_sources) == [])
+    check("화자귀속 2차: 활용형을 유령 화자로 잡지 않음",
+          speaker_role_consistency(round2_false_positives, round2_sources) == [])
+
+
+def test_unsupported_organization_entities():
+    sources = [_src(
+        1, "손명수", "더불어민주당(당시 야당)",
+        text="준공 처리 전까지 관리 책임은 공단에 있고 이후에는 대구시로 넘어갑니다.",
+    )]
+    expanded = "준공 전 관리 책임은 국가철도공단에 있습니다.[1]"
+    flags = unsupported_organization_entities(expanded, sources, "관리 책임은 어디에 있습니까?")
+    check("기관근거: 원문에 없는 구체 기관명 확장 차단", len(flags) == 1 and "국가철도공단" in flags[0], str(flags))
+    result = verify("관리 책임은 어디에 있습니까?", expanded, sources, [1])
+    check("기관근거: verify에 critical flag 연결", "unsupported_organization_entity" in result["flags"], str(result))
+
+    generic = "준공 전 관리 책임은 공단에 있습니다.[1]"
+    check("기관근거: 원문 그대로의 일반 지칭은 통과", unsupported_organization_entities(generic, sources, "") == [])
+
+    supported_sources = [_src(1, "손명수", None, text="국가철도공단이 관리 책임을 집니다.")]
+    check("기관근거: 원문에 명시된 기관은 통과", unsupported_organization_entities(expanded, supported_sources, "") == [])
+
+    question_named = "국가철도공단의 관리 책임은 언제까지입니까?"
+    check("기관근거: 질문이 명시한 기관명 반복은 통과", unsupported_organization_entities(expanded, sources, question_named) == [])
+
+    listed_sources = [_src(
+        1, "정동영", "정부측",
+        text="남북회담사무국과 교류협력국, 개성공단 지원사무국을 사실상 없앴다.",
+    )]
+    listed = "남북회담사무국·교류협력국·개성공단 지원사무국이 사실상 없어졌습니다.[1]"
+    check("기관근거: 가운뎃점 기관 열거를 하나의 공단명으로 오인하지 않음",
+          unsupported_organization_entities(listed, listed_sources, "") == [])
+
+
+def test_question_time_qualifier_completeness():
+    sources = [_src(1, "이수진", "더불어민주당(당시 야당)", date="2024-08-08",
+                    text="어제 총리가 8월 말 발표 계획을 밝혔다.")]
+    question = "전날 발표 계획과 향후 조치를 각각 설명해 주세요."
+    check("시점요구: 전날 범주 추출", requested_time_qualifiers(question) == ["previous_day"])
+    check("시점요구: 동의어 어제 허용",
+          missing_question_time_qualifiers(question, "어제 발표 계획입니다.[1]", sources) == [])
+    check("시점요구: 계산 가능한 정확한 날짜 허용",
+          missing_question_time_qualifiers(question, "8월 7일 발표 계획입니다.[1]", sources) == [])
+    check("시점요구: 내용만 있고 시점이 없으면 차단",
+          missing_question_time_qualifiers(question, "8월 말 발표 계획입니다.[1]", sources)
+          == ["previous_day"])
+    result = verify(question, "8월 말 발표 계획입니다.[1]", sources, [1])
+    check("시점요구: verify 치명 flag 연결",
+          "question_time_qualifier_missing" in result["flags"], str(result))
+    check("시점요구: 모호한 당시·이후는 검사 대상 아님",
+          requested_time_qualifiers("당시 발표 이후 조치는?") == [])
+
+
+def test_unsupported_evaluative_terms():
+    sources = [_src(1, "김승범", "정부측", text="자기자본이 50%라 사업의 안정성은 있다.")]
+    check("평가추론: 안정성을 사업성으로 교체하면 차단",
+          unsupported_evaluative_terms("사업성은 있으나 자금이 부족합니다.[1]", sources)
+          == ["근거에 없는 평가 표현 '사업성'"])
+    check("평가추론: 근거의 안정성은 통과",
+          unsupported_evaluative_terms("사업의 안정성은 있습니다.[1]", sources) == [])
+    check("평가추론: 질문에 명시된 평가 표현 반복은 통과",
+          unsupported_evaluative_terms("사업성이 있습니까?[1]", sources, "사업성이 있습니까?") == [])
+    result = verify("지원 이유는?", "사업성은 있으나 자금이 부족합니다.[1]", sources, [1])
+    check("평가추론: verify 치명 flag 연결",
+          "unsupported_evaluative_term" in result["flags"], str(result))
+
+
+def test_time_relation_mismatches():
+    sources = [_src(1, "이달희", "국민의힘(당시 여당)",
+                    text="2시 30분에 하겠다고 했으면 못 하면 몇 시까지 연장할지 적시해 달라.")]
+    check("시각관계: 원문의 시작 시점은 통과",
+          time_relation_mismatches("오후 2시 30분에 진행하기로 했습니다.[1]", sources) == [])
+    mismatch = time_relation_mismatches("오후 2시 30분까지 진행하기로 했습니다.[1]", sources)
+    check("시각관계: 시작 시각을 마감으로 바꾸면 차단", len(mismatch) == 1, str(mismatch))
+    result = verify("두 제안은?", "오후 2시 30분까지 진행하기로 했습니다.[1]", sources, [1])
+    check("시각관계: verify 치명 flag 연결", "time_relation_mismatch" in result["flags"], str(result))
+
+
+def test_round3_connective_words_are_not_person_names():
+    cases = [
+        ("유용원", "국내 건조가 맞지 않겠느냐고 하면서 장관의 의견을 물었습니다.[1]", "국내 건조가 맞는지 장관에게 물었다."),
+        ("신정훈", "위원회 기본 원칙에 따라 위원장으로서 정리했습니다.[1]", "위원회 기본 원칙에 입각해 정리했다."),
+        ("박상혁", "탄소중립을 실천하는 모습을 보이도록 위원장이 지시해 달라고 요청했습니다.[1]", "탄소중립 실천을 위한 지시를 요청했다."),
+        ("강대식", "패키지 안보 청구서를 제기할 가능성이 어느 정도인지 장관에게 물었습니다.[1]", "패키지 안보 청구서 가능성을 장관에게 물었다."),
+        ("남인순", "두 간사와 위원장에게 판단을 맡기되 오늘 의결하지 말고 검토하자고 했습니다.[1]", "두 간사와 위원장에게 판단을 맡길 수 있는지 물었다."),
+    ]
+    for speaker, answer, evidence in cases:
+        sources = [_src(1, speaker, "더불어민주당(당시 야당)", text=evidence)]
+        check(
+            f"3차 인물오탐: 연결어는 실명 아님({speaker})",
+            unsupported_named_entities(answer, sources) == [],
+        )
+        check(
+            f"3차 화자오탐: 연결어는 화자 아님({speaker})",
+            speaker_role_consistency(answer, sources) == [],
+        )
+
+    unsupported = "강대식 위원은 안규백 국방부장관에게 가능성을 물었습니다.[1]"
+    sources = [_src(1, "강대식", "국민의힘(당시 야당)", text="장관에게 가능성을 물었다.")]
+    flags = unsupported_named_entities(unsupported, sources)
+    check("3차 정탐보존: 실제 미지원 인물 안규백 차단", any("안규백" in flag for flag in flags), str(flags))
+
+
 def test_comparison_coverage():
     # eval_019 재현: 인용 3건 전부 더불어민주당 (시점만 달라 여야 표기가 갈림)
     one_sided = [
@@ -66,6 +289,8 @@ def test_comparison_coverage():
 
     covered = one_sided + [_src(4, "강민국", "국민의힘(당시 야당)")]
     check("커버리지: 정당 2개면 covered", comparison_coverage(covered)["covered"] is True)
+    check("비교축: 여야 질문만 진영 비교", party_comparison_question("여당과 야당의 입장은?"))
+    check("비교축: 두 경제지표 비교는 진영 비교 아님", not party_comparison_question("두 지표를 비교해 달라"))
 
     # F3(2026-07-26): 정부측도 진영 — "정부 vs 야당"은 정당한 2진영 비교이므로 covered=True
     # (구 스펙 §2-1 "정부측 집계 제외"는 결함으로 확정 — 스펙 개정절 참고)
@@ -698,6 +923,8 @@ def test_verify_integration():
     q2 = "전세사기 특별법 논의를 알려줘"
     clean = "김우영 위원은 특별법 보완을 주장했습니다[1]."
     check("verify: 정상 답변은 빈 flags", verify(q2, clean, srcs, [1])["flags"] == [])
+    metrics = verify("소비자지수와 소상공인지수를 비교해 달라", clean, srcs, [1], {"compare"})
+    check("verify: 비정당 비교는 one_sided 제외", "comparison_one_sided" not in metrics["flags"], str(metrics))
 
     # 인용 0건(거절 답변)은 검증하지 않는다 — REFUSED 답변에 flag 노이즈 방지
     refused = "제공된 회의록에서 확인할 수 없습니다."

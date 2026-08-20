@@ -1,0 +1,32 @@
+{
+  "records": 18,
+  "verdicts": {
+    "SEMANTIC_REVIEW_REQUIRED": 18
+  },
+  "grounding": {
+    "PARTIAL": 3,
+    "FULL": 15
+  },
+  "full_but_auto_fail": [],
+  "semantic_review_required": [
+    "dev-001",
+    "dev-002",
+    "dev-003",
+    "dev-004",
+    "dev-005",
+    "dev-006",
+    "dev-007",
+    "dev-008",
+    "dev-009",
+    "dev-010",
+    "dev-011",
+    "dev-012",
+    "dev-013",
+    "dev-014",
+    "dev-015",
+    "dev-016",
+    "dev-017",
+    "dev-018"
+  ],
+  "note": "1차 규칙 통과는 정답 판정이 아니며 의미 검토 전에는 PASS로 승격하지 않는다."
+}

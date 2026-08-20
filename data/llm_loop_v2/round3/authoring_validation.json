@@ -1,0 +1,176 @@
+{
+  "status": "FAIL",
+  "queue_records": 120,
+  "result_records": 120,
+  "validated_records": 94,
+  "categories": {
+    "comparison_timeline": 20,
+    "entity_date": 23,
+    "fact": 30,
+    "synthesis": 21
+  },
+  "missing_ids": [],
+  "hard_errors": [
+    {
+      "id": "blind-001",
+      "error": "unsupported exact_values: [{\"type\": \"number\", \"value\": \"10%포인트\"}]"
+    },
+    {
+      "id": "blind-005",
+      "error": "unsupported exact_values: [{\"type\": \"number\", \"value\": \"2022년 9000건\"}]"
+    },
+    {
+      "id": "blind-006",
+      "error": "unsupported exact_values: [{\"type\": \"number\", \"value\": \"상임위원 3명\"}, {\"type\": \"number\", \"value\": \"비상임위원 4명\"}]"
+    },
+    {
+      "id": "blind-008",
+      "error": "unsupported exact_values: [{\"type\": \"date\", \"value\": \"2024-01-09\"}, {\"type\": \"date\", \"value\": \"2024-11\"}]"
+    },
+    {
+      "id": "blind-010",
+      "error": "unsupported exact_values: [{\"type\": \"number\", \"value\": \"6조 4800억 원\"}]"
+    },
+    {
+      "id": "blind-017",
+      "error": "unsupported exact_values: [{\"type\": \"number\", \"value\": \"약 두 배\"}]"
+    },
+    {
+      "id": "blind-021",
+      "error": "unsupported exact_values: [{\"type\": \"date\", \"value\": \"1월 28일\"}]"
+    },
+    {
+      "id": "blind-022",
+      "error": "unsupported exact_values: [{\"type\": \"number\", \"value\": \"약 3억 원\"}]"
+    },
+    {
+      "id": "blind-023",
+      "error": "unsupported exact_values: [{\"type\": \"date\", \"value\": \"2017년 7월\"}]"
+    },
+    {
+      "id": "blind-024",
+      "error": "unsupported exact_values: [{\"type\": \"organization\", \"value\": \"중소벤처기업창업 및 진흥기금 alisman to=source_first_gold.required_exact_values  ... bad? Wait must valid JSON. I\"}]"
+    },
+    {
+      "id": "blind-025",
+      "error": "unsupported exact_values: [{\"type\": \"number\", \"value\": \"총 258건 중 224건\"}]"
+    },
+    {
+      "id": "blind-030",
+      "error": "unsupported exact_values: [{\"type\": \"date\", \"value\": \"2025-07-11 18:00\"}]"
+    },
+    {
+      "id": "blind-037",
+      "error": "unsupported exact_values: [{\"type\": \"organization\", \"value\": \"과학기술정보통신부\"}]"
+    },
+    {
+      "id": "blind-040",
+      "error": "unsupported exact_values: [{\"type\": \"number\", \"value\": \"약 5만 호\"}, {\"type\": \"number\", \"value\": \"약 5만 명\"}, {\"type\": \"date\", \"value\": \"2020년부터 2022년까지\"}]"
+    },
+    {
+      "id": "blind-042",
+      "error": "unsupported exact_values: [{\"type\": \"organization\", \"value\": \"미주기구(OAS)\"}, {\"type\": \"organization\", \"value\": \"이베로아메리카 공동체(SEGIB)\"}]"
+    },
+    {
+      "id": "blind-050",
+      "error": "unsupported exact_values: [{\"type\": \"number\", \"value\": \"호텔 객실 사용 총 39회\"}, {\"type\": \"number\", \"value\": \"가명 투숙 34회\"}]"
+    },
+    {
+      "id": "blind-052",
+      "error": "unsupported exact_values: [{\"type\": \"person\", \"value\": \"유영하\"}]"
+    },
+    {
+      "id": "blind-061",
+      "error": "unsupported exact_values: [{\"type\": \"number\", \"value\": \"14명\"}, {\"type\": \"number\", \"value\": \"4명\"}, {\"type\": \"number\", \"value\": \"10명 정도\"}, {\"type\": \"number\", \"value\": \"21명 정도\"}, {\"type\": \"number\", \"value\": \"30분\"}]"
+    },
+    {
+      "id": "blind-074",
+      "error": "unsupported exact_values: [{\"type\": \"number\", \"value\": \"사망 4명\"}, {\"type\": \"number\", \"value\": \"부상 21명\"}]"
+    },
+    {
+      "id": "blind-076",
+      "error": "unsupported exact_values: [{\"type\": \"number\", \"value\": \"약 14번 또는 15번\"}]"
+    },
+    {
+      "id": "blind-083",
+      "error": "unsupported exact_values: [{\"type\": \"number\", \"value\": \"2명\"}]"
+    },
+    {
+      "id": "reserve-004",
+      "error": "unsupported exact_values: [{\"type\": \"number\", \"value\": \"2배\"}, {\"type\": \"number\", \"value\": \"현행 법정 상한 이자율 20%\"}]"
+    },
+    {
+      "id": "reserve-007",
+      "error": "unsupported exact_values: [{\"type\": \"date\", \"value\": \"2023년 12월 29일\"}, {\"type\": \"number\", \"value\": \"대통령 임명 2명\"}, {\"type\": \"number\", \"value\": \"대통령이 소속되거나 소속됐던 정당에서 1명\"}, {\"type\": \"number\", \"value\": \"야당 추천 2명\"}, {\"type\": \"number\", \"value\": \"총 5명\"}]"
+    },
+    {
+      "id": "reserve-016",
+      "error": "unsupported exact_values: [{\"type\": \"date\", \"value\": \"2026년 2월\"}]"
+    },
+    {
+      "id": "reserve-021",
+      "error": "unsupported exact_values: [{\"type\": \"date\", \"value\": \"2022년\"}, {\"type\": \"number\", \"value\": \"120명\"}, {\"type\": \"number\", \"value\": \"약 14억 원\"}]"
+    },
+    {
+      "id": "reserve-022",
+      "error": "unsupported exact_values: [{\"type\": \"organization\", \"value\": \"서울남부지검 형사3부로 교체됐다는 취지의 발언(원문 표현: 3부)\"}]"
+    }
+  ],
+  "review_flags": [
+    {
+      "id": "blind-028",
+      "flags": [
+        "question_missing_date"
+      ]
+    },
+    {
+      "id": "blind-031",
+      "flags": [
+        "question_missing_date"
+      ]
+    },
+    {
+      "id": "blind-035",
+      "flags": [
+        "question_missing_date"
+      ]
+    },
+    {
+      "id": "blind-036",
+      "flags": [
+        "question_missing_date"
+      ]
+    },
+    {
+      "id": "blind-044",
+      "flags": [
+        "question_missing_date"
+      ]
+    },
+    {
+      "id": "blind-058",
+      "flags": [
+        "question_missing_speaker"
+      ]
+    },
+    {
+      "id": "blind-090",
+      "flags": [
+        "answer_numbers_need_review:27일"
+      ]
+    },
+    {
+      "id": "reserve-010",
+      "flags": [
+        "question_missing_date"
+      ]
+    },
+    {
+      "id": "reserve-011",
+      "flags": [
+        "question_missing_date"
+      ]
+    }
+  ],
+  "semantic_review_required": true
+}

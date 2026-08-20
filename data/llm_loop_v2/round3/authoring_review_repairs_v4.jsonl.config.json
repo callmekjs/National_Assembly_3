@@ -1,0 +1,16 @@
+{
+  "queue": "C:\\National_Assembly_3\\data\\llm_loop_v2\\round3\\authoring_queue_v3.jsonl",
+  "queue_sha256": "3e49044365ba7c31a9106cd9e4a97982677dd81679bf0476ccc5c334e4a3798f",
+  "records": 1,
+  "ids": [
+    "blind-063"
+  ],
+  "validation_source": null,
+  "review_source": null,
+  "model": "gpt-5.6-sol",
+  "effort": "high",
+  "max_completion_tokens": 4000,
+  "prior_ledgers": [],
+  "system_sha256": "10deb2887814b1b230814e55c74d8fdec30cbe4dc94e080bb1f53e8478c297eb",
+  "schema_sha256": "15b8674dc15dba0522851bd95eb5d3b842f3564c7dcaaf472616b0f378e0fcc6"
+}

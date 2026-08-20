@@ -1,0 +1,28 @@
+{
+  "created_at": "2026-08-18T20:20:35.310244+09:00",
+  "queue": {
+    "path": "C:\\National_Assembly_3\\data\\llm_loop_v2\\round3\\authoring_queue_v3.jsonl",
+    "sha256": "3e49044365ba7c31a9106cd9e4a97982677dd81679bf0476ccc5c334e4a3798f"
+  },
+  "inputs": [
+    {
+      "path": "C:\\National_Assembly_3\\data\\llm_loop_v2\\round3\\authoring_results_v5.jsonl",
+      "sha256": "b5c6299d7fd29dc7895953ed0c5af02ddf27231dcea6bc89bfb789dfda2674ee",
+      "records": 120
+    }
+  ],
+  "replacements": [
+    {
+      "path": "C:\\National_Assembly_3\\data\\llm_loop_v2\\round3\\authoring_review_repairs_v2.jsonl",
+      "sha256": "1fe08e400d33810c60a063043800ae37d18850a8b66b391c11350e4b5bf9752f",
+      "records": 1
+    }
+  ],
+  "output": {
+    "path": "C:\\National_Assembly_3\\data\\llm_loop_v2\\round3\\authoring_results_v6.jsonl",
+    "sha256": "996e477ccd32dc1233af6b3580cddb22aeac1fab2fb45dbbf416d3393ef2bf77"
+  },
+  "records": 120,
+  "unique_ids": 120,
+  "estimated_success_cost_usd": 2.677205
+}

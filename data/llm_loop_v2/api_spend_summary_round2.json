@@ -1,0 +1,77 @@
+{
+  "pricing_checked_at": "2026-08-18",
+  "price_source": "https://developers.openai.com/api/docs/models",
+  "components": {
+    "answer_terra": {
+      "calls": 424,
+      "input_tokens": 1554373,
+      "output_tokens": 62545,
+      "estimated_cost_usd": 4.824108
+    },
+    "reranker_luna": {
+      "calls": 424,
+      "input_tokens": 2427154,
+      "output_tokens": 97627,
+      "estimated_cost_usd": 3.012916
+    },
+    "semantic_judge_sol": {
+      "calls": 185,
+      "input_tokens": 233420,
+      "output_tokens": 66579,
+      "estimated_cost_usd": 3.16447
+    },
+    "gold_author_sol": {
+      "calls": 257,
+      "input_tokens": 165089,
+      "output_tokens": 117073,
+      "estimated_cost_usd": 4.337635
+    }
+  },
+  "estimated_total_usd": 15.339129,
+  "approved_cap_usd": 16.0,
+  "remaining_to_cap_usd": 0.660871,
+  "within_cap": true,
+  "baseline_spend_usd": 9.806811,
+  "additional_cap_usd": 6.0,
+  "additional_spent_usd": 5.532318,
+  "additional_remaining_usd": 0.467682,
+  "within_additional_cap": true,
+  "files_scanned": [
+    "data\\llm_loop_v2\\runs\\baseline-v2\\results.jsonl",
+    "data\\llm_loop_v2\\runs\\baseline-v2-valid\\results.jsonl",
+    "data\\llm_loop_v2\\runs\\blind-final\\results.jsonl",
+    "data\\llm_loop_v2\\runs\\dev-after-gate-final\\results.jsonl",
+    "data\\llm_loop_v2\\runs\\dev-after-gate-v1\\results.jsonl",
+    "data\\llm_loop_v2\\runs\\dev-after-gate-v2-probe\\results.jsonl",
+    "data\\llm_loop_v2\\runs\\dev-after-gate-v3-probe\\results.jsonl",
+    "data\\llm_loop_v2\\runs\\dev-after-gate-v4-probe\\results.jsonl",
+    "data\\llm_loop_v2\\runs\\dev-after-gate-v5-probe\\results.jsonl",
+    "data\\llm_loop_v2\\runs\\dev-after-loop-final\\results.jsonl",
+    "data\\llm_loop_v2\\runs\\dev-gate-candidate\\results.jsonl",
+    "data\\llm_loop_v2\\runs\\medium-prompt-probe\\results.jsonl",
+    "data\\llm_loop_v2\\runs\\relation-prompt-probe\\results.jsonl",
+    "data\\llm_loop_v2\\runs\\reserve-fix-probe-1\\results.jsonl",
+    "data\\llm_loop_v2\\runs\\reserve-fix-probe-2\\results.jsonl",
+    "data\\llm_loop_v2\\runs\\reserve-fix-probe-3\\results.jsonl",
+    "data\\llm_loop_v2\\runs\\reserve-impacted-regression\\results.jsonl",
+    "data\\llm_loop_v2\\runs\\reserve-run-1\\results.jsonl",
+    "data\\llm_loop_v2\\runs\\reserve-run-2\\results.jsonl",
+    "data\\llm_loop_v2\\runs\\reserve-run-3\\results.jsonl",
+    "data\\llm_loop_v2\\runs\\round2-blind-final\\results.jsonl",
+    "data\\llm_loop_v2\\runs\\round2-dev-regression\\results.jsonl",
+    "data\\llm_loop_v2\\runs\\baseline-v2-valid\\semantic_judgments.jsonl",
+    "data\\llm_loop_v2\\runs\\dev-after-gate-final\\semantic_judgments.jsonl",
+    "data\\llm_loop_v2\\runs\\dev-after-loop-final\\semantic_judgments.jsonl",
+    "data\\llm_loop_v2\\runs\\dev-gate-candidate\\semantic_judgments.jsonl",
+    "data\\llm_loop_v2\\runs\\medium-prompt-probe\\semantic_judgments.jsonl",
+    "data\\llm_loop_v2\\runs\\relation-prompt-probe\\semantic_judgments.jsonl",
+    "data\\llm_loop_v2\\runs\\round2-blind-final\\semantic_judgments_portfolio.jsonl",
+    "data\\llm_loop_v2\\runs\\round2-blind-final\\semantic_judgments_portfolio.jsonl.calls.jsonl",
+    "data\\llm_loop_v2\\authoring_results.jsonl.calls.jsonl",
+    "data\\llm_loop_v2\\authoring_results_round2.jsonl.calls.jsonl",
+    "data\\llm_loop_v2\\authoring_results_v2.jsonl.calls.jsonl",
+    "data\\llm_loop_v2\\authoring_results_v3.jsonl.calls.jsonl",
+    "data\\llm_loop_v2\\authoring_results_v4.jsonl.calls.jsonl"
+  ],
+  "note": "응답 생성 terra, 재순위 luna, 독립 의미 채점·골드 작성 sol의 저장 토큰을 공식 단가로 재계산했다."
+}

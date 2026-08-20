@@ -1,0 +1,30 @@
+{
+  "profile": "portfolio",
+  "thresholds": {
+    "overall_accuracy_min": 0.9,
+    "citation_accuracy_min": 0.95,
+    "refusal_accuracy_min": 1.0,
+    "critical_hallucinations_max": 0
+  },
+  "records": 20,
+  "passed": 19,
+  "failed": 1,
+  "overall_accuracy": 0.95,
+  "answerable_records": 18,
+  "citation_passed": 17,
+  "citation_accuracy": 0.944444,
+  "unanswerable_records": 2,
+  "refusal_passed": 2,
+  "refusal_accuracy": 1.0,
+  "critical_hallucinations": 1,
+  "checks": {
+    "overall_accuracy": true,
+    "citation_accuracy": false,
+    "critical_hallucinations": false,
+    "unanswerable_refusal": true
+  },
+  "gate": "FAIL",
+  "failed_ids": [
+    "dev-017"
+  ]
+}

@@ -1,0 +1,6 @@
+{"id": "blind-001", "attempt": 1, "model": "gpt-5.6-sol", "status": "SUCCESS", "usage": {"input_tokens": 1000, "output_tokens": 548}, "estimated_cost_usd": 0.02144}
+{"id": "blind-002", "attempt": 1, "model": "gpt-5.6-sol", "status": "SUCCESS", "usage": {"input_tokens": 796, "output_tokens": 859}, "estimated_cost_usd": 0.02975}
+{"id": "blind-003", "attempt": 1, "model": "gpt-5.6-sol", "status": "SUCCESS", "usage": {"input_tokens": 894, "output_tokens": 603}, "estimated_cost_usd": 0.02256}
+{"id": "blind-004", "attempt": 1, "model": "gpt-5.6-sol", "status": "SUCCESS", "usage": {"input_tokens": 813, "output_tokens": 510}, "estimated_cost_usd": 0.019365}
+{"id": "blind-005", "attempt": 1, "model": "gpt-5.6-sol", "status": "SUCCESS", "usage": {"input_tokens": 690, "output_tokens": 765}, "estimated_cost_usd": 0.0264}
+{"id": "blind-006", "attempt": 1, "model": "gpt-5.6-sol", "status": "SUCCESS", "usage": {"input_tokens": 697, "output_tokens": 816}, "estimated_cost_usd": 0.027965}

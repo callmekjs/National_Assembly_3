@@ -1,0 +1,40 @@
+{
+  "records": 30,
+  "runs": 3,
+  "exposures": 90,
+  "stage1_passed_exposures": 81,
+  "stage1_failure_exposures": 9,
+  "all_three_passed_records": 25,
+  "grounding_changed_records": [
+    "reserve-002",
+    "reserve-006",
+    "reserve-009",
+    "reserve-014",
+    "reserve-016",
+    "reserve-019",
+    "reserve-023"
+  ],
+  "verification_changed_records": [
+    "reserve-002",
+    "reserve-006",
+    "reserve-009",
+    "reserve-014",
+    "reserve-016",
+    "reserve-019",
+    "reserve-022",
+    "reserve-023"
+  ],
+  "citations_changed_records": [
+    "reserve-009",
+    "reserve-014",
+    "reserve-015",
+    "reserve-016",
+    "reserve-019",
+    "reserve-020",
+    "reserve-022",
+    "reserve-023",
+    "reserve-024"
+  ],
+  "stage1_gate": "FAIL",
+  "note": "이 결과는 반복 안정성의 결정 규칙 검사이며 독립 의미 정확도 점수를 대체하지 않는다."
+}

@@ -1,0 +1,5 @@
+{"id": "dev-001", "attempt": 1, "model": "gpt-5.6-sol", "status": "SUCCESS", "usage": {"input_tokens": 826, "output_tokens": 965}, "estimated_cost_usd": 0.03308}
+{"id": "dev-003", "attempt": 1, "model": "gpt-5.6-sol", "status": "SUCCESS", "usage": {"input_tokens": 922, "output_tokens": 758}, "estimated_cost_usd": 0.02735}
+{"id": "dev-011", "attempt": 1, "model": "gpt-5.6-sol", "status": "SUCCESS", "usage": {"input_tokens": 1079, "output_tokens": 421}, "estimated_cost_usd": 0.018025}
+{"id": "dev-013", "attempt": 1, "model": "gpt-5.6-sol", "status": "SUCCESS", "usage": {"input_tokens": 891, "output_tokens": 726}, "estimated_cost_usd": 0.026235}
+{"id": "dev-016", "attempt": 1, "model": "gpt-5.6-sol", "status": "SUCCESS", "usage": {"input_tokens": 779, "output_tokens": 493}, "estimated_cost_usd": 0.018685}

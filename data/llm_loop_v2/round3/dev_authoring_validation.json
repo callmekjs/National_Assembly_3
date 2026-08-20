@@ -1,0 +1,37 @@
+{
+  "status": "FAIL",
+  "queue_records": 18,
+  "result_records": 18,
+  "validated_records": 13,
+  "categories": {
+    "comparison_timeline": 3,
+    "entity_date": 4,
+    "fact": 4,
+    "synthesis": 2
+  },
+  "missing_ids": [],
+  "hard_errors": [
+    {
+      "id": "dev-001",
+      "error": "unsupported exact_values: [{\"type\": \"number\", \"value\": \"약 50%\"}, {\"type\": \"date\", \"value\": \"작년 11월\"}]"
+    },
+    {
+      "id": "dev-003",
+      "error": "unsupported exact_values: [{\"type\": \"date\", \"value\": \"11월 안\"}]"
+    },
+    {
+      "id": "dev-011",
+      "error": "unsupported exact_values: [{\"type\": \"number\", \"value\": \"3만 명 초과(예상)\"}]"
+    },
+    {
+      "id": "dev-013",
+      "error": "unsupported exact_values: [{\"type\": \"number\", \"value\": \"1인당 1분 30초도 되지 않는 시간\"}]"
+    },
+    {
+      "id": "dev-016",
+      "error": "unsupported exact_values: [{\"type\": \"organization\", \"value\": \"재정경제부\"}]"
+    }
+  ],
+  "review_flags": [],
+  "semantic_review_required": true
+}

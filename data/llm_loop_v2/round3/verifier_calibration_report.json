@@ -1,0 +1,915 @@
+{
+  "status": "PASS",
+  "checks": {
+    "normal_sample_gte_50": true,
+    "critical_sample_gte_3": true,
+    "normal_false_block_lte_2pct": true,
+    "critical_block_100pct": true
+  },
+  "normal_records": 99,
+  "normal_false_blocks": 0,
+  "normal_false_block_rate": 0.0,
+  "critical_records": 4,
+  "critical_blocked": 4,
+  "critical_block_rate": 1.0,
+  "false_block_ids": [],
+  "missed_critical_ids": [],
+  "wrong_refusal_ids_separate_g3_g5": [
+    "blind-040",
+    "blind-047",
+    "blind-069",
+    "blind-077",
+    "blind-084"
+  ],
+  "scope_or_completeness_ids_separate_g3_g5": [
+    "blind-048"
+  ],
+  "excluded_records": 11,
+  "rows": [
+    {
+      "id": "dev-001",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "dev-002",
+      "label": "excluded_semantic_failure",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "dev-003",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "dev-004",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "dev-005",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": [
+        "speaker_role_mismatch"
+      ]
+    },
+    {
+      "id": "dev-006",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": [
+        "speaker_role_mismatch"
+      ]
+    },
+    {
+      "id": "dev-007",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "dev-008",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "dev-009",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "dev-010",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "dev-011",
+      "label": "excluded_semantic_failure",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "dev-012",
+      "label": "blockable_critical",
+      "blocked": true,
+      "critical_failures": [
+        "unsupported_number",
+        "unsupported_organization_entity"
+      ],
+      "verification_flags": [
+        "unsupported_number",
+        "unsupported_organization_entity"
+      ]
+    },
+    {
+      "id": "dev-013",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": [
+        "speaker_role_mismatch"
+      ]
+    },
+    {
+      "id": "dev-014",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "dev-015",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "dev-016",
+      "label": "blockable_critical",
+      "blocked": true,
+      "critical_failures": [
+        "unsupported_named_entity"
+      ],
+      "verification_flags": [
+        "unsupported_named_entity"
+      ]
+    },
+    {
+      "id": "dev-017",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "dev-018",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "dev-019",
+      "label": "excluded_semantic_failure",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "dev-020",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-001",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-002",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-003",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-004",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-005",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-006",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-007",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-008",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-009",
+      "label": "excluded_semantic_failure",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-010",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-011",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-012",
+      "label": "excluded_semantic_failure",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-013",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-014",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-015",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-016",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": [
+        "speaker_role_mismatch"
+      ]
+    },
+    {
+      "id": "blind-017",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-018",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-019",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-020",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-021",
+      "label": "blockable_critical",
+      "blocked": true,
+      "critical_failures": [
+        "unsupported_number"
+      ],
+      "verification_flags": [
+        "unsupported_number"
+      ]
+    },
+    {
+      "id": "blind-022",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-023",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-024",
+      "label": "blockable_critical",
+      "blocked": true,
+      "critical_failures": [
+        "unsupported_organization_entity"
+      ],
+      "verification_flags": [
+        "unsupported_organization_entity"
+      ]
+    },
+    {
+      "id": "blind-025",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-026",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-027",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": [
+        "speaker_role_mismatch"
+      ]
+    },
+    {
+      "id": "blind-028",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": [
+        "speaker_role_mismatch"
+      ]
+    },
+    {
+      "id": "blind-029",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-030",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-031",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-032",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-033",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-034",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-035",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-036",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-037",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-038",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-039",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-040",
+      "label": "wrong_refusal_separate_gate",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-041",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": [
+        "speaker_role_mismatch"
+      ]
+    },
+    {
+      "id": "blind-042",
+      "label": "excluded_semantic_failure",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-043",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-044",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-045",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-046",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": [
+        "speaker_role_mismatch"
+      ]
+    },
+    {
+      "id": "blind-047",
+      "label": "wrong_refusal_separate_gate",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-048",
+      "label": "scope_or_completeness_separate_g3_g5",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-049",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-050",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-051",
+      "label": "excluded_semantic_failure",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-052",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-053",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-054",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-055",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-056",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-057",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-058",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-059",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": [
+        "speaker_role_mismatch"
+      ]
+    },
+    {
+      "id": "blind-060",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": [
+        "speaker_role_mismatch"
+      ]
+    },
+    {
+      "id": "blind-061",
+      "label": "excluded_semantic_failure",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-062",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-063",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-064",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-065",
+      "label": "excluded_semantic_failure",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-066",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-067",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-068",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-069",
+      "label": "wrong_refusal_separate_gate",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-070",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-071",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-072",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-073",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-074",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-075",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-076",
+      "label": "excluded_semantic_failure",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": [
+        "speaker_role_mismatch"
+      ]
+    },
+    {
+      "id": "blind-077",
+      "label": "wrong_refusal_separate_gate",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-078",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-079",
+      "label": "excluded_semantic_failure",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-080",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-081",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-082",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": [
+        "speaker_role_mismatch"
+      ]
+    },
+    {
+      "id": "blind-083",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-084",
+      "label": "wrong_refusal_separate_gate",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-085",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-086",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-087",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-088",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": [
+        "speaker_role_mismatch"
+      ]
+    },
+    {
+      "id": "blind-089",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-090",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-091",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-092",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-093",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-094",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-095",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-096",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-097",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-098",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-099",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    },
+    {
+      "id": "blind-100",
+      "label": "normal",
+      "blocked": false,
+      "critical_failures": [],
+      "verification_flags": []
+    }
+  ],
+  "note": "폐기된 round2 답변의 독립 의미판정을 검증기 보정에만 사용하며 최종 정확도에는 포함하지 않는다."
+}

@@ -1,0 +1,76 @@
+{
+  "pricing_checked_at": "2026-08-18",
+  "price_source": "https://developers.openai.com/api/docs/models",
+  "components": {
+    "answer_terra": {
+      "calls": 318,
+      "input_tokens": 1061306,
+      "output_tokens": 37210,
+      "estimated_cost_usd": 3.211415
+    },
+    "reranker_luna": {
+      "calls": 318,
+      "input_tokens": 1178049,
+      "output_tokens": 45650,
+      "estimated_cost_usd": 1.451949
+    },
+    "semantic_judge_sol": {
+      "calls": 310,
+      "input_tokens": 461436,
+      "output_tokens": 92226,
+      "estimated_cost_usd": 5.07396
+    },
+    "gold_author_sol": {
+      "calls": 121,
+      "input_tokens": 109408,
+      "output_tokens": 65918,
+      "estimated_cost_usd": 2.52458
+    }
+  },
+  "estimated_total_usd": 12.261904,
+  "approved_cap_usd": 12.5,
+  "remaining_to_cap_usd": 0.238096,
+  "within_cap": true,
+  "files_scanned": [
+    "data\\llm_loop_v2\\round3\\runs\\blind-final\\results.jsonl",
+    "data\\llm_loop_v2\\round3\\runs\\dev-g5-v1\\results.jsonl",
+    "data\\llm_loop_v2\\round3\\runs\\dev-g5-v2\\results.jsonl",
+    "data\\llm_loop_v2\\round3\\runs\\dev-g5-v3\\results.jsonl",
+    "data\\llm_loop_v2\\round3\\runs\\dev-g5-v4\\results.jsonl",
+    "data\\llm_loop_v2\\round3\\runs\\g3-gold-context\\results.jsonl",
+    "data\\llm_loop_v2\\round3\\runs\\g3-gold-context-v2\\results.jsonl",
+    "data\\llm_loop_v2\\round3\\runs\\g3-gold-context-v3\\results.jsonl",
+    "data\\llm_loop_v2\\round3\\runs\\g3-gold-context-v4\\results.jsonl",
+    "data\\llm_loop_v2\\round3\\runs\\g3-gold-context-v5\\results.jsonl",
+    "data\\llm_loop_v2\\round3\\runs\\g3-gold-context-v6\\results.jsonl",
+    "data\\llm_loop_v2\\round3\\runs\\g3-gold-context-v7\\results.jsonl",
+    "data\\llm_loop_v2\\round3\\runs\\reserve-stability-1\\results.jsonl",
+    "data\\llm_loop_v2\\round3\\runs\\blind-final\\semantic_judgments.jsonl",
+    "data\\llm_loop_v2\\round3\\runs\\blind-final\\semantic_judgments.jsonl.calls.jsonl",
+    "data\\llm_loop_v2\\round3\\runs\\dev-g5-v1\\semantic_judgments.jsonl",
+    "data\\llm_loop_v2\\round3\\runs\\dev-g5-v1\\semantic_judgments.jsonl.calls.jsonl",
+    "data\\llm_loop_v2\\round3\\runs\\dev-g5-v2\\semantic_judgments.jsonl",
+    "data\\llm_loop_v2\\round3\\runs\\dev-g5-v2\\semantic_judgments.jsonl.calls.jsonl",
+    "data\\llm_loop_v2\\round3\\runs\\dev-g5-v3\\semantic_judgments.jsonl",
+    "data\\llm_loop_v2\\round3\\runs\\dev-g5-v3\\semantic_judgments.jsonl.calls.jsonl",
+    "data\\llm_loop_v2\\round3\\runs\\dev-g5-v4\\semantic_judgments.jsonl",
+    "data\\llm_loop_v2\\round3\\runs\\dev-g5-v4\\semantic_judgments.jsonl.calls.jsonl",
+    "data\\llm_loop_v2\\round3\\runs\\dev-g5-v4\\semantic_judgments_v2.jsonl",
+    "data\\llm_loop_v2\\round3\\runs\\dev-g5-v4\\semantic_judgments_v2.jsonl.calls.jsonl",
+    "data\\llm_loop_v2\\round3\\runs\\g3-gold-context-v2\\semantic_judgments.jsonl",
+    "data\\llm_loop_v2\\round3\\runs\\g3-gold-context-v2\\semantic_judgments.jsonl.calls.jsonl",
+    "data\\llm_loop_v2\\round3\\runs\\g3-gold-context-v3\\semantic_judgments.jsonl",
+    "data\\llm_loop_v2\\round3\\runs\\g3-gold-context-v3\\semantic_judgments.jsonl.calls.jsonl",
+    "data\\llm_loop_v2\\round3\\runs\\g3-gold-context-v4\\semantic_judgments.jsonl",
+    "data\\llm_loop_v2\\round3\\runs\\g3-gold-context-v4\\semantic_judgments.jsonl.calls.jsonl",
+    "data\\llm_loop_v2\\round3\\runs\\g3-gold-context-v5\\semantic_judgments.jsonl",
+    "data\\llm_loop_v2\\round3\\runs\\g3-gold-context-v5\\semantic_judgments.jsonl.calls.jsonl",
+    "data\\llm_loop_v2\\round3\\runs\\g3-gold-context-v6\\semantic_judgments.jsonl",
+    "data\\llm_loop_v2\\round3\\runs\\g3-gold-context-v6\\semantic_judgments.jsonl.calls.jsonl",
+    "data\\llm_loop_v2\\round3\\runs\\g3-gold-context-v7\\semantic_judgments.jsonl",
+    "data\\llm_loop_v2\\round3\\runs\\g3-gold-context-v7\\semantic_judgments.jsonl.calls.jsonl",
+    "data\\llm_loop_v2\\round3\\authoring_results.jsonl.calls.jsonl",
+    "data\\llm_loop_v2\\round3\\authoring_results_overflow.jsonl.calls.jsonl"
+  ],
+  "note": "응답 생성 terra, 재순위 luna, 독립 의미 채점·골드 작성 sol의 저장 토큰을 공식 단가로 재계산했다."
+}

@@ -1,0 +1,42 @@
+{
+  "status": "PASS",
+  "stage": "READY_FOR_AUTHORING_APPROVAL",
+  "checks": {
+    "dev_exact_20": true,
+    "queue_exact_120": true,
+    "queue_exact_ids": true,
+    "queue_unique_candidates": true,
+    "queue_unique_sources": true,
+    "queue_distribution": true,
+    "negative_exact_10": true,
+    "negative_speakers_absent": true,
+    "negative_meetings_exist": true,
+    "negative_speakers_exist_elsewhere": true,
+    "budget_reserve_gte_6_25": true
+  },
+  "queue_distribution": {
+    "blind": {
+      "comparison_timeline": 25,
+      "entity_date": 20,
+      "synthesis": 20,
+      "fact": 25
+    },
+    "reserve": {
+      "comparison_timeline": 8,
+      "entity_date": 7,
+      "synthesis": 7,
+      "fact": 8
+    }
+  },
+  "records": {
+    "dev": 20,
+    "queue": 120,
+    "negative": 10
+  },
+  "remaining_budget_usd": 6.535341,
+  "reserved_budget_usd": {
+    "authoring": 2.5,
+    "semantic_judge": 2.0,
+    "final_answers": 1.75
+  }
+}

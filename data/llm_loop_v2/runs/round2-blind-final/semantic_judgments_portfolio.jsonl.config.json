@@ -1,0 +1,9 @@
+{
+  "inputs": "C:\\National_Assembly_3\\data\\llm_loop_v2\\runs\\round2-blind-final\\semantic_inputs_portfolio.jsonl",
+  "inputs_sha256": "af87479c0728f38d5018038c0dc1c1e2e880dfeea7ba6956f6a400a4f5dad19d",
+  "records": 100,
+  "model": "gpt-5.6-sol",
+  "effort": "high",
+  "system_sha256": "bbd9cae920b0df59a106c52ba800f46a782d251fb742aa348c90c75164c4a2e1",
+  "schema_sha256": "dee9af5dfd11fa9ac71cdcfc50f7176550eeff56bd8150701639a37c6c4dfe28"
+}

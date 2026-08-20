@@ -1,0 +1,9 @@
+{
+  "inputs": "C:\\National_Assembly_3\\data\\llm_loop_v2\\round3\\runs\\g3-gold-context-v5\\judge_inputs.jsonl",
+  "inputs_sha256": "5b0b30e9a2bc7dd4c7b37b5debec89fb4e5c9b48da66d2480c51802dbe3e7ebe",
+  "records": 18,
+  "model": "gpt-5.6-sol",
+  "effort": "high",
+  "system_sha256": "8bbecdd32d48267487f60fd5703edc03a8a6195882f2e177ed4f505e60bded25",
+  "schema_sha256": "dee9af5dfd11fa9ac71cdcfc50f7176550eeff56bd8150701639a37c6c4dfe28"
+}

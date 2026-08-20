@@ -1,0 +1,68 @@
+{
+  "status": "PASS",
+  "answerable_records": 30,
+  "recall": {
+    "keyword_at_30": 1.0,
+    "vector_at_30": 0.866667,
+    "rrf_at_10": 0.966667,
+    "final_context_at_5": 1.0
+  },
+  "by_category": {
+    "comparison_timeline": {
+      "records": 8,
+      "keyword_at_30": 1.0,
+      "vector_at_30": 1.0,
+      "rrf_at_10": 1.0,
+      "final_context_at_5": 1.0
+    },
+    "entity_date": {
+      "records": 7,
+      "keyword_at_30": 1.0,
+      "vector_at_30": 0.571429,
+      "rrf_at_10": 0.857143,
+      "final_context_at_5": 1.0
+    },
+    "fact": {
+      "records": 8,
+      "keyword_at_30": 1.0,
+      "vector_at_30": 0.875,
+      "rrf_at_10": 1.0,
+      "final_context_at_5": 1.0
+    },
+    "synthesis": {
+      "records": 7,
+      "keyword_at_30": 1.0,
+      "vector_at_30": 1.0,
+      "rrf_at_10": 1.0,
+      "final_context_at_5": 1.0
+    }
+  },
+  "miss_ids": {
+    "keyword_at_30": [],
+    "vector_at_30": [
+      "reserve-011",
+      "reserve-014",
+      "reserve-015",
+      "reserve-027"
+    ],
+    "rrf_at_10": [
+      "reserve-011"
+    ],
+    "final_context_at_5": []
+  },
+  "missing_trace_ids": [],
+  "filter_mismatch_ids": [],
+  "checks": {
+    "trace_complete": true,
+    "filters_exact": true,
+    "rrf_recall_at_10": true,
+    "final_context_recall_at_5": true,
+    "category_rrf_recall_at_10": true
+  },
+  "thresholds": {
+    "rrf_at_10": 0.85,
+    "final_context_at_5": 0.85,
+    "category_rrf_at_10": 0.75,
+    "filter_errors": 0
+  }
+}

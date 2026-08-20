@@ -44,6 +44,33 @@ K_EACH = 30           # 각 축에서 가져올 후보 수
 _SIDE_QUESTION = re.compile(r"여야|여당|야당|진영|정당별|당별")
 
 
+class SearchResults(list):
+    """기존 list 계약을 유지하면서 평가용 검색 단계 trace를 함께 운반한다."""
+
+    def __init__(self, values: list[dict], trace: dict):
+        super().__init__(values)
+        self.trace = trace
+
+
+def _trace_candidate(item: dict, rank: int) -> dict:
+    return {
+        "rank": rank,
+        "chunk_id": item.get("chunk_id"),
+        "speaker": item.get("speaker"),
+        "role": item.get("role"),
+        "committee": item.get("committee"),
+        "date": str(item.get("meeting_date")) if item.get("meeting_date") else None,
+        "kw_rank": item.get("kw_rank"),
+        "vec_rank": item.get("vec_rank"),
+        "vec_score": item.get("vec_score", item.get("score")),
+        "rrf_before_penalty": item.get("rrf_before_penalty"),
+        "rrf": item.get("rrf"),
+        "rerank_rank": item.get("rerank_rank"),
+        "found_in": item.get("found_in"),
+        "is_short": bool(item.get("is_short")),
+    }
+
+
 def _balance_by_side(ranked: list[dict], limit: int) -> list[dict]:
     """여야 비교 질문용 — 진영별 상한으로 근거를 나눠 담는다.
 
@@ -200,4 +227,24 @@ def hybrid_search(
         e["rrf_before_penalty"] = round(e["rrf_before_penalty"], 5)
         e["found_in"] = "+".join(sorted(set(e["found_in"])))
         e.pop("score", None)
-    return results
+    trace = {
+        "filters": {
+            "committees": committees,
+            "date_from": str(date_from) if date_from else None,
+            "date_to": str(date_to) if date_to else None,
+        },
+        "keyword_candidates": [
+            _trace_candidate(item, rank) for rank, item in enumerate(kw_hits, start=1)
+        ],
+        "vector_candidates": [
+            _trace_candidate(item, rank) for rank, item in enumerate(vec_hits, start=1)
+        ],
+        "rrf_candidates": [
+            _trace_candidate(item, rank)
+            for rank, item in enumerate(ranked[:RERANK_CANDIDATES], start=1)
+        ],
+        "final_results": [
+            _trace_candidate(item, rank) for rank, item in enumerate(results, start=1)
+        ],
+    }
+    return SearchResults(results, trace)

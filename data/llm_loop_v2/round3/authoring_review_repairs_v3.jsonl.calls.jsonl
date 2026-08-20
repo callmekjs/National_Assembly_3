@@ -1,0 +1,1 @@
+{"id": "blind-063", "attempt": 1, "model": "gpt-5.6-sol", "status": "INVALID_JSON", "usage": {"input_tokens": 1291, "output_tokens": 2400}, "estimated_cost_usd": 0.078455, "error_type": "JSONDecodeError"}

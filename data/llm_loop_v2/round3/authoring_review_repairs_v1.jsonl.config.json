@@ -1,0 +1,26 @@
+{
+  "queue": "C:\\National_Assembly_3\\data\\llm_loop_v2\\round3\\authoring_queue_v3.jsonl",
+  "queue_sha256": "3e49044365ba7c31a9106cd9e4a97982677dd81679bf0476ccc5c334e4a3798f",
+  "records": 8,
+  "ids": [
+    "blind-036",
+    "blind-038",
+    "blind-044",
+    "blind-052",
+    "blind-058",
+    "blind-063",
+    "reserve-015",
+    "reserve-021"
+  ],
+  "validation_source": null,
+  "review_source": {
+    "path": "C:\\National_Assembly_3\\data\\llm_loop_v2\\round3\\gold_reviews_completed_v1.jsonl",
+    "sha256": "8e8ef66f5134411f05c8a0c4319f7ddb85baeb037821d53a4a02cf674afce8fd"
+  },
+  "model": "gpt-5.6-sol",
+  "effort": "high",
+  "max_completion_tokens": 2400,
+  "prior_ledgers": [],
+  "system_sha256": "c5bb72e7653e594a36f26a46c7f786da63ab0cdd0a093ffe1d30a37f93ad423f",
+  "schema_sha256": "75b30655ad039a33db189341f50dc8b4a04718d1569bfb311d171aabeb8d157d"
+}

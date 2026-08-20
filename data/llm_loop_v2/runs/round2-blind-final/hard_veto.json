@@ -1,0 +1,33 @@
+{
+  "records": 100,
+  "gate": "FAIL_EARLY",
+  "hard_veto": true,
+  "auto_failed": 9,
+  "auto_failed_ids": [
+    "blind-009",
+    "blind-022",
+    "blind-040",
+    "blind-047",
+    "blind-049",
+    "blind-069",
+    "blind-076",
+    "blind-077",
+    "blind-084"
+  ],
+  "answerable_records": 90,
+  "citation_passed": 85,
+  "citation_accuracy": 0.944444,
+  "unanswerable_records": 10,
+  "refusal_passed": 10,
+  "refusal_accuracy": 1.0,
+  "refusal_failed_ids": [],
+  "hard_checks": {
+    "citation_accuracy_gte_98": false,
+    "unanswerable_refusal_100": true,
+    "stage1_auto_failures_zero": false
+  },
+  "semantic_review": "SKIPPED_AFTER_HARD_VETO",
+  "overall_accuracy": null,
+  "critical_hallucinations": null,
+  "note": "하드 기준 하나라도 실패하면 의미 채점 결과와 무관하게 최종 FAIL이다. 불필요한 유료 판정 호출을 생략하며, 의미 정확도를 측정한 것처럼 표시하지 않는다."
+}

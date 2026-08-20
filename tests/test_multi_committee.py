@@ -119,6 +119,32 @@ def test_date_ranges():
     check("기간: 날짜 표현은 질문에서 제거", "6월" not in cleaned and "8월" not in cleaned, cleaned)
 
 
+def test_leading_meeting_date_does_not_absorb_content_dates():
+    question = (
+        "2024년 10월 24일 외교통일위원회에서 김영배 위원은 "
+        "10월 18일 발표 이후의 조치를 어떻게 설명했습니까?"
+    )
+    cleaned, committees, df, dt = extract_filters(question)
+    check("회의 날짜: 첫 날짜만 exact 필터", (df, dt) == ("2024-10-24", "2024-10-24"), (df, dt))
+    check("회의 날짜: 위원회 인식 유지", committees == ["외통위"], committees)
+    check("회의 날짜: 내용 날짜는 검색어에 보존", "10월 18일" in cleaned, cleaned)
+
+    question = (
+        "2025년 11월 11일 정무위원회에서 기존 계좌의 2025년도 말 가입자와 "
+        "신규 가입 목표를 어떻게 비교했습니까?"
+    )
+    cleaned, _, df, dt = extract_filters(question)
+    check("회의 날짜: 내용 연도 때문에 연간 범위로 넓어지지 않음",
+          (df, dt) == ("2025-11-11", "2025-11-11"), (df, dt))
+    check("회의 날짜: 내용 연도 보존", "2025년도" in cleaned, cleaned)
+
+
+def test_nonleading_date_range_keeps_existing_behavior():
+    _, _, df, dt = extract_filters("외통위의 2025년 7월 14일부터 9월 1일까지 논의")
+    check("기간: 위원회가 먼저 나오면 명시 범위를 유지",
+          (df, dt) == ("2025-07-14", "2025-09-01"), (df, dt))
+
+
 def hit(cid, committee, rrf):
     return {"chunk_id": cid, "committee": committee, "rrf": rrf}
 

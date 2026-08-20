@@ -1,0 +1,24 @@
+{
+  "queue": "C:\\National_Assembly_3\\data\\llm_loop_v2\\round3\\dev_authoring_queue_v2.jsonl",
+  "queue_sha256": "87a79d6555a35d1f8f9462466bf38a58b81c0d98964be80613191428351f7e27",
+  "records": 1,
+  "ids": [
+    "dev-006"
+  ],
+  "validation_source": null,
+  "review_source": {
+    "path": "C:\\National_Assembly_3\\data\\llm_loop_v2\\round3\\dev_reviews_completed_v1.jsonl",
+    "sha256": "7a8220d4974e9cb9c522b1aa83617d92054cd5547be25a0d3dc98974b4f6e8b5"
+  },
+  "model": "gpt-5.6-sol",
+  "effort": "high",
+  "max_completion_tokens": 2400,
+  "prior_ledgers": [
+    {
+      "path": "C:\\National_Assembly_3\\data\\llm_loop_v2\\round3\\dev_authoring_repairs_v1.jsonl.calls.jsonl",
+      "sha256": "17aeb61bed5e84a42d1ba76c3c372186956c855f5a1d9f772f660054ee83029b"
+    }
+  ],
+  "system_sha256": "c5bb72e7653e594a36f26a46c7f786da63ab0cdd0a093ffe1d30a37f93ad423f",
+  "schema_sha256": "75b30655ad039a33db189341f50dc8b4a04718d1569bfb311d171aabeb8d157d"
+}

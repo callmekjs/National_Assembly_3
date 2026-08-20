@@ -17,6 +17,7 @@ import io
 import os
 import sys
 from pathlib import Path
+from types import SimpleNamespace
 
 if __name__ == "__main__":  # pytest 캡처와 충돌 방지 — 직접 실행할 때만 래핑
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
@@ -31,6 +32,8 @@ from answer import (  # noqa: E402
     display_speaker,
     neighbor_turn_ids,
     parse_citations,
+    requested_speaker,
+    requested_speaker_missing,
     build_user_message,
     restore_turn_text,
     strip_boilerplate,
@@ -91,6 +94,11 @@ def test_build_source_block():
     check("조립: chunk_id는 LLM에 노출 안 함", "chunk_id" not in block and "turn_0005" not in block)
     check("조립: 맥락 없으면 맥락 블록 없음", "주변 맥락" not in block)
 
+    party_source = [{**SOURCES[0], "party": "더불어민주당(당시 여당)"}]
+    check("조립: 기본 질문에는 당적 비노출", "더불어민주당" not in build_source_block(party_source))
+    check("조립: 정당 질문은 당적 명시",
+          "더불어민주당(당시 여당)" in build_source_block(party_source, include_party=True))
+
     neighbors = {1: {"previous": "박민규 위원: 앞선 발언", "next": "정동영 위원: 다음 발언"}}
     block2 = build_source_block(SOURCES, neighbors)
     check("조립: [1 주변 맥락] 블록", "[1 주변 맥락]" in block2)
@@ -141,7 +149,7 @@ def test_restore_turn_text():
 
 
 def test_assemble_turn():
-    from answer import _assemble_turn
+    from answer import _assemble_turn, _assemble_turn_with_ids
 
     def frag(i, text):
         return {"chunk_id": f"t_turn_0001_chunk_{i:03d}", "chunk_index": i, "text": text}
@@ -149,6 +157,11 @@ def test_assemble_turn():
     # 상한 이내 → 전 조각 순서대로 복원 (입력 순서가 섞여 있어도)
     frags = [frag(2, "둘째."), frag(1, "첫째."), frag(3, "셋째.")]
     check("근거복원: 상한 이내면 turn 전문", _assemble_turn(frags, "t_turn_0001_chunk_002") == "첫째. 둘째. 셋째.")
+    text, support_ids = _assemble_turn_with_ids(frags, "t_turn_0001_chunk_002")
+    check("근거복원: 실제 모델 문맥의 모든 chunk ID 기록",
+          text == "첫째. 둘째. 셋째." and support_ids == [
+              "t_turn_0001_chunk_001", "t_turn_0001_chunk_002", "t_turn_0001_chunk_003"
+          ], support_ids)
 
     # 상한 초과 → 검색된 조각 중심 창. 조각당 400자 × 5, 상한 1000 → 검색 조각 ± 이웃만
     big = [frag(i, f"{i}" * 400) for i in range(1, 6)]
@@ -157,6 +170,9 @@ def test_assemble_turn():
     check("근거복원: 상한 준수", len(out) <= 1000, len(out))
     check("근거복원: 이웃 조각이 먼저 붙음", ("2" * 400 in out) or ("4" * 400 in out))
     check("근거복원: 잘린 경계는 … 표기", "…" in out, out[:50])
+    _, support_ids = _assemble_turn_with_ids(big, "t_turn_0001_chunk_003", max_len=1000)
+    check("근거복원: 잘린 경계 chunk도 support ID에 기록", "t_turn_0001_chunk_003" in support_ids,
+          support_ids)
 
     # 검색 조각 자체가 상한보다 커도 잘리지 않는다
     huge = [frag(1, "가" * 5000), frag(2, "나" * 100)]
@@ -200,6 +216,43 @@ def test_no_evidence():
     check("0건: mode 반영", result["mode"] == "qa")
 
 
+def test_explicit_requested_speaker_guard():
+    similar = [{"speaker": "최혁진"}, {"speaker": "김석기"}]
+    q = "2025-06-27 외교통일위원회 회의에서 최형두 위원은 어떤 발언을 했는가?"
+    check("대상 화자: 직접 발언 문형 추출", requested_speaker(q) == "최형두")
+    check("대상 화자: 유사 이름은 정확 일치 아님", requested_speaker_missing(q, similar))
+    check("대상 화자: 정확 이름이 있으면 통과",
+          not requested_speaker_missing(q, similar + [{"speaker": "최형두"}]))
+    check("대상 화자: 일반 내용 질문에는 사전 거절 미적용",
+          not requested_speaker_missing("최형두 위원이 제안한 예산은 얼마인가?", similar))
+
+
+def test_explicit_requested_speaker_guard_skips_llm():
+    hits = [{
+        "chunk_id": "외통위_20250627_1_1_turn_0001_chunk_001",
+        "speaker": "최혁진", "role": "위원", "committee": "외통위",
+        "meeting_date": "2025-06-27", "page_start": 1, "snippet": "ODA 발언",
+    }]
+    called = []
+    original_fetch, original_client, original_party = answer._fetch_texts, answer._get_client, answer.party_label
+    answer._fetch_texts = lambda chunk_ids: {hits[0]["chunk_id"]: "ODA 사업을 점검해야 합니다."}
+    answer._get_client = lambda: called.append(True)
+    answer.party_label = lambda speaker, meeting_date, role: "더불어민주당(당시 여당)"
+    try:
+        result = answer.generate_answer(
+            "2025-06-27 외교통일위원회 회의에서 최형두 위원은 어떤 발언을 했는가?",
+            hits=hits,
+        )
+    finally:
+        answer._fetch_texts, answer._get_client, answer.party_label = original_fetch, original_client, original_party
+
+    check("대상 화자 사전차단: LLM 미호출", not called)
+    check("대상 화자 사전차단: 확인 불가", result["answer"] == NO_EVIDENCE)
+    check("대상 화자 사전차단: 유사 화자 무인용", result["citations"] == [])
+    check("대상 화자 사전차단: 원인 기록",
+          result["verification"]["detail"]["target_speaker_absent"] == "최형두")
+
+
 # ── 7. 모드 설정 차등 ─────────────────────────────────────────────────────────
 
 def test_mode_config():
@@ -207,7 +260,8 @@ def test_mode_config():
     check("모드: 근거 수 5 vs 10", qa["limit"] == 5 and report["limit"] == 10)
     # 2026-08-04: qa 도 인접 턴을 켠다. 회의록은 질의응답 구조인데 근거를 맥락
     # 없이 던지고 있었다(청크 중앙값 36자·81%가 150자 미만) — 절단 길이로 차등한다.
-    check("모드: 인접 턴 양쪽 on", qa["neighbors"] is True and report["neighbors"] is True)
+    check("모드: QA 주변 턴 차단·report만 유지",
+          qa["neighbors"] is False and report["neighbors"] is True)
     check("모드: 인접 턴 절단 qa < report",
           qa["neighbor_trunc"] < report["neighbor_trunc"])
     check("모드: max_tokens 700 vs 2000", qa["max_tokens"] == 700 and report["max_tokens"] == 2000)
@@ -245,6 +299,127 @@ def test_cost_per_model():
           answer._cost("gpt-없는모델-test", 1000, 1000) > answer._cost("gpt-4o-mini", 1000, 1000))
 
 
+def test_critical_verification_failures():
+    clean = {"flags": [], "detail": {}}
+    check("품질게이트: 정상 답변 통과", answer.critical_verification_failures(clean, []) == [])
+    numeric = {"flags": ["unsupported_number"], "detail": {}}
+    check("품질게이트: 근거 없는 숫자 치명적", answer.critical_verification_failures(numeric, []) == ["unsupported_number"])
+    organization = {"flags": ["unsupported_organization_entity"], "detail": {}}
+    check("품질게이트: 근거 없는 구체 기관명 치명적",
+          answer.critical_verification_failures(organization, []) == ["unsupported_organization_entity"])
+    temporal = {"flags": ["question_time_qualifier_missing"], "detail": {}}
+    check("품질게이트: 질문의 명시 시점 누락 치명적",
+          answer.critical_verification_failures(temporal, []) == ["question_time_qualifier_missing"])
+    evaluative = {"flags": ["unsupported_evaluative_term"], "detail": {}}
+    check("품질게이트: 근거 없는 평가 결론 치명적",
+          answer.critical_verification_failures(evaluative, []) == ["unsupported_evaluative_term"])
+    time_relation = {"flags": ["time_relation_mismatch"], "detail": {}}
+    check("품질게이트: 시각 관계 변경 치명적",
+          answer.critical_verification_failures(time_relation, []) == ["time_relation_mismatch"])
+    check("품질게이트: 잘못된 인용번호 치명적",
+          answer.critical_verification_failures(clean, [9]) == ["invalid_citation_number"])
+    noisy = {"flags": ["speaker_role_mismatch"], "detail": {}}
+    check("품질게이트: 오탐 이력 규칙은 재생성 제외", answer.critical_verification_failures(noisy, []) == [])
+
+
+def test_qa_prompt_requires_question_scoped_values_and_literal_organizations():
+    prompt = answer.MODE_CONFIG["qa"]["system_prompt"]
+    check("프롬프트 범위: 질문에 직접 필요하지 않은 구체 수치 금지",
+          "구체 수치" in prompt and "직접 답변" in prompt)
+    check("프롬프트 기관: 축약 기관명을 완전명으로 임의 확장 금지",
+          "완전한 기관명으로 확장" in prompt)
+    check("프롬프트 완전성: 복합 요구와 정확 수치 보존",
+          "요구 항목을 내부적으로" in prompt and "정확한 수치·연도·기간" in prompt)
+    check("프롬프트 완전성: 질문 밖 골드 문구 추가 방지",
+          "사용자가 실제로 물은 모든 항목" in prompt)
+
+
+def test_repair_guide_deletes_only_flagged_values_and_preserves_supported_answers():
+    guide = answer.build_repair_guide(["unsupported_number"], ["1억 5000만 원"])
+    check("재생성 범위: 검출된 값은 명시적으로 삭제", "1억 5000만 원" in guide)
+    check("재생성 범위: 정답 수치까지 일괄 삭제 금지", "없는 값까지 함께 지우지 마세요" in guide)
+    check("재생성 완전성: 근거가 지지하는 연도·수치·기간 보존",
+          "연도·수치·기간은 반드시 보존" in guide)
+    check("재생성 완전성: 명시 시점 보존", "시점 한정어" in guide)
+
+
+def test_time_qualifier_guard():
+    check("시점가드: 명시 시점이 없으면 미삽입", answer._time_qualifier_guard("발표 계획은?") == "")
+    guard = answer._time_qualifier_guard("전날 발표와 다음 날 조치를 설명해 주세요.")
+    check("시점가드: 복수 시점 요구 보존", "전날" in guard and "다음 날" in guard)
+
+
+def test_question_act_guard():
+    check("질문행위가드: 일반 질문에는 미삽입", answer._question_act_guard("비자 문제는?") == "")
+    guard = answer._question_act_guard("비자 문제와 관련해 무엇을 물었습니까?")
+    check("질문행위가드: 이유·전제·대조 보존", all(word in guard for word in ("이유", "전제", "대조")))
+
+
+def test_generate_answer_retries_and_repairs_unsupported_number(monkeypatch):
+    outputs = iter([
+        "이형훈 차관은 7억 원 증액을 수용했고 세부적으로 1억 5000만 원을 배정했습니다.[1]",
+        "이형훈 차관은 7억 원 증액을 수용했습니다.[1]",
+    ])
+    calls = []
+
+    def create(**kwargs):
+        calls.append(kwargs)
+        return SimpleNamespace(
+            choices=[SimpleNamespace(message=SimpleNamespace(content=next(outputs)))],
+            usage=SimpleNamespace(prompt_tokens=100, completion_tokens=20),
+        )
+
+    client = SimpleNamespace(chat=SimpleNamespace(completions=SimpleNamespace(create=create)))
+    chunk_id = "복지위_20251111_test_turn_0001_chunk_001"
+    monkeypatch.setattr(answer, "_get_client", lambda: client)
+    monkeypatch.setattr(answer, "_fetch_texts", lambda ids: {chunk_id: "이형훈 차관은 7억 원 증액안을 수용한다고 답했습니다."})
+    monkeypatch.setattr(answer, "_fetch_neighbors", lambda *args, **kwargs: {})
+    monkeypatch.setattr(answer, "reranker_usage", lambda: None)
+    hits = [{
+        "chunk_id": chunk_id,
+        "speaker": "이형훈",
+        "role": "보건복지부제2차관",
+        "committee": "복지위",
+        "meeting_date": "2025-11-11",
+        "page_start": 3,
+        "snippet": "",
+    }]
+
+    result = answer.generate_answer("이형훈 차관이 수용한 증액액은 얼마인가?", hits=hits)
+    check("품질게이트 통합: 치명적 숫자면 1회 재생성", len(calls) == 2, str(len(calls)))
+    check("품질게이트 통합: 재생성 답변 채택", "1억 5000만 원" not in result["answer"], result["answer"])
+    gate = result["verification"]["detail"]["quality_gate"]
+    check("품질게이트 통합: 재생성 근거 기록", gate["attempts"] == 2 and gate["repaired"] == ["unsupported_number"], str(gate))
+    check("품질게이트 통합: 두 호출 토큰 합산", result["usage"]["input_tokens"] == 200 and result["usage"]["output_tokens"] == 40, str(result["usage"]))
+
+
+def test_gold_context_only_disables_neighbors_and_issue_injection(monkeypatch):
+    chunk_id = "정무위_20250101_test_turn_0001_chunk_001"
+    hits = [{
+        "chunk_id": chunk_id, "speaker": "홍길동", "role": "위원",
+        "committee": "정무위", "meeting_date": "2025-01-01",
+        "page_start": 1, "snippet": "홍길동 위원은 찬성한다고 말했다.",
+    }]
+    response = SimpleNamespace(
+        choices=[SimpleNamespace(message=SimpleNamespace(content="홍길동 위원은 찬성한다고 말했습니다.[1]"))],
+        usage=SimpleNamespace(prompt_tokens=50, completion_tokens=10),
+    )
+    client = SimpleNamespace(chat=SimpleNamespace(completions=SimpleNamespace(create=lambda **_: response)))
+    monkeypatch.setattr(answer, "_get_client", lambda: client)
+    monkeypatch.setattr(answer, "_fetch_texts", lambda _: {chunk_id: hits[0]["snippet"]})
+    monkeypatch.setattr(answer, "_fetch_neighbors", lambda *_: (_ for _ in ()).throw(AssertionError("neighbors called")))
+    monkeypatch.setattr(answer, "issue_context_for", lambda *_args, **_kwargs: (_ for _ in ()).throw(AssertionError("issue called")))
+    monkeypatch.setattr(answer, "party_label", lambda *_: "더불어민주당(당시 여당)")
+    monkeypatch.setattr(answer, "verify", lambda *_: {"flags": [], "detail": {}})
+    monkeypatch.setattr(answer, "reranker_usage", lambda: None)
+    result = answer.generate_answer(
+        "2025년 1월 1일 정무위원회에서 여야 입장을 비교하면 홍길동 위원은 무엇이라 했는가?",
+        hits=hits,
+        gold_context_only=True,
+    )
+    check("G3 gold context: 이웃·이슈 없이 답변 생성", "찬성" in result["answer"])
+
+
 # ── 8. 상투구 후처리 ──────────────────────────────────────────────────────────
 
 def test_strip_boilerplate():
@@ -261,6 +436,11 @@ def test_strip_boilerplate():
 
     party_q = "북한 오물풍선에 대한 쟁점을 여야별로 정리"
     check("후처리: 정당 질문이면 정당 문구 보존", strip_boilerplate(a, party_q) == a)
+
+    a = "더불어민주당(2025년 당시 여당) 소속 이재정 위원은 수습이 필요하다고 했습니다.[1]"
+    check("후처리: 정당 무관 질문의 불필요한 당적 제거",
+          strip_boilerplate(a, q) == "이재정 위원은 수습이 필요하다고 했습니다.[1]")
+    check("후처리: 정당 질문의 당적 서술 보존", strip_boilerplate(a, party_q) == a)
 
     a = "이준석 의원의 발언은 제공된 회의록에서 확인할 수 없습니다."
     check("후처리: 구체적 대상 거절은 보존", strip_boilerplate(a, q) == a)
@@ -288,6 +468,9 @@ def test_build_user_message():
 
     msg = build_user_message("정당별 입장 차이는?", block)
     check("안내문: '정당' 키워드에도 첨부", "안내:" in msg)
+
+    paired = answer._paired_value_guard("예산과 정원이 각각 얼마에서 얼마로 늘었습니까?")
+    check("안내문: 전후 종점값 보존", "시작값" in paired and "종점값" in paired and "증가액" in paired)
 
     msg = build_user_message("티메프 사태 피해자 구제 대책", block)
     check("안내문: 무관 질문엔 없음", "안내:" not in msg)

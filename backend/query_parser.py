@@ -215,6 +215,38 @@ def _remove_spans(text: str, spans: list[tuple[int, int]]) -> str:
     return "".join(out)
 
 
+def _leading_meeting_date(text: str, dates: list[dict]) -> dict | None:
+    """질문 맨 앞의 ``날짜 + 위원회`` 형식에서 회의 날짜만 고른다.
+
+    평가 질문처럼 ``2024년 10월 24일 외통위에서 ... 10월 18일 ...``인 경우
+    뒤 날짜는 답변 내용이지 검색 기간이 아니다. 반면 ``7월 14일부터 9월 1일까지``
+    같은 일반 기간 질문은 날짜 바로 뒤에 위원회명이 없으므로 기존 범위 규칙을 쓴다.
+    """
+    if not dates:
+        return None
+    first = dates[0]
+    start, end = first["span"]
+    if text[:start].strip():
+        return None
+    # 날짜와 위원회 사이의 공백만 허용한다.
+    committee_pos = end
+    while committee_pos < len(text) and text[committee_pos].isspace():
+        committee_pos += 1
+    committee_match = _COMMITTEE_RE.match(text, committee_pos)
+    if committee_match is None or text[end:committee_match.start()].strip():
+        return None
+    # ``위원회에서/위원회의``처럼 회의 맥락임이 명시된 경우만 우선 날짜로 본다.
+    suffix = text[committee_match.end():]
+    speaker_context = (
+        r"[가-힣\uf900-\ufaff]{2,8}\s*"
+        r"(?:수석전문위원|전문위원|소위원장|위원장|위원|장관|차관|청장|국장|진술인|참고인)"
+        r"(?:의)?\s*(?:발언|보고|설명|질의)"
+    )
+    if not re.match(rf"\s*(?:에서|의|회의|{speaker_context})", suffix):
+        return None
+    return first
+
+
 def extract_filters(q: str):
     """질문 → (cleaned_q, committees, date_from, date_to). 못 찾으면 None.
 
@@ -231,9 +263,12 @@ def extract_filters(q: str):
     #  전부 배제 → 거짓 부정을 만들던 문제, 2026-07-07 수정)
     dates = _find_dates(cleaned)
     if dates:
-        date_from = min(f["from"] for f in dates)
-        date_to = max(f["to"] for f in dates)
-        cleaned = _remove_spans(cleaned, [f["span"] for f in dates])
+        meeting_date = _leading_meeting_date(cleaned, dates)
+        selected = [meeting_date] if meeting_date else dates
+        date_from = min(f["from"] for f in selected)
+        date_to = max(f["to"] for f in selected)
+        # 회의 날짜 형식에서는 답변 내용에 등장한 다른 날짜를 검색어로 보존한다.
+        cleaned = _remove_spans(cleaned, [f["span"] for f in selected])
 
     # 위원회는 전부 감지 (findall) — 위원회명은 의미 정보라 질문에서 제거하지 않는다 (벡터 축에 유용)
     found = [COMMITTEE_MAP[m] for m in _COMMITTEE_RE.findall(cleaned)]

@@ -1,0 +1,9 @@
+{
+  "inputs": "C:\\National_Assembly_3\\data\\llm_loop_v2\\round3\\runs\\dev-g5-v4\\judge_inputs_v2.jsonl",
+  "inputs_sha256": "2d67abbde9fe241ee3b3b21403b92292d7a6305cddafab7882c63647e7197b1a",
+  "records": 20,
+  "model": "gpt-5.6-sol",
+  "effort": "high",
+  "system_sha256": "71f925d12d01be91936a47f756aa951a5f11121b2cbcf3e4a6d927a823dde961",
+  "schema_sha256": "dee9af5dfd11fa9ac71cdcfc50f7176550eeff56bd8150701639a37c6c4dfe28"
+}

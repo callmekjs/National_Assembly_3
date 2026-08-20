@@ -1,0 +1,49 @@
+{
+  "schema_version": "2.0",
+  "frozen_at": "2026-08-18T13:36:55.030110+09:00",
+  "git_head": "779a12ada1c8675f5bb16e79ca3a43dcd8240b43",
+  "files": {
+    "dev": {
+      "path": "data\\llm_loop_v2\\dev.jsonl",
+      "sha256": "d33ea30ba6efd138ae16cfa6a94518a1e04fca720faa869bf9152dc9e089c969",
+      "records": 20
+    },
+    "blind_gold": {
+      "path": "data\\llm_loop_v2\\round2\\blind_gold.jsonl",
+      "sha256": "c1c55bd547bceee704abb929ec1e55d25f1258b3ec0c2030c5ee1211bf99ff73",
+      "records": 100
+    },
+    "reserve": {
+      "path": "data\\llm_loop_v2\\round2\\reserve.jsonl",
+      "sha256": "7f5c5047c77f499f20074d7cd5d19133f348d4448067bbb11149684c8dc45cf1",
+      "records": 30
+    },
+    "blind_questions": {
+      "path": "data\\llm_loop_v2\\round2\\frozen\\blind_questions.jsonl",
+      "sha256": "0d5a0b5a0878a1ce88a2e660a3e23f323141a3040cf69fa99340ff2e77439017",
+      "records": 100
+    }
+  },
+  "categories": {
+    "dev": {
+      "comparison_timeline": 2,
+      "entity_date": 7,
+      "fact": 5,
+      "synthesis": 6
+    },
+    "blind": {
+      "comparison_timeline": 25,
+      "entity_date": 20,
+      "fact": 25,
+      "synthesis": 20,
+      "unanswerable": 10
+    },
+    "reserve": {
+      "comparison_timeline": 8,
+      "entity_date": 7,
+      "fact": 8,
+      "synthesis": 7
+    }
+  },
+  "source_overlap": 0
+}

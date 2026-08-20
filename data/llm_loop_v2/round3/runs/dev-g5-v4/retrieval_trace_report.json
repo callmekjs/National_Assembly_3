@@ -1,0 +1,69 @@
+{
+  "status": "PASS",
+  "answerable_records": 18,
+  "recall": {
+    "keyword_at_30": 1.0,
+    "vector_at_30": 0.777778,
+    "rrf_at_10": 0.888889,
+    "final_context_at_5": 1.0
+  },
+  "by_category": {
+    "comparison_timeline": {
+      "records": 5,
+      "keyword_at_30": 1.0,
+      "vector_at_30": 1.0,
+      "rrf_at_10": 1.0,
+      "final_context_at_5": 1.0
+    },
+    "entity_date": {
+      "records": 4,
+      "keyword_at_30": 1.0,
+      "vector_at_30": 0.75,
+      "rrf_at_10": 1.0,
+      "final_context_at_5": 1.0
+    },
+    "fact": {
+      "records": 5,
+      "keyword_at_30": 1.0,
+      "vector_at_30": 0.6,
+      "rrf_at_10": 0.8,
+      "final_context_at_5": 1.0
+    },
+    "synthesis": {
+      "records": 4,
+      "keyword_at_30": 1.0,
+      "vector_at_30": 0.75,
+      "rrf_at_10": 0.75,
+      "final_context_at_5": 1.0
+    }
+  },
+  "miss_ids": {
+    "keyword_at_30": [],
+    "vector_at_30": [
+      "dev-008",
+      "dev-012",
+      "dev-014",
+      "dev-018"
+    ],
+    "rrf_at_10": [
+      "dev-012",
+      "dev-014"
+    ],
+    "final_context_at_5": []
+  },
+  "missing_trace_ids": [],
+  "filter_mismatch_ids": [],
+  "checks": {
+    "trace_complete": true,
+    "filters_exact": true,
+    "rrf_recall_at_10": true,
+    "final_context_recall_at_5": true,
+    "category_rrf_recall_at_10": true
+  },
+  "thresholds": {
+    "rrf_at_10": 0.85,
+    "final_context_at_5": 0.85,
+    "category_rrf_at_10": 0.75,
+    "filter_errors": 0
+  }
+}

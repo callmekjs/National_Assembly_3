@@ -1,0 +1,65 @@
+{
+  "queue": "C:\\National_Assembly_3\\data\\llm_loop_v2\\round3\\authoring_queue_v3.jsonl",
+  "queue_sha256": "3e49044365ba7c31a9106cd9e4a97982677dd81679bf0476ccc5c334e4a3798f",
+  "records": 35,
+  "ids": [
+    "blind-001",
+    "blind-005",
+    "blind-006",
+    "blind-008",
+    "blind-010",
+    "blind-017",
+    "blind-021",
+    "blind-022",
+    "blind-023",
+    "blind-024",
+    "blind-025",
+    "blind-028",
+    "blind-030",
+    "blind-031",
+    "blind-035",
+    "blind-036",
+    "blind-037",
+    "blind-040",
+    "blind-042",
+    "blind-044",
+    "blind-050",
+    "blind-052",
+    "blind-058",
+    "blind-061",
+    "blind-074",
+    "blind-076",
+    "blind-083",
+    "blind-090",
+    "reserve-004",
+    "reserve-007",
+    "reserve-010",
+    "reserve-011",
+    "reserve-016",
+    "reserve-021",
+    "reserve-022"
+  ],
+  "validation_source": {
+    "path": "C:\\National_Assembly_3\\data\\llm_loop_v2\\round3\\authoring_validation.json",
+    "sha256": "ca8a1157b7295d912c293f230fff660846f2b698920f049fcf9e22d13ee4c601"
+  },
+  "model": "gpt-5.6-sol",
+  "effort": "low",
+  "max_completion_tokens": 1800,
+  "prior_ledgers": [
+    {
+      "path": "C:\\National_Assembly_3\\data\\llm_loop_v2\\round3\\authoring_results.jsonl.calls.jsonl",
+      "sha256": "919307da698490254225492a67b5be2ba3727c999942a61e449ab8725ce235bb"
+    },
+    {
+      "path": "C:\\National_Assembly_3\\data\\llm_loop_v2\\round3\\authoring_results_overflow.jsonl.calls.jsonl",
+      "sha256": "15213e619e82852ba944884f89f489f254ffad3464a1ead72d6b62889d100c28"
+    },
+    {
+      "path": "C:\\National_Assembly_3\\data\\llm_loop_v2\\round3\\dev_authoring_results.jsonl.calls.jsonl",
+      "sha256": "57fd1748c752335195981f031fe18a577ab376581c6fbf90e985a7b472b0f521"
+    }
+  ],
+  "system_sha256": "2aab85be452840f2371a7305d0bfd4805857967172a65851d2af5beefd9b1b72",
+  "schema_sha256": "4844c8db1c0641bc92054faf849fe5edc0d0054b74b460f5dcec79e46c064eef"
+}

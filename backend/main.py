@@ -19,7 +19,8 @@ from pydantic import BaseModel, Field, StringConstraints, field_validator
 import auth
 from actors import actor_profile, search_members
 from issues import issue_party_stances, issue_stances, issue_timeline, list_issues
-from answer import MODE_CONFIG, NO_EVIDENCE, generate_answer, reranker_only_usage
+from answer import (MODE_CONFIG, NO_EVIDENCE, _assemble_turn_with_ids,
+                    generate_answer, reranker_only_usage)
 from db import init_pool, close_pool, get_conn
 from grounding import judge, pre_gate
 from guard import RateLimiter, client_ip, daily_cost_exceeded
@@ -161,6 +162,7 @@ class QueryRequest(BaseModel):
     committee: str | None = None
     date_from: datetime.date | None = None
     date_to: datetime.date | None = None
+    include_trace: bool = False
 
 
 class AnswerRequest(BaseModel):
@@ -212,16 +214,19 @@ def health():
             """)
             approx = dict(cur.fetchall())
             chunks, embeddings = approx.get("chunks", -1), approx.get("embeddings_openai", -1)
+            counts_approximate = True
             if chunks < 0 or embeddings < 0:      # 통계 없음 — 한 번은 정확히 센다
                 cur.execute("SELECT count(*) FROM chunks")
                 chunks = cur.fetchone()[0]
                 cur.execute("SELECT count(*) FROM embeddings_openai")
                 embeddings = cur.fetchone()[0]
+                counts_approximate = False
         return {
             "status": "ok",
             "db": "ok",
             "chunks": chunks,
             "embeddings": embeddings,
+            "counts_approximate": counts_approximate,
             "log_failures": _log_failures,  # query_logs 저장 실패 누적 (0 이 정상)
             # 검증 규칙 실행 실패 누적 (0 이 정상) — 0 이 아니면 검증층이 썩고 있다는
             # 뜻이다. 예전에는 규칙이 죽어도 아무 신호가 없어 통과와 구별되지 않았다
@@ -313,6 +318,19 @@ def query(req: QueryRequest, authorization: str | None = Header(default=None)):
             grounding = "PARTIAL"
 
     latency_ms = int((time.time() - t0) * 1000)
+    if req.include_trace:
+        trace = getattr(hits, "trace", None)
+        if isinstance(trace, dict):
+            support_by_hit = {
+                source.get("chunk_id"): source.get("support_chunk_ids")
+                for source in result.get("sources", [])
+                if source.get("chunk_id") and source.get("support_chunk_ids")
+            }
+            for candidate in trace.get("final_results", []):
+                support = support_by_hit.get(candidate.get("chunk_id"))
+                if support:
+                    candidate["support_chunk_ids"] = support
+        result["retrieval_trace"] = trace
     # 근거 블록은 로그에만 저장 — API 응답에 그대로 내보내면 응답이 수십 KB 로 불어난다
     source_block = result.pop("source_block", None)
     user = _bearer_user(authorization)  # 무효 토큰이어도 None — 질의는 익명으로 계속 (spec)
@@ -527,7 +545,7 @@ def get_issue_party_stances(issue_id: str):
 
 @app.get("/citations/{chunk_id}")
 def get_citation(chunk_id: str):
-    """출처 원문 조회 — 발언 전문 + 앞뒤 맥락 + 원본 PDF 페이지. (신뢰 설계의 핵심)"""
+    """출처 조회 — 답변 모델이 본 동일 turn 문맥 + 앞뒤 맥락 + 원본 PDF 페이지."""
     with get_conn() as conn, conn.cursor(cursor_factory=RealDictCursor) as cur:
         cur.execute(
             """
@@ -546,8 +564,23 @@ def get_citation(chunk_id: str):
             (chunk_id,),
         )
         row = cur.fetchone()
+        if row is not None:
+            cur.execute(
+                """
+                SELECT chunk_id, chunk_index, text
+                FROM chunks
+                WHERE turn_id = %s
+                ORDER BY chunk_index
+                """,
+                (row["turn_id"],),
+            )
+            fragments = cur.fetchall()
     if row is None:
         raise HTTPException(status_code=404, detail=f"chunk_id not found: {chunk_id}")
+    # 답변 생성기가 같은 hit chunk를 중심으로 조립한 정확한 창을 사용자에게도 보여준다.
+    # 이전에는 모델은 turn 전문을 보고 UI·의미채점은 hit chunk 하나만 봐 인용이 서로 달랐다.
+    row["hit_text"] = row["text"]
+    row["text"], row["support_chunk_ids"] = _assemble_turn_with_ids(fragments, chunk_id)
     return row
 
 

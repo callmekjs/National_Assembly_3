@@ -15,7 +15,7 @@ main.py 가 flags 비어있지 않으면 FULL→PARTIAL 강등 (invalid_citation
 
 import logging
 import re
-from datetime import date
+from datetime import date, timedelta
 
 from party import RULING_PERIODS, speaker_group
 from query_parser import classify_question
@@ -79,6 +79,14 @@ def comparison_coverage(sources: list[dict]) -> dict:
     identity_count = len(parties) + (1 if gov_present else 0)
     covered = len(sides) >= 2 and identity_count >= 2
     return {"core_parties": parties, "sides": sides, "covered": covered}
+
+
+_PARTY_COMPARE_QUESTION = re.compile(r"여야|여당|야당|정당|진영|정부측|정부\s*(?:와|대|vs)\s*야당", re.I)
+
+
+def party_comparison_question(question: str) -> bool:
+    """지표·시점 비교를 정당 진영 비교로 오인하지 않도록 질문 축을 구분한다."""
+    return bool(_PARTY_COMPARE_QUESTION.search(question))
 
 
 # ── 화자·진영 이중 사용 (spec §2-2, eval_068) ────────────────────────────────
@@ -223,6 +231,143 @@ def _cited_in(sent: str, by_n: dict[int, dict]) -> list[dict]:
     return [by_n[n] for n in (int(m) for m in _CITE_RE.findall(sent)) if n in by_n]
 
 
+# ── 숫자 주장-근거 일치 (신규 루프 v2, dev-012) ────────────────────────────
+
+# 금액 복합 표기(1억 5000만 원), 단위 수치(56개월), 백분율, 소수 지표를 보존한다.
+# 인용 번호 [4] 자체는 검사 전에 제거한다.
+_NUMBER_CLAIM = re.compile(
+    r"(?<!\d)\d+(?:[.,]\d+)?(?:\s*(?:조|억|만|천|백)\s*\d*(?:[.,]\d+)?)*"
+    r"(?:\s*(?:조|억|만|천|백))?\s*여?\s*"
+    r"(?:원|명|건|개|대|%|퍼센트|배|개월|년|월|일|주|시간|회|차례|곳|꼭지)"
+    r"|(?<!\d)\d+\.\d+(?!\d)"
+    r"|(?<!\d)\d{5,}(?!\d)"
+)
+
+
+def _compact_number(value: str) -> str:
+    return re.sub(r"[\s,]", "", value)
+
+
+_COUNT_UNITS = {"명", "건", "개", "대", "회", "차례", "곳"}
+_SCALES = {"조": 10**12, "억": 10**8, "만": 10**4, "천": 10**3, "백": 10**2}
+
+
+def _scaled_count(value: str) -> tuple[int, str] | None:
+    """`1만 3500건`처럼 명시된 정수 계수만 산술 검증용으로 읽는다."""
+    compact = _compact_number(value).replace("여", "")
+    unit = next((candidate for candidate in sorted(_COUNT_UNITS, key=len, reverse=True)
+                 if compact.endswith(candidate)), None)
+    if not unit:
+        return None
+    body = compact[:-len(unit)]
+    parts = list(re.finditer(r"(\d+)(조|억|만|천|백)?", body))
+    if not parts or "".join(match.group(0) for match in parts) != body:
+        return None
+    total = sum(int(match.group(1)) * _SCALES.get(match.group(2), 1) for match in parts)
+    return total, "회" if unit == "차례" else unit
+
+
+def _difference_supported(value: str, evidence: str) -> bool:
+    """같은 계수사의 근거 숫자 두 개에서 직접 계산되는 차이만 허용한다."""
+    target = _scaled_count(value)
+    if not target:
+        return False
+    target_value, target_unit = target
+    evidence_values = [
+        parsed[0]
+        for match in _NUMBER_CLAIM.finditer(evidence)
+        if (parsed := _scaled_count(match.group(0))) and parsed[1] == target_unit
+    ]
+    return any(
+        abs(left - right) == target_value
+        for index, left in enumerate(evidence_values)
+        for right in evidence_values[index + 1:]
+    )
+
+
+def _number_supported(value: str, evidence: str) -> bool:
+    compact = _compact_number(value)
+    evidence_compact = _compact_number(evidence)
+    alternatives = {compact}
+    native_numbers = {
+        "1": "한", "2": "두", "3": "세", "4": "네", "5": "다섯",
+        "6": "여섯", "7": "일곱", "8": "여덟", "9": "아홉", "10": "열",
+    }
+    native_match = re.fullmatch(r"(10|[1-9])(명|건|개|대|회|차례|곳)", compact)
+    if native_match:
+        native = native_numbers[native_match.group(1)]
+        unit = native_match.group(2)
+        alternatives.add(native + unit)
+        if unit in {"회", "차례"}:
+            alternatives.add(native + "번")
+    # 회의록은 '7억'과 '7억 원'을 섞어 쓴다. 통화 단위 원의 띄어쓰기·생략만 허용한다.
+    if compact.endswith("원"):
+        alternatives.add(compact[:-1])
+    # 회의 발언은 앞에서 `5조 8530억 원`이라고 단위를 밝힌 뒤 종점은
+    # `6조 4800`처럼 억 단위를 생략한다. 답변의 `6조 4800억 원`은 같은 값이다.
+    if "조" in compact:
+        for suffix in ("억원", "억"):
+            if compact.endswith(suffix):
+                alternatives.add(compact[:-len(suffix)])
+    year_match = re.fullmatch(r"((?:19|20)\d{2})년(?:도)?", compact)
+    if year_match:
+        year = year_match.group(1)
+        alternatives.add(year[2:] + "년")  # 2024년 ↔ 24년도
+        alternatives.add(year[2:] + "년도")
+        # 회의 연도와 '금년'이 함께 있으면 그 해를 뜻하는 것으로 인정한다.
+        if f"{year}-" in evidence_compact and "금년" in evidence_compact:
+            return True
+        if f"{year}-" in evidence_compact:
+            return True
+    month_match = re.fullmatch(r"(\d{1,2})월", compact)
+    if month_match and f"-{int(month_match.group(1)):02d}-" in evidence_compact:
+        return True
+    day_match = re.fullmatch(r"(\d{1,2})일", compact)
+    if day_match and f"-{int(day_match.group(1)):02d}" in evidence_compact:
+        return True
+    return any(candidate and candidate in evidence_compact for candidate in alternatives)
+
+
+def unsupported_numeric_claims(answer: str, cited_sources: list[dict]) -> list[str]:
+    """답변 숫자가 그 문장에 직접 인용된 전문 또는 근거 메타데이터에 있는지 검사한다.
+
+    문장에 직접 인용이 없으면 전체 인용 근거를 사용해 오탐을 줄인다. 이 규칙은
+    숫자가 맞는지 계산하지 않고, 근거에 아예 없는 숫자를 새로 만든 경우만 막는다.
+    """
+    by_n = {source["n"]: source for source in cited_sources}
+    all_evidence = " ".join(
+        str(source.get(field) or "")
+        for source in cited_sources
+        for field in ("text", "speaker", "role", "committee", "date")
+    )
+    found: list[str] = []
+    for sentence, _ in _paragraph_sentences(answer):
+        if _REFUSAL_SENT.search(sentence):
+            continue
+        direct = _cited_in(sentence, by_n)
+        evidence = " ".join(
+            str(source.get(field) or "")
+            for source in direct
+            for field in ("text", "speaker", "role", "committee", "date")
+        ) if direct else all_evidence
+        clean_sentence = _CITE_RE.sub("", sentence)
+        for match in _NUMBER_CLAIM.finditer(clean_sentence):
+            value = match.group(0).strip()
+            speaker_count = re.fullmatch(r"(\d+)명", _compact_number(value))
+            if speaker_count:
+                actual_speakers = {source.get("speaker") for source in direct or cited_sources if source.get("speaker")}
+                if int(speaker_count.group(1)) == len(actual_speakers):
+                    continue
+            if (re.search(r"증가|늘(?:었|어|어난)|감소|줄(?:었|어|어든)", clean_sentence)
+                    and _difference_supported(value, evidence)):
+                continue
+            if not _number_supported(value, evidence):
+                detail = f"근거에 없는 숫자 '{value}': {clean_sentence[:80]}"
+                if detail not in found:
+                    found.append(detail)
+    return found
+
+
 # ── 화자/역할 귀속 (spec §4-2, eval_013·019) ─────────────────────────────────
 
 # 정부 기관 주어 — 문장이 이 기관의 방안·입장 서술 흐름인지 판단.
@@ -262,8 +407,9 @@ _NAME_PARTY = re.compile(rf"(?<![가-힣])([가-힣]{{2,4}})\s*(?:위원장|위�
 # 사이에 부처명이 낀 문형은 여전히 '조현'이 잡혀야 한다(환각 화자 검사 재현율 보존) —
 # 접두가 부/처/청/실/원/위원회로 끝나면 직함 앞에서 소비하고 이름 그룹은 건드리지 않는다.
 _NAMED_SPEAKER = re.compile(
-    r"(?<![가-힣])([가-힣]{2,4})\s+(?:[가-힣]{2,8}(?:부|처|청|실|원|위원회)\s*)?"
+    r"(?<![가-힣])([가-힣]{2,4})\s+(?:[가-힣]{2,8}(?:부|처|청|실|원|위원회|위원장)\s*)?"
     r"(?:위원장|위원(?!회)|의원|장관|차관|청장|처장|총리|후보자|대변인|소위원장|부위원장)"
+    r"(?=$|[\s,.)\[\]]|은|는|이|가|을|를|에게|께서|의|도|과|와|으로|로)"
 )
 _NOT_NAMES = frozenset([
     "해당", "관련", "소속", "여당", "야당", "양당", "양측", "모든", "다른", "일부",
@@ -271,12 +417,128 @@ _NOT_NAMES = frozenset([
     # 대명사(2026-07-26 F1 확장, replay 실측 eval_004·046): "그는 외교부 장관에게"
     # 처럼 대명사+공백+기관+직함 구조가 _NAMED_SPEAKER 의 [이름]+공백+[기관접두]+
     # [직함] 패턴에 우연히 들어맞아 대명사 자체가 유령 이름으로 캡처됐다.
-    "그는", "그가", "그녀는", "그녀가",
+    "그는", "그가", "그녀는", "그녀가", "통해", "위해",
+    # 상대 시점+기관직함 문형(`전날 국방부차관`)에서 전날을 실명으로 오인하지 않는다.
+    "전날", "다음날", "어제", "오늘", "지난해", "올해",
 ])
 # 활용형 접두 — 이 접두로 시작하는 캡처는 이름이 아니다(2026-07-26 F1 확장,
 # replay 실측 eval_066): "관련하여"(4자)는 _NOT_NAMES 의 "관련"(2자)과 정확히
 # 일치하지 않아 exact-match 필터를 통과했다 — "관련" 활용형은 실명이 될 수 없다.
 _NOT_NAME_PREFIXES = ("관련",)
+
+# 이름처럼 보이지만 실제로는 관형사형·직함+조사인 토큰. 정규식만으로는
+# "업무를 했던 위원", "정부에 일임하면 위원", "제2차관은 위원 취지를"에서
+# 했던/일임하면/차관은을 사람 이름으로 오인할 수 있다. 실제 근거에 같은 이름이
+# 있으면 먼저 통과시키고, 근거에 없는 후보에만 이 정밀 필터를 적용한다.
+_INFLECTED_NON_NAME_ENDINGS = (
+    "했던", "았던", "었던", "였던", "맡았던", "일했던",
+    "있는", "없는", "하는", "일임하면", "된다면", "라면",
+    "면서", "느냐며", "도록", "인지", "따라", "말고",
+)
+_ROLE_WITH_PARTICLE = re.compile(
+    r"(?:위원장|위원|의원|장관|차관|청장|처장|총리|후보자|소위원장|부위원장)"
+    r"(?:은|는|이|가|을|를|의)$"
+)
+
+
+def _looks_like_inflected_non_name(value: str) -> bool:
+    return value.endswith(_INFLECTED_NON_NAME_ENDINGS) or bool(_ROLE_WITH_PARTICLE.fullmatch(value))
+
+
+# 미지원 인물 검사는 오탐이 답변 전체를 거절시키므로 precision을 우선한다. 근거에 실제
+# 화자로 존재하는 이름은 성씨 목록과 무관하게 인정하고, 근거에 없는 새 이름 후보만
+# 한국 성씨 구조를 요구한다. 연결어·서술어를 끝없이 blacklist 하는 방식보다 일반적이다.
+_KOREAN_SURNAMES = frozenset(
+    "김이박최정강조윤장임한오서신권황안송전홍유고문양손배백허남심노하곽성차주우구"
+    "민진지엄채원천방공현함변염여추도소석선설마길연위표명기반왕금옥육인맹제모탁국"
+    "어은편용류나라봉복빈사갈"
+)
+_COMPOUND_SURNAMES = ("남궁", "황보", "제갈", "선우", "독고", "서문", "사공", "동방")
+
+
+def _plausible_korean_person_name(value: str) -> bool:
+    if not 2 <= len(value) <= 4 or _looks_like_inflected_non_name(value):
+        return False
+    return value.startswith(_COMPOUND_SURNAMES) or value[0] in _KOREAN_SURNAMES
+
+# 직함과 함께 명시된 실명만 대상으로 한다. 일반 명사·기관명을 인물로 추측하지 않는다.
+_EXPLICIT_NAMED_ROLE = re.compile(
+    r"(?<![가-힣])([가-힣]{2,4})\s+(?=[가-힣0-9]{0,24}"
+    r"(?:위원장|위원(?!회)|의원|장관|차관|후보자|청장|처장|총리|소위원장|부위원장))"
+)
+
+
+def unsupported_named_entities(answer: str, cited_sources: list[dict]) -> list[str]:
+    """'김병환 금융위원장후보자'처럼 인용에 없는 명시 실명 추가를 차단한다."""
+    by_n = {source["n"]: source for source in cited_sources}
+    found: list[str] = []
+    for sentence, _ in _paragraph_sentences(answer):
+        if _REFUSAL_SENT.search(sentence):
+            continue
+        direct = _cited_in(sentence, by_n) or cited_sources
+        evidence_text = " ".join(
+            str(source.get(field) or "")
+            for source in direct
+            for field in ("text", "speaker", "role")
+        )
+        # 직함에 실제로 인접한 이름만 검사한다. 예전의 넓은 lookahead는
+        # "10여 개국의 의원들"의 '개국의', "보고한 전문위원"의 '보고한'을
+        # 사람 이름으로 오인해 올바른 답변을 차단했다.
+        for match in _NAMED_SPEAKER.finditer(sentence):
+            name = match.group(1)
+            if name in _NOT_NAMES or any(name.startswith(prefix) for prefix in _NOT_NAME_PREFIXES):
+                continue
+            if name in evidence_text:
+                continue
+            if _looks_like_inflected_non_name(name):
+                continue
+            if not _plausible_korean_person_name(name):
+                continue
+            detail = f"근거에 없는 인물 '{name}': {sentence[:80]}"
+            if detail not in found:
+                found.append(detail)
+    return found
+
+
+# 긴 고유 기관명 중 오탐 위험이 낮은 법인·공공기관 접미만 검사한다. `공단` 같은
+# 일반 지칭 자체는 허용하지만, 근거의 `공단`을 `국가철도공단`으로 임의 확장하는 것은
+# 다른 기관일 가능성이 있으므로 차단한다. 질문에 사용자가 직접 명시한 기관명은 반복을
+# 허용한다.
+_EXPLICIT_ORGANIZATION = re.compile(
+    r"(?<![가-힣])([가-힣A-Za-z0-9·]{2,30}"
+    r"(?:공단|공사|은행|재단|협회|연구원|진흥원|개발원|대학교|대학|센터))"
+    r"(?=$|[\s,.)\[\]]|은|는|이|가|을|를|의|에서|에|에게|께|으로|로|와|과|도)"
+)
+
+
+def unsupported_organization_entities(
+    answer: str,
+    cited_sources: list[dict],
+    question: str = "",
+) -> list[str]:
+    """인용·질문 어디에도 없는 구체 기관명 확장을 높은 정밀도로 차단한다."""
+    by_n = {source["n"]: source for source in cited_sources}
+    found: list[str] = []
+    for sentence, _ in _paragraph_sentences(answer):
+        if _REFUSAL_SENT.search(sentence):
+            continue
+        direct = _cited_in(sentence, by_n) or cited_sources
+        evidence_text = " ".join(
+            str(source.get(field) or "")
+            for source in direct
+            for field in ("text", "speaker", "role", "committee")
+        )
+        for match in _EXPLICIT_ORGANIZATION.finditer(sentence):
+            # "A사무국·B국·개성공단"처럼 여러 기관을 가운뎃점으로 압축하면
+            # 정규식이 전체 열거를 하나의 공단명으로 잡을 수 있다. 실제 접미 기관만
+            # 마지막 열거 항목이므로 그 부분을 검증한다.
+            name = match.group(1).rsplit("·", 1)[-1]
+            if name in question or name in evidence_text:
+                continue
+            detail = f"근거에 없는 기관 '{name}': {sentence[:80]}"
+            if detail not in found:
+                found.append(detail)
+    return found
 # 직함 단독어 — _NAME_PARTY 는 "실명 직함(정당)" 구조를 기대하지만 직함이 "소위원장"
 # 처럼 _NAME_PARTY 의 optional 직함군(위원장|위원|의원)에 없는 복합어면, 앞의 진짜
 # 실명은 공백에 막혀 버려지고 직함 단어 자체가 "이름"으로 잘못 캡처된다
@@ -345,10 +607,10 @@ def _is_ghost_candidate(name: str) -> bool:
     통째로 캡처된다 — _GOV_SUBJECT·_PARTY_NAMES 자체와 대조해 후보에서 제외.
     """
     return (bool(_GOV_SUBJECT.search(name)) or bool(_PARTY_NAME_ONLY.match(name))
-            or name.startswith(_NOT_NAME_PREFIXES))
+            or name.startswith(_NOT_NAME_PREFIXES) or _looks_like_inflected_non_name(name))
 
 
-def _sentence_names(sent: str) -> list[str]:
+def _sentence_names(sent: str, known_speakers: set[str] | None = None) -> list[str]:
     """문장 속 명시 화자명 — '이름+직함' 또는 '이름(정당명)' 표기 모두 인식.
 
     2026-07-25 오탐 수정(eval_019): "이재정(더불어민주당)은 …" 처럼 직함 없이
@@ -358,9 +620,11 @@ def _sentence_names(sent: str) -> list[str]:
     2026-07-26 최종 리뷰 F1: 캡처 후보가 기관명·정당명 자체(_is_ghost_candidate)
     이면 실명이 아니므로 양쪽 경로 모두에서 제외한다.
     """
+    known_speakers = known_speakers or set()
     names = [
         m for m in _NAMED_SPEAKER.findall(sent)
         if m not in _NOT_NAMES and not _is_ghost_candidate(m)
+        and (m in known_speakers or _plausible_korean_person_name(m))
     ]
     names += [
         m.group(1) for m in _NAME_PARTY.finditer(sent)
@@ -405,7 +669,7 @@ def speaker_role_consistency(answer: str, cited_sources: list[dict]) -> list[str
             prev_para = pi
         if _REFUSAL_SENT.search(sent):
             continue
-        names = _sentence_names(sent)
+        names = _sentence_names(sent, all_speaker_keys)
 
         if not names and para_has_named_speaker and _PRONOUN_SUBJECT.match(sent):
             # 대명사 주어 승계 — 직전 명시 화자에 귀속, gov 분기 스킵 (inherited_gov 불변)
@@ -552,6 +816,107 @@ def rule_failure_count() -> int:
     return _rule_failures
 
 
+# 질문이 명시한 상대 시점을 답변이 빠뜨리는 완전성 오류를 잡는다. 의미가 분명한
+# 네 범주만 다뤄 "당시", "이후" 같은 문맥 의존 표현의 오탐은 피한다.
+_QUESTION_TIME_QUALIFIERS = {
+    "previous_day": (re.compile(r"전날|어제"), ("전날", "어제")),
+    "next_day": (re.compile(r"다음\s*날|익일"), ("다음 날", "다음날", "익일")),
+    "previous_year": (re.compile(r"지난해|작년"), ("지난해", "작년")),
+    "current_year": (re.compile(r"올해|금년"), ("올해", "금년")),
+}
+
+
+def requested_time_qualifiers(question: str) -> list[str]:
+    """질문에 직접 적힌, 안전하게 동치 판정할 수 있는 상대 시점 범주."""
+    return [name for name, (pattern, _) in _QUESTION_TIME_QUALIFIERS.items()
+            if pattern.search(question)]
+
+
+def missing_question_time_qualifiers(
+    question: str,
+    answer: str,
+    cited: list[dict],
+) -> list[str]:
+    """질문의 상대 시점이 답변에 같은 표현 또는 계산 가능한 날짜로 보존됐는지 확인."""
+    missing: list[str] = []
+    for name in requested_time_qualifiers(question):
+        _, aliases = _QUESTION_TIME_QUALIFIERS[name]
+        if any(alias in answer for alias in aliases):
+            continue
+
+        accepted_dates: set[str] = set()
+        accepted_years: set[str] = set()
+        for source in cited:
+            raw = str(source.get("date") or "")[:10]
+            try:
+                meeting_date = date.fromisoformat(raw)
+            except ValueError:
+                continue
+            if name == "previous_day":
+                target = meeting_date - timedelta(days=1)
+                accepted_dates.update((target.isoformat(), f"{target.month}월 {target.day}일"))
+            elif name == "next_day":
+                target = meeting_date + timedelta(days=1)
+                accepted_dates.update((target.isoformat(), f"{target.month}월 {target.day}일"))
+            elif name == "previous_year":
+                accepted_years.update((str(meeting_date.year - 1), str(meeting_date.year - 1)[2:]))
+            elif name == "current_year":
+                accepted_years.update((str(meeting_date.year), str(meeting_date.year)[2:]))
+
+        if accepted_dates and any(value in answer for value in accepted_dates):
+            continue
+        if accepted_years and any(re.search(rf"(?<!\d){re.escape(value)}\s*년", answer)
+                                  for value in accepted_years):
+            continue
+        missing.append(name)
+    return missing
+
+
+# 단순 요약처럼 보이지만 정책 판단을 새로 만들어내는 강한 평가 명사만 검사한다.
+# "필요성"처럼 용언의 자연스러운 명사화는 오탐 위험이 커 제외한다.
+_EVALUATIVE_TERMS = re.compile(r"사업성|경제성|타당성|실효성|효과성|정당성|적법성|위법성")
+
+
+def unsupported_evaluative_terms(
+    answer: str,
+    cited: list[dict],
+    question: str = "",
+) -> list[str]:
+    """질문이나 인용 본문에 없는 평가 결론을 답변이 새로 붙였는지 확인."""
+    allowed = question + "\n" + "\n".join(str(source.get("text") or "") for source in cited)
+    return [f"근거에 없는 평가 표현 '{term}'"
+            for term in dict.fromkeys(_EVALUATIVE_TERMS.findall(answer))
+            if term not in allowed]
+
+
+_CLOCK_RELATION = re.compile(r"(?P<clock>\d{1,2}\s*시(?:\s*\d{1,2}\s*분)?)\s*(?P<relation>까지|부터|에)")
+
+
+def time_relation_mismatches(
+    answer: str,
+    cited: list[dict],
+    question: str = "",
+) -> list[str]:
+    """동일 시각을 시작 시점(`에`)과 마감(`까지`) 등으로 뒤바꾸는 오류를 잡는다."""
+    allowed_text = re.sub(r"\s+", "", question + "\n" + "\n".join(
+        str(source.get("text") or "") for source in cited
+    ))
+    allowed: dict[str, set[str]] = {}
+    for match in _CLOCK_RELATION.finditer(allowed_text):
+        allowed.setdefault(match.group("clock"), set()).add(match.group("relation"))
+
+    found: list[str] = []
+    compact_answer = re.sub(r"\s+", "", answer)
+    for match in _CLOCK_RELATION.finditer(compact_answer):
+        clock, relation = match.group("clock"), match.group("relation")
+        relations = allowed.get(clock)
+        if relations and relation not in relations:
+            found.append(
+                f"시각 관계 불일치 '{clock}{relation}' (근거: {', '.join(sorted(relations))})"
+            )
+    return list(dict.fromkeys(found))
+
+
 def note_rule_failure() -> None:
     """규칙 실패 1건 기록 — verify() 자체가 죽는 경로(answer.py 최후 방어)에서도 센다."""
     global _rule_failures
@@ -596,7 +961,7 @@ def verify(
                 flags.append(INCOMPLETE_FLAG)
             return None
 
-    if "compare" in types:
+    if "compare" in types and party_comparison_question(question):
         cov = run("comparison_coverage", lambda: comparison_coverage(cited))
         if cov is not None:
             detail["comparison_coverage"] = cov
@@ -614,6 +979,12 @@ def verify(
         ("party_label_mismatch", lambda: party_label_consistency(answer, cited)),
         ("keyword_missing", lambda: keyword_containment(answer, cited, question)),
         ("ruling_period_mismatch", lambda: ruling_period_consistency(answer, cited)),
+        ("unsupported_number", lambda: unsupported_numeric_claims(answer, cited)),
+        ("unsupported_named_entity", lambda: unsupported_named_entities(answer, cited)),
+        ("unsupported_organization_entity", lambda: unsupported_organization_entities(answer, cited, question)),
+        ("unsupported_evaluative_term", lambda: unsupported_evaluative_terms(answer, cited, question)),
+        ("time_relation_mismatch", lambda: time_relation_mismatches(answer, cited, question)),
+        ("question_time_qualifier_missing", lambda: missing_question_time_qualifiers(question, answer, cited)),
     ):
         found = run(flag_name, fn)
         if found:

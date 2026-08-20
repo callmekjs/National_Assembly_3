@@ -1,0 +1,96 @@
+{
+  "status": "READY_FOR_AUTHORING",
+  "stage": "READY_FOR_AUTHORING",
+  "checks": {
+    "dev_exact_20": true,
+    "queue_exact_120": true,
+    "queue_exact_ids": true,
+    "queue_unique_candidates": true,
+    "queue_unique_sources": true,
+    "queue_distribution": true,
+    "negative_exact_10": true,
+    "negative_speakers_absent": true,
+    "negative_meetings_exist": true,
+    "negative_speakers_exist_elsewhere": true,
+    "budget_reserve_gte_11_00": true,
+    "dev_answerable_exact_18": true,
+    "dev_distribution": true,
+    "dev_nine_committees_two_each": true,
+    "blind_all_nine_committees": true,
+    "reserve_all_nine_committees": true,
+    "split_source_overlap_zero": true,
+    "dev_source_records_exact_20": true,
+    "blind_source_records_exact_100": true,
+    "reserve_source_records_exact_30": true
+  },
+  "queue_distribution": {
+    "blind": {
+      "comparison_timeline": 25,
+      "entity_date": 20,
+      "synthesis": 20,
+      "fact": 25
+    },
+    "reserve": {
+      "comparison_timeline": 8,
+      "entity_date": 7,
+      "synthesis": 7,
+      "fact": 8
+    }
+  },
+  "records": {
+    "dev": 20,
+    "queue": 120,
+    "negative": 10
+  },
+  "remaining_budget_usd": 11.0,
+  "required_budget_usd": 11.0,
+  "budget_stage": "authoring",
+  "source_ready": true,
+  "budget_ready": true,
+  "source_counts": {
+    "dev": 20,
+    "blind": 100,
+    "reserve": 30
+  },
+  "dev_categories": {
+    "comparison_timeline": 5,
+    "entity_date": 4,
+    "synthesis": 4,
+    "fact": 5
+  },
+  "committee_counts": {
+    "dev": {
+      "국토위": 2,
+      "복지위": 2,
+      "과방위": 2,
+      "행안위": 2,
+      "산자중기위": 2,
+      "정무위": 2,
+      "국방위": 2,
+      "외통위": 2,
+      "기재위": 2
+    },
+    "blind": {
+      "정무위": 11,
+      "국토위": 11,
+      "복지위": 13,
+      "행안위": 11,
+      "국방위": 10,
+      "과방위": 11,
+      "산자중기위": 10,
+      "외통위": 9,
+      "기재위": 4
+    },
+    "reserve": {
+      "외통위": 4,
+      "기재위": 1,
+      "복지위": 3,
+      "정무위": 4,
+      "국토위": 4,
+      "행안위": 4,
+      "과방위": 3,
+      "산자중기위": 4,
+      "국방위": 3
+    }
+  }
+}

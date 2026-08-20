@@ -1,0 +1,41 @@
+{
+  "raw_records": 20,
+  "raw_semantic_verdicts": {
+    "PASS": 15,
+    "FAIL": 5
+  },
+  "excluded_rubric_invalid": [
+    "dev-002",
+    "dev-011",
+    "dev-019",
+    "dev-020"
+  ],
+  "included_records": 16,
+  "final_verdicts": {
+    "PASS": 14,
+    "FAIL": 2
+  },
+  "confirmed_failure_ids": [
+    "dev-012",
+    "dev-016"
+  ],
+  "unsupported_failure_ids": [
+    "dev-012",
+    "dev-016"
+  ],
+  "full_but_failed_ids": [
+    "dev-012"
+  ],
+  "semantic_judge_usage": {
+    "input_tokens": 23553,
+    "output_tokens": 7999
+  },
+  "gate": {
+    "minimum_pass_rate": 0.9,
+    "maximum_unsupported_failures": 0,
+    "actual_pass_rate": 0.875,
+    "actual_unsupported_failures": 2,
+    "passed": false
+  },
+  "note": "REVIEW는 PASS로 세지 않으며 질문보다 넓은 잘못된 루브릭은 시스템 점수에서 제외한다."
+}

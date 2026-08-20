@@ -1,0 +1,23 @@
+{
+  "queue": "C:\\National_Assembly_3\\data\\llm_loop_v2\\round3\\authoring_queue_v3.jsonl",
+  "queue_sha256": "3e49044365ba7c31a9106cd9e4a97982677dd81679bf0476ccc5c334e4a3798f",
+  "records": 1,
+  "ids": [
+    "reserve-030"
+  ],
+  "model": "gpt-5.6-sol",
+  "effort": "low",
+  "max_completion_tokens": 1800,
+  "prior_ledgers": [
+    {
+      "path": "C:\\National_Assembly_3\\data\\llm_loop_v2\\round3\\authoring_results.jsonl.calls.jsonl",
+      "sha256": "919307da698490254225492a67b5be2ba3727c999942a61e449ab8725ce235bb"
+    },
+    {
+      "path": "C:\\National_Assembly_3\\data\\llm_loop_v2\\authoring_results_round2.jsonl.calls.jsonl",
+      "sha256": "c420d0ce1bd23915c6c8056f7ff7ddda302fd626d76882744c89cb152adcf349"
+    }
+  ],
+  "system_sha256": "49b044c514e3dc6557be6e67d3405f73aa23f8586a537e9e2c47f04fcc411c26",
+  "schema_sha256": "4844c8db1c0641bc92054faf849fe5edc0d0054b74b460f5dcec79e46c064eef"
+}

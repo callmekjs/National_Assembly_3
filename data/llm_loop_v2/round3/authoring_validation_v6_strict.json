@@ -1,0 +1,21 @@
+{
+  "status": "FAIL",
+  "queue_records": 120,
+  "result_records": 120,
+  "validated_records": 119,
+  "categories": {
+    "comparison_timeline": 33,
+    "entity_date": 27,
+    "fact": 33,
+    "synthesis": 26
+  },
+  "missing_ids": [],
+  "hard_errors": [
+    {
+      "id": "blind-063",
+      "error": "claim contamination: required_claims[4]_combining_mark_contamination"
+    }
+  ],
+  "review_flags": [],
+  "semantic_review_required": true
+}

@@ -1,0 +1,23 @@
+{
+  "queue": "C:\\National_Assembly_3\\data\\llm_loop_v2\\round3\\authoring_queue_v3.jsonl",
+  "queue_sha256": "3e49044365ba7c31a9106cd9e4a97982677dd81679bf0476ccc5c334e4a3798f",
+  "records": 1,
+  "ids": [
+    "blind-031"
+  ],
+  "validation_source": {
+    "path": "C:\\National_Assembly_3\\data\\llm_loop_v2\\round3\\authoring_validation_v3.json",
+    "sha256": "6119dfc8f24c161c69d1835a8d4adec87e5582fb7a816358be7389ada1b3bb95"
+  },
+  "model": "gpt-5.6-sol",
+  "effort": "high",
+  "max_completion_tokens": 2400,
+  "prior_ledgers": [
+    {
+      "path": "C:\\National_Assembly_3\\data\\llm_loop_v2\\round3\\authoring_repairs_v2.jsonl.calls.jsonl",
+      "sha256": "e75371d649949899c3843eae8355ba1ae33f64d7f88491f090eb4253a075085a"
+    }
+  ],
+  "system_sha256": "c5bb72e7653e594a36f26a46c7f786da63ab0cdd0a093ffe1d30a37f93ad423f",
+  "schema_sha256": "75b30655ad039a33db189341f50dc8b4a04718d1569bfb311d171aabeb8d157d"
+}

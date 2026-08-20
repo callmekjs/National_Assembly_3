@@ -1,0 +1,126 @@
+{
+  "status": "FAIL",
+  "queue_records": 120,
+  "result_records": 120,
+  "validated_records": 102,
+  "categories": {
+    "comparison_timeline": 22,
+    "entity_date": 25,
+    "fact": 31,
+    "synthesis": 24
+  },
+  "missing_ids": [],
+  "hard_errors": [
+    {
+      "id": "blind-001",
+      "error": "unsupported exact_values: [{\"type\": \"date\", \"value\": \"2022년도\"}, {\"type\": \"number\", \"value\": \"1조 7000억 원\"}]"
+    },
+    {
+      "id": "blind-002",
+      "error": "unsupported exact_values: [{\"type\": \"number\", \"value\": \"약 8000가구\"}]"
+    },
+    {
+      "id": "blind-004",
+      "error": "unsupported exact_values: [{\"type\": \"number\", \"value\": \"56 impact punctuation? Actually JSON broken if Korean char? Continue. Need valid exact. I see value \"}]"
+    },
+    {
+      "id": "blind-009",
+      "error": "unsupported exact_values: [{\"type\": \"person\", \"value\": \"조승환 출처가 불분명합니다. 질문이 요구하는 날짜·위원회·발언자·두 안건의 대표발의자와 의안번호를 원문과 메타데이터에 근거해 답하면, 2026년 4월 30일 재정경제기획위원회에서의\"}]"
+    },
+    {
+      "id": "blind-011",
+      "error": "unsupported exact_values: [{\"type\": \"number\", \"value\": \"2023년도 65.9%\"}]"
+    },
+    {
+      "id": "blind-012",
+      "error": "unsupported exact_values: [{\"type\": \"person\", \"value\": \"윤희근 청장},{\"}]"
+    },
+    {
+      "id": "blind-014",
+      "error": "unsupported exact_values: [{\"type\": \"date\", \"value\": \"2026년 예산안(26년예산안)\"}]"
+    },
+    {
+      "id": "blind-016",
+      "error": "unsupported exact_values: [{\"type\": \"date\", \"value\": \"8월 18일\"}]"
+    },
+    {
+      "id": "blind-018",
+      "error": "unsupported exact_values: [{\"type\": \"number\", \"value\": \"1380억 원\"}, {\"type\": \"number\", \"value\": \"1600억 원\"}, {\"type\": \"number\", \"value\": \"1000억 원\"}]"
+    },
+    {
+      "id": "blind-021",
+      "error": "unsupported exact_values: [{\"type\": \"number\", \"value\": \"정보공개법 제9조 제1항 제5호\"}]"
+    },
+    {
+      "id": "blind-028",
+      "error": "unsupported exact_values: [{\"type\": \"date\", \"value\": \"2023년 5월\"}]"
+    },
+    {
+      "id": "blind-054",
+      "error": "unsupported exact_values: [{\"type\": \"organization\", \"value\": \"기획재정부\"}]"
+    },
+    {
+      "id": "blind-060",
+      "error": "unsupported exact_values: [{\"type\": \"number\", \"value\": \"최소한 열 번 이상\"}]"
+    },
+    {
+      "id": "blind-062",
+      "error": "unsupported exact_values: [{\"type\": \"organization\", \"value\": \"보건복지부\"}]"
+    },
+    {
+      "id": "blind-074",
+      "error": "unsupported exact_values: [{\"type\": \"number\", \"value\": \"제24조\"}, {\"type\": \"number\", \"value\": \"제45조\"}]"
+    },
+    {
+      "id": "blind-082",
+      "error": "unsupported exact_values: [{\"type\": \"number\", \"value\": \"1일 1000만 원\"}]"
+    },
+    {
+      "id": "reserve-005",
+      "error": "unsupported exact_values: [{\"type\": \"date\", \"value\": \"2022년 6월 6일\"}]"
+    },
+    {
+      "id": "reserve-012",
+      "error": "unsupported exact_values: [{\"type\": \"date\", \"value\": \"2023-12-31\"}]"
+    }
+  ],
+  "review_flags": [
+    {
+      "id": "blind-015",
+      "flags": [
+        "answer_numbers_need_review:2133억 원"
+      ]
+    },
+    {
+      "id": "blind-026",
+      "flags": [
+        "question_missing_speaker"
+      ]
+    },
+    {
+      "id": "blind-045",
+      "flags": [
+        "question_missing_speaker"
+      ]
+    },
+    {
+      "id": "blind-056",
+      "flags": [
+        "answer_numbers_need_review:12억 원"
+      ]
+    },
+    {
+      "id": "blind-067",
+      "flags": [
+        "answer_numbers_need_review:194억 원"
+      ]
+    },
+    {
+      "id": "reserve-009",
+      "flags": [
+        "question_missing_speaker"
+      ]
+    }
+  ],
+  "semantic_review_required": true
+}

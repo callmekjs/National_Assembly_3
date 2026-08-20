@@ -1,0 +1,139 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://national-assembly.local/llm-loop-v2.schema.json",
+  "title": "National Assembly LLM Loop v2 gold record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "split",
+    "category",
+    "question",
+    "mode",
+    "answerable",
+    "filters",
+    "gold",
+    "provenance"
+  ],
+  "properties": {
+    "schema_version": {"const": "2.0"},
+    "id": {"type": "string", "pattern": "^(dev|blind|reserve)-[0-9]{3}$"},
+    "split": {"enum": ["dev", "blind", "reserve"]},
+    "category": {
+      "enum": ["fact", "entity_date", "synthesis", "comparison_timeline", "unanswerable"]
+    },
+    "question": {"type": "string", "minLength": 5, "maxLength": 1000},
+    "mode": {"enum": ["qa", "report"]},
+    "answerable": {"type": "boolean"},
+    "filters": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["committee", "date_from", "date_to"],
+      "properties": {
+        "committee": {"type": ["string", "null"]},
+        "date_from": {"type": ["string", "null"], "format": "date"},
+        "date_to": {"type": ["string", "null"], "format": "date"}
+      }
+    },
+    "gold": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "answer",
+        "required_claims",
+        "forbidden_claims",
+        "exact_values",
+        "evidence",
+        "refusal_reason"
+      ],
+      "properties": {
+        "answer": {"type": ["string", "null"]},
+        "required_claims": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 2},
+          "uniqueItems": true
+        },
+        "forbidden_claims": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 2},
+          "uniqueItems": true
+        },
+        "exact_values": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["type", "value"],
+            "properties": {
+              "type": {"enum": ["person", "date", "committee", "number", "organization"]},
+              "value": {"type": "string", "minLength": 1}
+            }
+          }
+        },
+        "required_exact_values": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["type", "value"],
+            "properties": {
+              "type": {"enum": ["person", "date", "committee", "number", "organization"]},
+              "value": {"type": "string", "minLength": 1}
+            }
+          }
+        },
+        "reference_values": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["type", "value"],
+            "properties": {
+              "type": {"enum": ["person", "date", "committee", "number", "organization"]},
+              "value": {"type": "string", "minLength": 1}
+            }
+          }
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "chunk_id",
+              "source_id",
+              "quote",
+              "speaker",
+              "role",
+              "committee",
+              "date",
+              "page_start"
+            ],
+            "properties": {
+              "chunk_id": {"type": "string", "minLength": 1},
+              "source_id": {"type": "string", "minLength": 1},
+              "quote": {"type": "string", "minLength": 10},
+              "speaker": {"type": ["string", "null"]},
+              "role": {"type": ["string", "null"]},
+              "committee": {"type": "string", "minLength": 1},
+              "date": {"type": "string", "format": "date"},
+              "page_start": {"type": ["integer", "null"], "minimum": 1}
+            }
+          }
+        },
+        "refusal_reason": {"type": ["string", "null"]}
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["selection_method", "created_at", "review_status"],
+      "properties": {
+        "selection_method": {"const": "source_first_v2"},
+        "created_at": {"type": "string", "format": "date-time"},
+        "review_status": {"enum": ["draft", "source_checked", "frozen"]}
+      }
+    }
+  }
+}

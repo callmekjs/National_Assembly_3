@@ -1,0 +1,27 @@
+{
+  "version": "1.0",
+  "reviewed_at": "2026-08-18T01:20:00+09:00",
+  "policy": "수정 전과 같은 기준으로 질문이 요구하지 않은 내용을 필수 정답으로 둔 문항은 시스템 점수에서 제외한다. 의미 채점 REVIEW는 통과로 세지 않는다.",
+  "items": [
+    {
+      "id": "dev-002",
+      "classification": "RUBRIC_INVALID",
+      "reason": "질문은 먼저 택할 해결 방식만 물었지만 루브릭은 국고 지원의 부작용 설명까지 필수로 요구했다."
+    },
+    {
+      "id": "dev-011",
+      "classification": "RUBRIC_INVALID",
+      "reason": "질문은 무엇이 빠졌는지만 물었지만 루브릭은 비공개 회담 관련 후속 질문까지 필수로 요구했다."
+    },
+    {
+      "id": "dev-019",
+      "classification": "RUBRIC_INVALID",
+      "reason": "질문은 두 평균 처리기간만 물었지만 루브릭은 해외 대비 6배라는 비교까지 필수로 요구했다."
+    },
+    {
+      "id": "dev-020",
+      "classification": "RUBRIC_INVALID",
+      "reason": "질문은 주 52시간제와 산업 경쟁력을 연결한 입장을 물었지만 루브릭은 투잡·쓰리잡이라는 개별 사례까지 필수로 요구했다."
+    }
+  ]
+}

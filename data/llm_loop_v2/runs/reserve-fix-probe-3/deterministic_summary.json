@@ -1,0 +1,19 @@
+{
+  "records": 5,
+  "verdicts": {
+    "SEMANTIC_REVIEW_REQUIRED": 5
+  },
+  "grounding": {
+    "FULL": 3,
+    "PARTIAL": 2
+  },
+  "full_but_auto_fail": [],
+  "semantic_review_required": [
+    "reserve-009",
+    "reserve-012",
+    "reserve-014",
+    "reserve-016",
+    "reserve-022"
+  ],
+  "note": "1차 규칙 통과는 정답 판정이 아니며 의미 검토 전에는 PASS로 승격하지 않는다."
+}

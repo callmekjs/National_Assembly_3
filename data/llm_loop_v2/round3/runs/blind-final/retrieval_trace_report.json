@@ -1,0 +1,73 @@
+{
+  "status": "PASS",
+  "answerable_records": 90,
+  "recall": {
+    "keyword_at_30": 1.0,
+    "vector_at_30": 0.922222,
+    "rrf_at_10": 0.966667,
+    "final_context_at_5": 1.0
+  },
+  "by_category": {
+    "comparison_timeline": {
+      "records": 25,
+      "keyword_at_30": 1.0,
+      "vector_at_30": 0.92,
+      "rrf_at_10": 0.96,
+      "final_context_at_5": 1.0
+    },
+    "entity_date": {
+      "records": 20,
+      "keyword_at_30": 1.0,
+      "vector_at_30": 0.9,
+      "rrf_at_10": 0.95,
+      "final_context_at_5": 1.0
+    },
+    "fact": {
+      "records": 25,
+      "keyword_at_30": 1.0,
+      "vector_at_30": 0.88,
+      "rrf_at_10": 0.96,
+      "final_context_at_5": 1.0
+    },
+    "synthesis": {
+      "records": 20,
+      "keyword_at_30": 1.0,
+      "vector_at_30": 1.0,
+      "rrf_at_10": 1.0,
+      "final_context_at_5": 1.0
+    }
+  },
+  "miss_ids": {
+    "keyword_at_30": [],
+    "vector_at_30": [
+      "blind-008",
+      "blind-023",
+      "blind-039",
+      "blind-040",
+      "blind-068",
+      "blind-079",
+      "blind-083"
+    ],
+    "rrf_at_10": [
+      "blind-008",
+      "blind-040",
+      "blind-068"
+    ],
+    "final_context_at_5": []
+  },
+  "missing_trace_ids": [],
+  "filter_mismatch_ids": [],
+  "checks": {
+    "trace_complete": true,
+    "filters_exact": true,
+    "rrf_recall_at_10": true,
+    "final_context_recall_at_5": true,
+    "category_rrf_recall_at_10": true
+  },
+  "thresholds": {
+    "rrf_at_10": 0.85,
+    "final_context_at_5": 0.85,
+    "category_rrf_at_10": 0.75,
+    "filter_errors": 0
+  }
+}

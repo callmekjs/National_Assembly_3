@@ -1,0 +1,86 @@
+{
+  "status": "FAIL",
+  "queue_records": 120,
+  "result_records": 120,
+  "validated_records": 106,
+  "categories": {
+    "comparison_timeline": 24,
+    "entity_date": 25,
+    "fact": 32,
+    "synthesis": 25
+  },
+  "missing_ids": [],
+  "hard_errors": [
+    {
+      "id": "blind-004",
+      "error": "unsupported exact_values: [{\"type\": \"number\", \"value\": \"현재 약 51%\"}, {\"type\": \"number\", \"value\": \"약 8%\"}]"
+    },
+    {
+      "id": "blind-007",
+      "error": "unsupported exact_values: [{\"type\": \"number\", \"value\": \"제25조제2항\"}]"
+    },
+    {
+      "id": "blind-008",
+      "error": "unsupported exact_values: [{\"type\": \"number\", \"value\": \"1200만 원\"}]"
+    },
+    {
+      "id": "blind-010",
+      "error": "unsupported exact_values: [{\"type\": \"organization\", \"value\": \"호주},{\"}]"
+    },
+    {
+      "id": "blind-013",
+      "error": "unsupported exact_values: [{\"type\": \"number\", \"value\": \"2023년도 약 2800억 원\"}, {\"type\": \"number\", \"value\": \"2023년도 1967억 원\"}, {\"type\": \"number\", \"value\": \"2024년도 2581억 원\"}]"
+    },
+    {
+      "id": "blind-015",
+      "error": "unsupported exact_values: [{\"type\": \"number\", \"value\": \"20년 초과\"}]"
+    },
+    {
+      "id": "blind-022",
+      "error": "unsupported exact_values: [{\"type\": \"number\", \"value\": \"안 제93조\"}]"
+    },
+    {
+      "id": "blind-039",
+      "error": "unsupported exact_values: [{\"type\": \"person\", \"value\": \"봉준호 ائتلاف to=source_first_gold.answer  ... wait invalid extra? We need ensure JSON only. Need redo.\"}]"
+    },
+    {
+      "id": "blind-043",
+      "error": "unsupported exact_values: [{\"type\": \"number\", \"value\": \"약 3억 원\"}]"
+    },
+    {
+      "id": "blind-051",
+      "error": "unsupported exact_values: [{\"type\": \"organization\", \"value\": \"전남 국립의대\"}]"
+    },
+    {
+      "id": "blind-057",
+      "error": "unsupported exact_values: [{\"type\": \"number\", \"value\": \"전날 저녁 6시\"}, {\"type\": \"organization\", \"value\": \"국민권익위원회\"}]"
+    },
+    {
+      "id": "blind-082",
+      "error": "unsupported exact_values: [{\"type\": \"date\", \"value\": \"2015년\"}, {\"type\": \"organization\", \"value\": \"보건복지부\"}]"
+    },
+    {
+      "id": "reserve-003",
+      "error": "unsupported exact_values: [{\"type\": \"number\", \"value\": \"2212348 안에 보이는데, 이건 오타가 아니라 주어진 자료 그대로 써야 합니다.\"}]"
+    },
+    {
+      "id": "reserve-006",
+      "error": "unsupported exact_values: [{\"type\": \"date\", \"value\": \"2011년 10월\"}, {\"type\": \"date\", \"value\": \"2011년 11월\"}]"
+    }
+  ],
+  "review_flags": [
+    {
+      "id": "blind-026",
+      "flags": [
+        "question_missing_date"
+      ]
+    },
+    {
+      "id": "blind-044",
+      "flags": [
+        "question_missing_date_committee"
+      ]
+    }
+  ],
+  "semantic_review_required": true
+}

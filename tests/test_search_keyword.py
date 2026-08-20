@@ -37,6 +37,11 @@ def test_terms_from_query():
     check("토큰화: 구문 후보 존재", len(phrases) >= 1, phrases)
     check("토큰화: 토큰 상한 8", len(tokens) <= 8, tokens)
 
+    phrases, _ = _terms_from_query(
+        "박희석 수석전문위원은 정부가 제출한 산업 디지털 전환 촉진법 일부개정안의 내용을 설명했는가"
+    )
+    check("토큰화: 법률명 다어절 앵커", any("디지털 전환 촉진법" in p for p in phrases), phrases)
+
 
 def main():
     test_like_escape()

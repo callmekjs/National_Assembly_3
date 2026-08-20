@@ -1,0 +1,39 @@
+{
+  "records": 100,
+  "profile": "portfolio",
+  "thresholds": {
+    "citation_min": 0.9,
+    "refusal_min": 0.9,
+    "max_auto_failures": 15
+  },
+  "gate": "SEMANTIC_REVIEW_REQUIRED",
+  "hard_veto": false,
+  "auto_failed": 9,
+  "auto_failed_ids": [
+    "blind-009",
+    "blind-022",
+    "blind-040",
+    "blind-047",
+    "blind-049",
+    "blind-069",
+    "blind-076",
+    "blind-077",
+    "blind-084"
+  ],
+  "answerable_records": 90,
+  "citation_passed": 85,
+  "citation_accuracy": 0.944444,
+  "unanswerable_records": 10,
+  "refusal_passed": 10,
+  "refusal_accuracy": 1.0,
+  "refusal_failed_ids": [],
+  "hard_checks": {
+    "citation_accuracy": true,
+    "unanswerable_refusal": true,
+    "stage1_auto_failures": true
+  },
+  "semantic_review": "REQUIRED",
+  "overall_accuracy": null,
+  "critical_hallucinations": null,
+  "note": "하드 기준 하나라도 실패하면 의미 채점 결과와 무관하게 최종 FAIL이다. 하드 기준을 통과한 경우에만 독립 의미 채점을 진행한다."
+}

@@ -1,0 +1,9 @@
+{
+  "queue": "C:\\National_Assembly_3\\data\\llm_loop_v2\\blind_authoring_queue.jsonl",
+  "queue_sha256": "865631dc63b320dbc4a2f0b34dded3f27ca810b94234f0e3bfaedf09507a9088",
+  "records": 120,
+  "model": "gpt-5.6-sol",
+  "effort": "high",
+  "system_sha256": "7ed802674e0372c4509c99eed2959d306addeb75ad7f368a3838955a9ab158d2",
+  "schema_sha256": "48474d8255f85ae75cc5d4c31600ae7c8438968e095e50b073dff8d3891371f8"
+}

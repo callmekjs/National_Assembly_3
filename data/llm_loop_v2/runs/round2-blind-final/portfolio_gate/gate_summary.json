@@ -1,0 +1,47 @@
+{
+  "profile": "portfolio",
+  "thresholds": {
+    "overall_accuracy_min": 0.85,
+    "citation_accuracy_min": 0.9,
+    "refusal_accuracy_min": 0.9,
+    "critical_hallucinations_max": 0
+  },
+  "records": 100,
+  "passed": 82,
+  "failed": 18,
+  "overall_accuracy": 0.82,
+  "answerable_records": 90,
+  "citation_passed": 83,
+  "citation_accuracy": 0.922222,
+  "unanswerable_records": 10,
+  "refusal_passed": 10,
+  "refusal_accuracy": 1.0,
+  "critical_hallucinations": 8,
+  "checks": {
+    "overall_accuracy": false,
+    "citation_accuracy": true,
+    "critical_hallucinations": false,
+    "unanswerable_refusal": true
+  },
+  "gate": "FAIL",
+  "failed_ids": [
+    "blind-009",
+    "blind-012",
+    "blind-021",
+    "blind-022",
+    "blind-024",
+    "blind-040",
+    "blind-042",
+    "blind-047",
+    "blind-048",
+    "blind-049",
+    "blind-051",
+    "blind-061",
+    "blind-065",
+    "blind-069",
+    "blind-076",
+    "blind-077",
+    "blind-079",
+    "blind-084"
+  ]
+}

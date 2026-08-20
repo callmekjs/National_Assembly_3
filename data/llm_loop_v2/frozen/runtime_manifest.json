@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "frozen_at": "2026-08-18T09:38:03.755089+09:00",
+  "git_head": "779a12ada1c8675f5bb16e79ca3a43dcd8240b43",
+  "safe_settings": {
+    "RERANKER_ENABLED": "1"
+  },
+  "runtime_sha256": {
+    "backend/actors.py": "9f3d18668b4d9fc9fb0855c2ece6fb901b7a81ef6133ee08e4581d13c1eae589",
+    "backend/aliases.py": "fb4ddb2e5ff77a496667249e2c6a3e3c5477db97856886b1f2c1e16855bac157",
+    "backend/answer.py": "1f78417cb709cbc391331327d57f57eb985b0a6c9c01c9bccce02204dab33f3f",
+    "backend/auth.py": "3ceda1e65c0705a17f1be8b9a877a47729fd1e5568160f111af1fb667825febd",
+    "backend/db.py": "6948ec7de0e165bd232485d4cd28d1df1455a8694111176747c455eeae011ddf",
+    "backend/grounding.py": "9647be18070e8e92a898475556f62df7e8adc461508515cf3ffe4eb0ff38c265",
+    "backend/guard.py": "38f8feba7f1605abbc392821f3290d6e17e98e6b8ba36af650b2a0205646c12a",
+    "backend/issue_context.py": "ca5cbb9846ea074a45809a5fb9dccbe90f934ff37158eb7c210e3990b80e4bdb",
+    "backend/issues.py": "5cccec6f19af59b964eded11bc9f909c87f409b9099b338c502abb92221bf0ec",
+    "backend/main.py": "7bda40d0909365bb57f2b35d1296f17e70116f3acd7a69b434be4d8c0ad45e22",
+    "backend/party.py": "45051b08df71e80a75b0cef8e96b8051a5a1995cb8ef4a900efddf56135cefff",
+    "backend/query_parser.py": "1bd5e81fa57475767911f02dca5fbacb359a9013312bad504ea2b7acf1098855",
+    "backend/requirements.txt": "d5b1f6268b652bb203a75f44457e9d9e7db34f4fba0398077c6dd36dc5d6a835",
+    "backend/reranker.py": "7e584e2c36d24bda6fc94c8ea8f052d00be9821eca47dfe0bf74b5713d30105c",
+    "backend/search_hybrid.py": "bd89f52b1ec1a2588d175c33abf89f65fde9b489408dd923d63405430bc0ae04",
+    "backend/search_keyword.py": "bee91a9a8f0e94cf2eb028100a4d4bdd0735640be9e7c45516034e6be2112c51",
+    "backend/search_vector.py": "374a9128e4710a42a574d164e3a673ce7dd86c0ee4a3685e0398caa4183fce2c",
+    "backend/utterance_summary.py": "58862362bb263ae40762f27149283c056e3d176ec7106b30ef4f4a8ed280f68a",
+    "backend/verification.py": "2b19c22e4cbf8492c488c5193eb3af79c34e917dc4b0e805ed013fc3395f2940"
+  },
+  "runtime_file_count": 19
+}

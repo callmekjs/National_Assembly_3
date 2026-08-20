@@ -1,0 +1,12 @@
+{
+  "run_id": "dev-after-gate-v3-probe",
+  "started_at": "2026-08-18T00:50:12.958413+09:00",
+  "git_head": "779a12ada1c8675f5bb16e79ca3a43dcd8240b43",
+  "dataset": "C:\\National_Assembly_3\\data\\llm_loop_v2\\dev.jsonl",
+  "dataset_sha256": "d33ea30ba6efd138ae16cfa6a94518a1e04fca720faa869bf9152dc9e089c969",
+  "base_url": "http://127.0.0.1:8000",
+  "requested_records": 2,
+  "safe_settings": {
+    "RERANKER_ENABLED": "1"
+  }
+}

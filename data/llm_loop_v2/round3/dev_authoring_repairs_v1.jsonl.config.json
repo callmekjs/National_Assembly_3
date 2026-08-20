@@ -1,0 +1,31 @@
+{
+  "queue": "C:\\National_Assembly_3\\data\\llm_loop_v2\\round3\\dev_authoring_queue_v2.jsonl",
+  "queue_sha256": "87a79d6555a35d1f8f9462466bf38a58b81c0d98964be80613191428351f7e27",
+  "records": 5,
+  "ids": [
+    "dev-001",
+    "dev-003",
+    "dev-011",
+    "dev-013",
+    "dev-016"
+  ],
+  "validation_source": {
+    "path": "C:\\National_Assembly_3\\data\\llm_loop_v2\\round3\\dev_authoring_validation.json",
+    "sha256": "df44ef087820b62e8cfdac7e7a6b19fa9a64598ec488b6a883ac9a40559ec0a0"
+  },
+  "model": "gpt-5.6-sol",
+  "effort": "low",
+  "max_completion_tokens": 1800,
+  "prior_ledgers": [
+    {
+      "path": "C:\\National_Assembly_3\\data\\llm_loop_v2\\round3\\authoring_repairs_v1.jsonl.calls.jsonl",
+      "sha256": "4fe08e6a4202732a3ed2c73d744103c9c37e5b05ca3610df32fc7d508614c422"
+    },
+    {
+      "path": "C:\\National_Assembly_3\\data\\llm_loop_v2\\round3\\dev_authoring_results.jsonl.calls.jsonl",
+      "sha256": "57fd1748c752335195981f031fe18a577ab376581c6fbf90e985a7b472b0f521"
+    }
+  ],
+  "system_sha256": "2aab85be452840f2371a7305d0bfd4805857967172a65851d2af5beefd9b1b72",
+  "schema_sha256": "4844c8db1c0641bc92054faf849fe5edc0d0054b74b460f5dcec79e46c064eef"
+}

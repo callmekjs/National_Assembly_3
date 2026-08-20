@@ -1,0 +1,44 @@
+{
+  "records": 30,
+  "verdicts": {
+    "SEMANTIC_REVIEW_REQUIRED": 28,
+    "AUTO_FAIL": 2
+  },
+  "grounding": {
+    "FULL": 23,
+    "PARTIAL": 5,
+    "REFUSED": 2
+  },
+  "full_but_auto_fail": [],
+  "semantic_review_required": [
+    "reserve-001",
+    "reserve-002",
+    "reserve-003",
+    "reserve-004",
+    "reserve-005",
+    "reserve-006",
+    "reserve-007",
+    "reserve-008",
+    "reserve-010",
+    "reserve-011",
+    "reserve-013",
+    "reserve-014",
+    "reserve-015",
+    "reserve-016",
+    "reserve-017",
+    "reserve-018",
+    "reserve-019",
+    "reserve-020",
+    "reserve-021",
+    "reserve-022",
+    "reserve-023",
+    "reserve-024",
+    "reserve-025",
+    "reserve-026",
+    "reserve-027",
+    "reserve-028",
+    "reserve-029",
+    "reserve-030"
+  ],
+  "note": "1차 규칙 통과는 정답 판정이 아니며 의미 검토 전에는 PASS로 승격하지 않는다."
+}

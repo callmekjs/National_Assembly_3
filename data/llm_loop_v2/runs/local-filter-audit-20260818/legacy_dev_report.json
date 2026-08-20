@@ -1,0 +1,232 @@
+{
+  "status": "FAIL",
+  "records": 20,
+  "matched": 6,
+  "mismatch_count": 14,
+  "mismatches": [
+    {
+      "id": "dev-003",
+      "question": "김윤덕 국토교통부장관후보자는 수도권 유휴 부지를 활용한 주택 공급을 진전시키기 위해 무엇이 필요하다고 보았는가?",
+      "expected": {
+        "committees": [
+          "국토위"
+        ],
+        "date_from": "2025-07-29",
+        "date_to": "2025-07-29"
+      },
+      "actual": {
+        "committees": null,
+        "date_from": null,
+        "date_to": null
+      }
+    },
+    {
+      "id": "dev-004",
+      "question": "조지호 경찰청장은 음주단속 현장에서 감지와 측정이 어떤 순서로 진행되며 감지 불응 시 무엇을 확인한다고 설명했는가?",
+      "expected": {
+        "committees": [
+          "행안위"
+        ],
+        "date_from": "2024-09-25",
+        "date_to": "2024-09-25"
+      },
+      "actual": {
+        "committees": null,
+        "date_from": null,
+        "date_to": null
+      }
+    },
+    {
+      "id": "dev-007",
+      "question": "허영 위원은 금융 샌드박스 지정 혁신기업의 인허가 문제를 해결하기 위해 어떤 제도 개선을 제안했는가?",
+      "expected": {
+        "committees": [
+          "정무위"
+        ],
+        "date_from": "2026-02-05",
+        "date_to": "2026-02-05"
+      },
+      "actual": {
+        "committees": null,
+        "date_from": null,
+        "date_to": null
+      }
+    },
+    {
+      "id": "dev-008",
+      "question": "안규백 국방부장관이 보고한 2024회계연도 국방부 전체 세출예산 현액, 집행액, 이월액, 불용액은 각각 얼마인가?",
+      "expected": {
+        "committees": [
+          "국방위"
+        ],
+        "date_from": "2025-08-25",
+        "date_to": "2025-08-25"
+      },
+      "actual": {
+        "committees": null,
+        "date_from": null,
+        "date_to": null
+      }
+    },
+    {
+      "id": "dev-009",
+      "question": "박대출 위원이 기록을 근거로 언급한 직접 입영 연기 신청은 몇 번이며 각각 어떤 사유였는가?",
+      "expected": {
+        "committees": [
+          "기재위"
+        ],
+        "date_from": "2026-03-23",
+        "date_to": "2026-03-23"
+      },
+      "actual": {
+        "committees": null,
+        "date_from": null,
+        "date_to": null
+      }
+    },
+    {
+      "id": "dev-010",
+      "question": "박민규 위원은 방송시장 경쟁상황 평가에서 어떤 시장 변화가 지적됐지만 정작 무엇이 평가 대상에서 빠졌다고 문제를 제기했는가?",
+      "expected": {
+        "committees": [
+          "과방위"
+        ],
+        "date_from": "2024-07-24",
+        "date_to": "2024-07-24"
+      },
+      "actual": {
+        "committees": null,
+        "date_from": null,
+        "date_to": null
+      }
+    },
+    {
+      "id": "dev-013",
+      "question": "임명현 전문위원은 출연형 R&D와 투자형 R&D의 자금 회수·재투자 방식을 어떻게 구분했고 어떤 불일치를 지적했는가?",
+      "expected": {
+        "committees": [
+          "기재위"
+        ],
+        "date_from": "2026-04-29",
+        "date_to": "2026-04-29"
+      },
+      "actual": {
+        "committees": null,
+        "date_from": null,
+        "date_to": null
+      }
+    },
+    {
+      "id": "dev-014",
+      "question": "류광준 본부장은 제도 개선을 서둘러야 하는 근거로 설문 찬성률과 예산 적용 시점을 어떻게 제시했는가?",
+      "expected": {
+        "committees": [
+          "과방위"
+        ],
+        "date_from": "2025-04-16",
+        "date_to": "2025-04-16"
+      },
+      "actual": {
+        "committees": null,
+        "date_from": null,
+        "date_to": null
+      }
+    },
+    {
+      "id": "dev-015",
+      "question": "곽상언 위원은 2025년 6월 소비자심리지수와 대선 이후 소상공인체감지수를 어떻게 비교하고 해석했는가?",
+      "expected": {
+        "committees": [
+          "산자중기위"
+        ],
+        "date_from": "2025-06-25",
+        "date_to": "2025-06-25"
+      },
+      "actual": {
+        "committees": null,
+        "date_from": "2025-06-01",
+        "date_to": "2025-06-30"
+      }
+    },
+    {
+      "id": "dev-016",
+      "question": "박상혁 위원은 인사청문경과보고서를 어떤 의견으로 채택해야 한다고 요청했고 그 이유로 어떤 정책 문제를 들었는가?",
+      "expected": {
+        "committees": [
+          "정무위"
+        ],
+        "date_from": "2024-07-30",
+        "date_to": "2024-07-30"
+      },
+      "actual": {
+        "committees": null,
+        "date_from": null,
+        "date_to": null
+      }
+    },
+    {
+      "id": "dev-017",
+      "question": "강희업 국토교통부제2차관은 여러 특례에 대한 부처 반대가 있었음에도 법의 제도적 기반을 먼저 마련하자고 한 이유를 무엇이라고 설명했는가?",
+      "expected": {
+        "committees": [
+          "국토위"
+        ],
+        "date_from": "2025-12-04",
+        "date_to": "2025-12-04"
+      },
+      "actual": {
+        "committees": null,
+        "date_from": null,
+        "date_to": null
+      }
+    },
+    {
+      "id": "dev-018",
+      "question": "박용수 인사혁신처차장이 설명한 직위해제자 결원 보충 제한기간 단축의 세 가지 조건은 무엇인가?",
+      "expected": {
+        "committees": [
+          "행안위"
+        ],
+        "date_from": "2024-09-24",
+        "date_to": "2024-09-24"
+      },
+      "actual": {
+        "committees": null,
+        "date_from": null,
+        "date_to": null
+      }
+    },
+    {
+      "id": "dev-019",
+      "question": "민병덕 위원은 공정거래 사건 처리 지연을 설명하며 카르텔 담합과 독과점 사건의 평균 처리기간을 각각 얼마라고 언급했는가?",
+      "expected": {
+        "committees": [
+          "정무위"
+        ],
+        "date_from": "2025-09-05",
+        "date_to": "2025-09-05"
+      },
+      "actual": {
+        "committees": null,
+        "date_from": null,
+        "date_to": null
+      }
+    },
+    {
+      "id": "dev-020",
+      "question": "서일준 위원은 반도체와 조선산업의 경쟁력 문제를 주 52시간제와 연결해 어떤 입장을 밝혔는가?",
+      "expected": {
+        "committees": [
+          "산자중기위"
+        ],
+        "date_from": "2025-12-04",
+        "date_to": "2025-12-04"
+      },
+      "actual": {
+        "committees": null,
+        "date_from": null,
+        "date_to": null
+      }
+    }
+  ]
+}

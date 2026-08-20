@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "expected_records": 20,
+  "dataset_records": 20,
+  "result_records": 20,
+  "unique_result_ids": 20,
+  "http_success": 20,
+  "missing_ids": [],
+  "extra_ids": [],
+  "request_mismatch_ids": [],
+  "http_failure_ids": [],
+  "malformed_response_ids": [],
+  "missing_trace_ids": [],
+  "errors": [],
+  "dataset_sha256": "fa0edfb940c28d42193d240eea284bb813cff563a9da06c91ea2c20675c13268",
+  "results_sha256": "319aa50b55eeef79ed2c0eaf2fafdd877d1b7537fde87870d6c6ea82553a99ae"
+}

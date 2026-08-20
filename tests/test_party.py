@@ -165,6 +165,7 @@ def test_speaker_group():
     assert speaker_group("위원장") == "assembly"          # 국회 위원장 — exact 매치가 우선
     assert speaker_group("소위원장") == "assembly"
     assert speaker_group("보건복지부장관") == "government"
+    assert speaker_group("과학기술정보통신부과학기술혁신본부장") == "government"
     assert speaker_group("금융위원장") == "government"     # 행정기관장 (위원장$ 패턴)
     assert speaker_group("증인") == "witness"
     assert speaker_group("참고인") == "witness"

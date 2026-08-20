@@ -1,0 +1,16 @@
+{
+  "status": "PASS",
+  "queue_records": 120,
+  "result_records": 120,
+  "validated_records": 120,
+  "categories": {
+    "comparison_timeline": 33,
+    "entity_date": 27,
+    "fact": 33,
+    "synthesis": 27
+  },
+  "missing_ids": [],
+  "hard_errors": [],
+  "review_flags": [],
+  "semantic_review_required": true
+}

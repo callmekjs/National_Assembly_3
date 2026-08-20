@@ -1,0 +1,25 @@
+{
+  "status": "FAIL",
+  "queue_records": 120,
+  "result_records": 120,
+  "validated_records": 118,
+  "categories": {
+    "comparison_timeline": 32,
+    "entity_date": 26,
+    "fact": 33,
+    "synthesis": 27
+  },
+  "missing_ids": [],
+  "hard_errors": [
+    {
+      "id": "blind-024",
+      "error": "unsupported exact_values: [{\"type\": \"number\", \"value\": \"2조 705억 2100만 원 totalling overall 2조 5131억 8100만 원 overall\"}]"
+    },
+    {
+      "id": "blind-031",
+      "error": "unsupported exact_values: [{\"type\": \"number\", \"value\": \"2202133},{\"}]"
+    }
+  ],
+  "review_flags": [],
+  "semantic_review_required": true
+}
